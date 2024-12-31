@@ -30,8 +30,3 @@
 *.exe
 *.out
 *.app
-
-# Workspace
-platformio.ini
-.pio
-.vscode

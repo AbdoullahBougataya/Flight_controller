@@ -14,7 +14,7 @@ For example, see a structure of the following two libraries `Foo` and `Bar`:
 |  |  |--src
 |  |     |- Bar.c
 |  |     |- Bar.h
-|  |  |- library.json (optional, custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
+|  |  |- library.json (optional, custom build options, etc)
 |  |
 |  |--Foo
 |  |  |- Foo.c
@@ -22,11 +22,11 @@ For example, see a structure of the following two libraries `Foo` and `Bar`:
 |  |
 |  |- README --> THIS FILE
 |
-|- platformio.ini
+|- Flight_controller.ino
 |--src
    |- main.c
 
-and a contents of `src/main.c`:
+and a contents of `./Flight_controller.ino`:
 ```
 #include <Foo.h>
 #include <Bar.h>

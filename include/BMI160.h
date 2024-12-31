@@ -137,7 +137,7 @@
  * @enum eBmi160AnySigMotionActiveInterruptState
  * @brief bmi160 active state of any & sig motion interrupt.
  */
-enum eBmi160AnySigMotionActiveInterruptState { 
+enum eBmi160AnySigMotionActiveInterruptState {
   eBmi160BothAnySigMotionDisabled = -1, /**< Both any & sig motion are disabled */
   eBmi160AnyMotionEnabled,              /**< Any-motion selected */
   eBmi160SigMotionEnabled               /**< Sig-motion selected */
@@ -198,7 +198,7 @@ struct bmi160SensorData {
 class BMI160{
 public:
   BMI160();
-  
+
   /**
    * @fn Init
    * @brief set the i2c addr and init the i2c.
@@ -208,7 +208,7 @@ public:
    * @return BMI160_OK(0) means success
    */
   int8_t Init(int8_t i2c_addr = BMI160_I2C_ADDR);
-  
+
   /**
    * @fn getSensorData
    * @brief select mode and save returned data to parameter data.
@@ -220,10 +220,10 @@ public:
    * @return BMI160_OK(0) means succse
    */
   int8_t getSensorData(uint8_t type,int16_t* data);
-  
+
   /**
    * @fn getAccelGyroData
-   * @brief get the accel and gyro data 
+   * @brief get the accel and gyro data
    * @param data pointer to store the accel and gyro data
    * @return BMI160_OK(0) means succse
    */
@@ -231,7 +231,7 @@ public:
 
   /**
    * @fn getAccelGyroData
-   * @brief get the accel and gyro data 
+   * @brief get the accel and gyro data
    * @param data pointer to store the accel and gyro data
    * @param timestamp pointer to store the timestamp for accel and gyro
    * @return BMI160_OK(0) means succse
@@ -247,13 +247,13 @@ public:
 
   private:
     int8_t Init(struct bmi160Dev *dev);
-    
+
     int8_t softReset(struct bmi160Dev *dev);
     void   defaultParamSettg(struct bmi160Dev *dev);
-    
+
     int8_t setSensConf();
     int8_t setSensConf(struct bmi160Dev *dev);
-    
+
     int8_t setAccelConf(struct bmi160Dev *dev);
     int8_t checkAccelConfig(uint8_t *data, struct bmi160Dev *dev);
     int8_t processAccelOdr(uint8_t *data, struct bmi160Dev *dev);
@@ -282,9 +282,9 @@ public:
     int8_t I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
     int8_t I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
 
-    
+
 
     struct bmi160Dev* Obmi160;
     struct bmi160SensorData* Oaccel;
-    struct bmi160SensorData* Ogyro; 
+    struct bmi160SensorData* Ogyro;
 };

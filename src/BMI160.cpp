@@ -8,7 +8,7 @@ BMI160::BMI160()
   Oaccel= (struct bmi160SensorData*)malloc(sizeof(struct bmi160SensorData));
   Ogyro = (struct bmi160SensorData*)malloc(sizeof(struct bmi160SensorData));
 }
-  
+
 int8_t BMI160::Init(int8_t i2c_addr)
 {
   Obmi160->id = i2c_addr;
@@ -21,7 +21,7 @@ int8_t BMI160::Init(struct bmi160Dev *dev)
   uint8_t chip_id=0;
   uint8_t data=0;
   if (dev==NULL){
-    return BMI160_E_NULL_PTR; 
+    return BMI160_E_NULL_PTR;
   }
   if (rslt == BMI160_OK){
     rslt = getRegs(BMI160_CHIP_ID_ADDR, &chip_id, 1, dev);
@@ -43,7 +43,7 @@ int8_t BMI160::softReset()
   int8_t rslt=BMI160_OK;
   if (Obmi160 == NULL){
     rslt = BMI160_E_NULL_PTR;
-  }  
+  }
   rslt = softReset(Obmi160);
   return rslt;
 }
@@ -59,7 +59,7 @@ int8_t BMI160::softReset(struct bmi160Dev *dev)
   delay(BMI160_SOFT_RESET_DELAY_MS);
   if (rslt == BMI160_OK){
     BMI160::defaultParamSettg(dev);
-  }  
+  }
   return rslt;
 }
 
@@ -84,7 +84,7 @@ void BMI160::defaultParamSettg(struct bmi160Dev *dev)
 
 int8_t BMI160::setSensConf()
 {
-  return BMI160::setSensConf(Obmi160); 
+  return BMI160::setSensConf(Obmi160);
 }
 
 int8_t BMI160::setSensConf(struct bmi160Dev *dev)
@@ -100,8 +100,8 @@ int8_t BMI160::setSensConf(struct bmi160Dev *dev)
   dev->gyroCfg.range = BMI160_GYRO_RANGE_2000_DPS;
   dev->gyroCfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
 
-  dev->gyroCfg.power = BMI160_GYRO_NORMAL_MODE; 
-  
+  dev->gyroCfg.power = BMI160_GYRO_NORMAL_MODE;
+
 
   rslt = BMI160::setAccelConf(dev);
   if (rslt == BMI160_OK) {
@@ -114,7 +114,7 @@ int8_t BMI160::setSensConf(struct bmi160Dev *dev)
     }
   }
 
-  return rslt; 
+  return rslt;
 }
 
 int8_t BMI160::setAccelConf(struct bmi160Dev *dev)
@@ -134,7 +134,7 @@ int8_t BMI160::setAccelConf(struct bmi160Dev *dev)
       }
     }
   }
-  return rslt;   
+  return rslt;
 }
 
 int8_t BMI160::checkAccelConfig(uint8_t *data, struct bmi160Dev *dev)
@@ -172,7 +172,7 @@ int8_t BMI160::processAccelOdr(uint8_t *data,  struct bmi160Dev *dev)
     rslt = BMI160_E_OUT_OF_RANGE;
   }
 
-  return rslt;  
+  return rslt;
 }
 
 int8_t BMI160::processAccelBw(uint8_t *data, struct bmi160Dev *dev)
@@ -192,7 +192,7 @@ int8_t BMI160::processAccelBw(uint8_t *data, struct bmi160Dev *dev)
     rslt = BMI160_E_OUT_OF_RANGE;
   }
 
-  return rslt; 
+  return rslt;
 }
 
 int8_t BMI160::processAccelRange(uint8_t *data, struct bmi160Dev *dev)
@@ -212,7 +212,7 @@ int8_t BMI160::processAccelRange(uint8_t *data, struct bmi160Dev *dev)
     rslt = BMI160_E_OUT_OF_RANGE;
   }
 
-  return rslt;  
+  return rslt;
 }
 
 int8_t BMI160::setGyroConf(struct bmi160Dev *dev)
@@ -221,22 +221,22 @@ int8_t BMI160::setGyroConf(struct bmi160Dev *dev)
   uint8_t data[2]={0};
 
   rslt = BMI160::checkGyroConfig(data, dev);
-  
+
   if (rslt == BMI160_OK) {
-    // Write output data rate and bandwidth 
+    // Write output data rate and bandwidth
     rslt = BMI160::setRegs(BMI160_GYRO_CONFIG_ADDR, &data[0], 1, dev);
     if (rslt == BMI160_OK) {
       dev->prevGyroCfg.odr = dev->gyroCfg.odr;
       dev->prevGyroCfg.bw = dev->gyroCfg.bw;
       delay(1);
-      // Write gyro range 
+      // Write gyro range
       rslt = BMI160::setRegs(BMI160_GYRO_RANGE_ADDR, &data[1], 1, dev);
       if (rslt == BMI160_OK)
         dev->prevGyroCfg.range = dev->gyroCfg.range;
     }
   }
-  
-  return rslt;  
+
+  return rslt;
 }
 
 int8_t BMI160::checkGyroConfig(uint8_t *data, struct bmi160Dev *dev)
@@ -329,7 +329,7 @@ int8_t BMI160::setAccelPwr(struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t data = 0;
-  
+
   if ((dev->accelCfg.power >= BMI160_ACCEL_SUSPEND_MODE) &&
     (dev->accelCfg.power <= BMI160_ACCEL_LOWPOWER_MODE)) {
     if (dev->accelCfg.power != dev->prevAccelCfg.power) {
@@ -348,7 +348,7 @@ int8_t BMI160::setAccelPwr(struct bmi160Dev *dev)
     rslt = BMI160_E_OUT_OF_RANGE;
   }
 
-  return rslt; 
+  return rslt;
 }
 
 int8_t BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev)
@@ -382,7 +382,7 @@ int8_t BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev)
     }
   }
 
-  return rslt; 
+  return rslt;
 }
 
 int8_t BMI160::setGyroPwr(struct bmi160Dev *dev)
@@ -410,7 +410,7 @@ int8_t BMI160::setGyroPwr(struct bmi160Dev *dev)
     rslt = BMI160_E_OUT_OF_RANGE;
   }
 
-  return rslt; 
+  return rslt;
 }
 
 int8_t BMI160::checkInvalidSettg( struct bmi160Dev *dev)
@@ -418,7 +418,7 @@ int8_t BMI160::checkInvalidSettg( struct bmi160Dev *dev)
   int8_t rslt;
   uint8_t data = 0;
 
-  // read the error reg 
+  // read the error reg
   rslt = BMI160::getRegs(BMI160_ERROR_REG_ADDR, &data, 1, dev);
 
   data = data >> 1;
@@ -446,7 +446,7 @@ int8_t BMI160::getSensorData(uint8_t type, int16_t* data)
     data[3]=Oaccel->x;
     data[4]=Oaccel->y;
     data[5]=Oaccel->z;
-  } 
+  }
   return rslt;
 }
 
@@ -462,7 +462,7 @@ int8_t BMI160::getAccelGyroData( int16_t* data)
     data[4]=Oaccel->y;
     data[5]=Oaccel->z;
   }
-  return rslt;  
+  return rslt;
 }
 
 int8_t BMI160::getAccelGyroData( int16_t* data, uint32_t* timestamp)
@@ -479,7 +479,7 @@ int8_t BMI160::getAccelGyroData( int16_t* data, uint32_t* timestamp)
     timestamp[0]=Oaccel->sensortime;
     timestamp[1]=Ogyro->sensortime;
   }
-  return rslt;  
+  return rslt;
 }
 
 int8_t BMI160::getSensorData(uint8_t select_sensor, struct bmi160SensorData *accel, struct bmi160SensorData *gyro,struct bmi160Dev *dev)
@@ -574,13 +574,13 @@ int8_t BMI160::getAccelGyroData(uint8_t len, struct bmi160SensorData *accel, str
   }
 
   return rslt;
-} 
+}
 
 int8_t BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
 {
-  
+
   int8_t rslt = BMI160_OK;
-  //Null-pointer check 
+  //Null-pointer check
   if (dev == NULL) {
     rslt = BMI160_E_NULL_PTR;
   } else {
@@ -588,11 +588,11 @@ int8_t BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi
     rslt = BMI160::I2cGetRegs(dev, reg_addr, data, len);
     delay(1);
     if (rslt != BMI160_OK){
-      rslt = BMI160_E_COM_FAIL;  
+      rslt = BMI160_E_COM_FAIL;
     }
   }
 
-  return rslt;  
+  return rslt;
 }
 
 int8_t BMI160::I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
@@ -644,7 +644,7 @@ int8_t BMI160::I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data
       Wire.beginTransmission(dev->id);
       Wire.write(reg_addr);
       Wire.write(data[i]);
-      
+
       Wire.endTransmission(true);
       delay(1);
     }
