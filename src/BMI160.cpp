@@ -4,7 +4,6 @@ BMI160::BMI160()
 {
   Wire.begin();
   Obmi160=(struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
-  //Obmi160->id = BMI160_I2C_ADDR;
   Oaccel= (struct bmi160SensorData*)malloc(sizeof(struct bmi160SensorData));
   Ogyro = (struct bmi160SensorData*)malloc(sizeof(struct bmi160SensorData));
 }
