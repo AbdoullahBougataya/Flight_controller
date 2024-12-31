@@ -33,3 +33,5 @@
 
 # Workspace
 platformio.ini
+.pio
+.vscode
