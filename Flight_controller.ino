@@ -41,8 +41,9 @@ void loop(){
     for(int i = 0; i < 6; i++)
     {
       filteredAccelGyro[i] = alpha * accelGyro[i] + (1 - alpha) * filteredAccelGyro[i]; // EMA Filter
+      Serial.print(filteredAccelGyro[i]);Serial.print("\t");
     }
-    
+    Serial.println();
   }else{
     Serial.println("err");
   }
