@@ -1,4 +1,4 @@
-#include "BMI160.h"
+#include "./include/BMI160.h"
 
 BMI160 bmi160;
 const int8_t addr = 0x68;
@@ -37,9 +37,9 @@ void loop(){
     raw_roll = (accelGyro[0] + 9) / 16.4;
     raw_pitch= (accelGyro[1] - 4) / 16.4;
     raw_yaw  = (accelGyro[2] - 7) / 16.4;
-    raw_acc_x= ((accelGyro[3] / 16384.0) - 0.03);
-    raw_acc_y= ((accelGyro[4] / 16384.0) + 0.03);
-    raw_acc_z= ((accelGyro[5] / 16384.0) - 0.03);
+    raw_acc_x= ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2;
+    raw_acc_y= ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2;
+    raw_acc_z= ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2;
     Serial.print("Roll:");
     Serial.print(raw_roll);
     Serial.print("\t");
