@@ -40,7 +40,7 @@ void loop(){
     rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03);
     for(int i = 0; i < 6; i++)
     {
-      filteredAccelGyro[i] = 12.5 * (alpha * rawAccelGyro[i] + (1 - alpha) * filteredAccelGyro[i]); // EMA Filter
+      filteredAccelGyro[i] = 100 * (alpha * rawAccelGyro[i] + (1 - alpha) * filteredAccelGyro[i]); // EMA Filter
       Serial.print(filteredAccelGyro[i]);Serial.print("\t");
     }
     Serial.println();
