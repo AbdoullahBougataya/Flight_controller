@@ -8,8 +8,8 @@ const int8_t addr = 0x68;
 
 float raw_acc_x, raw_acc_y, raw_acc_z;
 float raw_roll, raw_pitch, raw_yaw;
-float filtered_acc_x, filtered_acc_y, filtered_acc_z;
-float filtered_roll, filtered_pitch, filtered_yaw;
+float filtered_acc_x = 0, filtered_acc_y = 0, filtered_acc_z = 0;
+float filtered_roll = 0, filtered_pitch = 0, filtered_yaw = 0;
 
 void setup(){
   Serial.begin(115200);
