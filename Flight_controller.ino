@@ -6,11 +6,6 @@ const int8_t addr = 0x68;
 #define G_MPS2 9.81000000000000000000f // g
 #define CUTOFF_FREQUENCY 1 //Cutoff frequency
 
-float raw_acc_x, raw_acc_y, raw_acc_z;
-float raw_roll, raw_pitch, raw_yaw;
-float filtered_acc_x = 0, filtered_acc_y = 0, filtered_acc_z = 0;
-float filtered_roll = 0, filtered_pitch = 0, filtered_yaw = 0;
-
 void setup(){
   Serial.begin(115200);
   delay(100);
@@ -36,18 +31,12 @@ void loop(){
   //parameter accelGyro is the pointer to store the data
   rslt = bmi160.getAccelGyroData(accelGyro);
   if(rslt == 0){
-    raw_roll = (accelGyro[0] + 9) / 16.4;
-    raw_pitch= (accelGyro[1] - 4) / 16.4;
-    raw_yaw  = (accelGyro[2] - 7) / 16.4;
-    raw_acc_x= ((accelGyro[3] / 16384.0) - 0.03);
-    raw_acc_y= ((accelGyro[4] / 16384.0) + 0.03);
-    raw_acc_z= ((accelGyro[5] / 16384.0) - 0.03);
-    filtered_roll = (accelGyro[0] + 9) / 16.4;
-    filtered_pitch= (accelGyro[1] - 4) / 16.4;
-    filtered_yaw  = (accelGyro[2] - 7) / 16.4;
-    filtered_acc_x= ((accelGyro[3] / 16384.0) - 0.03);
-    filtered_acc_y= ((accelGyro[4] / 16384.0) + 0.03);
-    filtered_acc_z= ((accelGyro[5] / 16384.0) - 0.03);
+    accelGyro[0] = (accelGyro[0] + 9) / 16.4;
+    accelGyro[1] = (accelGyro[1] - 4) / 16.4;
+    accelGyro[2] = (accelGyro[2] - 7) / 16.4;
+    accelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03);
+    accelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03);
+    accelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03);
     // Serial.print("Roll:");
     // Serial.print(raw_roll);
     // Serial.print("\t");
