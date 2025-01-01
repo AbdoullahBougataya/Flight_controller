@@ -4,6 +4,7 @@ BMI160 bmi160;
 const int8_t addr = 0x68;
 
 #define G_MPS2 9.81000000000000000000f // g
+#define CUTOFF_FREQUENCY 1 //Cutoff frequency
 
 float raw_acc_x, raw_acc_y, raw_acc_z;
 float raw_roll, raw_pitch, raw_yaw;
