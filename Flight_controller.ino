@@ -29,7 +29,6 @@ void loop(){
   int i = 0;
   int rslt;
   int16_t accelGyro[6]={0};
-
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   rslt = bmi160.getAccelGyroData(accelGyro);
