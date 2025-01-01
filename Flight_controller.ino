@@ -4,7 +4,7 @@ BMI160 bmi160;
 const int8_t addr = 0x68;
 
 #define G_MPS2 9.81000000000000000000f // g
-#define CUTOFF_FREQUENCY 1 //Cutoff frequency
+int alpha = 0.5;
 
 void setup(){
   Serial.begin(115200);
