@@ -34,6 +34,15 @@ void loop(){
   //parameter accelGyro is the pointer to store the data
   rslt = bmi160.getAccelGyroData(accelGyro);
   if(rslt == 0){
+    for(i=0;i<6;i++){
+      if (i<3){
+        //the first three are gyro data
+        Serial.print(accelGyro[i]*3.14/180.0);Serial.print("\t");
+      }else{
+        //the following three data are accel data
+        Serial.print(accelGyro[i]/16384.0);Serial.print("\t");
+      }
+    }
     raw_roll = (accelGyro[0] + 9) / 16.4;
     raw_pitch= (accelGyro[1] - 4) / 16.4;
     raw_yaw  = (accelGyro[2] - 7) / 16.4;
