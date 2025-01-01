@@ -42,24 +42,7 @@ void loop(){
     {
       filteredAccelGyro[i] = alpha * accelGyro[i] + (1 - alpha) * filteredAccelGyro[i]; // EMA Filter
     }
-    // Serial.print("Roll:");
-    // Serial.print(raw_roll);
-    // Serial.print("\t");
-    // Serial.print("Pitch:");
-    // Serial.print(raw_pitch);
-    // Serial.print("\t");
-    // Serial.print("Yaw:");
-    // Serial.print(raw_yaw);
-    // Serial.print("\t");
-    // Serial.print("X-Acceleration:");
-    // Serial.print(raw_acc_x);
-    // Serial.print("\t");
-    // Serial.print("Y-Acceleration:");
-    // Serial.print(raw_acc_y);
-    // Serial.print("\t");
-    // Serial.print("Z-Acceleration:");
-    // Serial.print(raw_acc_z);
-    // Serial.println("\t");
+    
   }else{
     Serial.println("err");
   }
