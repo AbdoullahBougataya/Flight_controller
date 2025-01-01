@@ -1,5 +1,5 @@
 #include "./include/BMI160.h"
-// 
+
 BMI160 bmi160;
 const int8_t addr = 0x68;
 
@@ -44,7 +44,7 @@ void loop(){
       }
     }
     print(raw_roll, raw_pitch, raw_yaw, raw_acc_x, raw_acc_y, raw_acc_z);
-    
+
   }else{
     Serial.println("err");
   }
