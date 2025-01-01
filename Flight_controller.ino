@@ -24,7 +24,6 @@ void setup(){
 }
 
 void loop(){
-  int i = 0;
   int rslt;
   int16_t accelGyro[6]={0};
   int16_t filteredAccelGyro[6]={0};
