@@ -33,6 +33,8 @@ void loop(){
   float rawAccelGyro[6]={0};
   float phiHat_deg = 0.0f;
   float thetaHat_deg = 0.0f;
+  float phiHat_rad = 0.0f;
+  float thetaHat_rad = 0.0f;
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   rslt = bmi160.getAccelGyroData(accelGyro);
@@ -54,8 +56,8 @@ void loop(){
     }
     phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG;
     thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG;
-    float phi
-    float
+    float phiDot_rps = filteredAccelGyro[0] + tanf(phiHat_rad);
+    float thetaDot_rps = ;
     Serial.print(phiHat_deg);
     Serial.print("\t");
     Serial.print(thetaHat_deg);
