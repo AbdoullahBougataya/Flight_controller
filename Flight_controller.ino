@@ -52,11 +52,11 @@ void loop() {
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-    offset();
+    offset(accelGyro, rawAccelGyro);
 
-    EMAFilter();
+    EMAFilter(rawAccelGyro, filteredAccelGyro);
 
-    complimentaryFilter();
+    complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
     Serial.print("Roll-estimate:");
     Serial.print(phiHat_rad * RAD2DEG);
