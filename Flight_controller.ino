@@ -6,6 +6,7 @@ const int8_t addr = 0x68;
 
 #define G_MPS2 9.81000000000000000000f // g
 #define ALPHA 0.02000000000000000000f // Filter coefficient
+#define COMP_FLTR_ALPHA 0.50000000000000000000f // Complementary filter coefficient
 #define DPS2RPS 0.01745329251994329576f // degrees to radians per second
 #define RAD2DEG 57.2957795130823208767f // Radians to degrees
 
@@ -13,8 +14,8 @@ const int8_t addr = 0x68;
 float dt = 0.0;
 static unsigned long lastTime = 0;
 
-float phiHat_deg = 0.0f;
-float thetaHat_deg = 0.0f;
+float phiHat_acc_rad = 0.0f;
+float thetaHat_acc_rad = 0.0f;
 float phiHat_rad = 0.0f;
 float thetaHat_rad = 0.0f;
 
@@ -62,25 +63,19 @@ void loop(){
       Serial.print(filteredAccelGyro[i]);Serial.print("\t");
     }
     // Using gravity to estimate the euler angles
-    phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG; // Roll estimate
-    thetaHat_deg = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f)) * RAD2DEG; // Pitch estimate
+    phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]); // Roll estimate
+    thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f)); // Pitch estimate
+    // Using gyroscope to estimate the euler rates
+    float phiDot_rps = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]); // Roll rate (rad/s)
+    float thetaDot_rps =                                            cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2]; // Pitch rate (rad/s)
+    // Complementary filter implementation
+    phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps); // Roll estimate
+    thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps); // Pitch estimate
     Serial.print("Roll-estimate:");
-    Serial.print(phiHat_deg);
+    Serial.print(phiHat_rad * RAD2DEG);
     Serial.print("\t");
     Serial.print("Pitch-estimate:");
-    Serial.print(thetaHat_deg);
-    Serial.print("\t");
-    // Using gyroscope to estimate the euler rates
-    float phiDot_rad = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]); // Roll rate (rad/s)
-    float thetaDot_rad =                                            cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2]; // Pitch rate (rad/s)
-    // Euler integration of Roll and Pitch rates
-    phiHat_rad += dt * phiDot_rad; // Roll estimate
-    thetaHat_rad += dt * thetaDot_rad; // Pitch estimate
-    Serial.print("Roll-estimate-rad:");
-    Serial.print(phiHat_rad);
-    Serial.print("\t");
-    Serial.print("Pitch-estimate-rad:");
-    Serial.print(thetaHat_rad);
+    Serial.print(thetaHat_rad * RAD2DEG);
     Serial.print("\t");
     Serial.println();
   }else{
