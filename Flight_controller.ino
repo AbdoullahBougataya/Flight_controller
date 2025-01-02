@@ -15,6 +15,12 @@ float dt = 0.0;
 static unsigned long lastTime = 0;
 static unsigned long currentTime = 0;
 
+// Define sensor data arrays
+int16_t accelGyro[6] = { 0 };
+float filteredAccelGyro[6] = { 0 };
+float rawAccelGyro[6] = { 0 };
+
+// Declare sensor fusion variables
 float phiHat_acc_rad = 0.0f;
 float thetaHat_acc_rad = 0.0f;
 float phiHat_rad = 0.0f;
@@ -44,21 +50,18 @@ void loop() {
   dt = (currentTime - lastTime);
   lastTime = currentTime;
 
-  int16_t accelGyro[6] = { 0 };
-  float filteredAccelGyro[6] = { 0 };
-  float rawAccelGyro[6] = { 0 };
-  
+
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   int rslt = bmi160.getAccelGyroData(accelGyro);
-  
+
   if (rslt == 0) {
-    rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS;
-    rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS;
-    rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS;
-    rawAccelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2;
-    rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4;
-    rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2;
+    rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
+    rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
+    rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
+    rawAccelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
+    rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4; // Offset added
+    rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
     for (int i = 0; i < 6; i++) {
       if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
         rawAccelGyro[i] = 0;
@@ -67,15 +70,15 @@ void loop() {
       Serial.print(filteredAccelGyro[i]);
       Serial.print("\t");
     }
-    
+
     // Using gravity to estimate the euler angles
     phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
     thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
-    
+
     // Using gyroscope to estimate the euler rates
     float phiDot_rps = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]);  // Roll rate (rad/s)
     float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                              // Pitch rate (rad/s)
-    
+
     // Complementary filter implementation
     phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
     thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
