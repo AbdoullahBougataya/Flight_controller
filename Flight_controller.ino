@@ -27,6 +27,9 @@ void setup(){
 }
 static unsigned long lastTime = 0;
 void loop(){
+  unsigned long currentTime = millis();
+  float deltaTime = (currentTime - lastTime) / 1000.0; // Time in seconds
+  lastTime = currentTime;
   int rslt;
   int16_t accelGyro[6]={0};
   float filteredAccelGyro[6]={0};
@@ -35,9 +38,6 @@ void loop(){
   float thetaHat_deg = 0.0f;
   float phiHat_rad = 0.0f;
   float thetaHat_rad = 0.0f;
-  unsigned long currentTime = millis();
-  float deltaTime = (currentTime - lastTime) / 1000.0; // Time in seconds
-  lastTime = currentTime;
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   rslt = bmi160.getAccelGyroData(accelGyro);
