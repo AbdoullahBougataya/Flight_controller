@@ -56,7 +56,7 @@ void loop() {
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-    offset(rawAccelGyro);
+    offset(rawAccelGyro, accelGyro);
     for (int i = 0; i < 6; i++) {
       // Default to zero in low amplitude noise
       if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
@@ -94,7 +94,7 @@ void loop() {
   delay(50);
 }
 
-void offset(float rawAccelGyro) {
+void offset(float rawAccelGyro, int16_t accelGyro) {
   rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
   rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
   rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
