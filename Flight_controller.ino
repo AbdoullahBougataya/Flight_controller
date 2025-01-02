@@ -69,8 +69,8 @@ void loop(){
     // Using gyroscope to estimate the euler rates
     float phiDot_rad = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]); // Roll rate (rad/s)
     float thetaDot_rad =                                            cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2]; // Pitch rate (rad/s)
-    phiHat_rad += ; // Roll estimate
-    thetaHat_rad = ; // Pitch estimate
+    phiHat_rad += deltaTime * ; // Roll estimate
+    thetaHat_rad += deltaTime * ; // Pitch estimate
     Serial.println();
   }else{
     Serial.println("err");
