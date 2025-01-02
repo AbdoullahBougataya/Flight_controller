@@ -5,7 +5,7 @@ BMI160 bmi160;
 const int8_t addr = 0x68;
 
 #define G_MPS2 9.81000000000000000000f // g
-#define ALPHA 0.01000000000000000000f
+#define ALPHA 0.01000000000000000000f // Filter coefficient
 #define DPS2RPS 0.01745329251994329576f // degrees to radians per second
 #define RAD2DEG 57.2957795130823208767f // Radians to degrees
 
@@ -26,9 +26,7 @@ void setup(){
   }
 }
 
-unsigned long t1, t2;
 void loop(){
-  t1 = millis();
   int rslt;
   int16_t accelGyro[6]={0};
   float filteredAccelGyro[6]={0};
@@ -57,20 +55,14 @@ void loop(){
       Serial.print(filteredAccelGyro[i]);Serial.print("\t");
     }
     // Using gravity to estimate the euler angles
-    phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG;
-    thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG;
-    t2 = millis();
-    Serial.print(t1 - t2);
-    // Transforming Pitch, Roll and Yaw rates to euler rates
-    float phiDot_rps = filteredAccelGyro[0] + sinf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[2];
-    float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];
-    // Integrating the Euler rates to get the euler angles
-    // phiHat_rad += (50/1000.0) * phiDot_rps;
-    // thetaHat_rad += (50/1000.0) * thetaDot_rps;
-    Serial.print(phiHat_deg);
-    Serial.print("\t");
-    Serial.print(thetaHat_deg);
-    Serial.print("\t");
+    phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG; // Roll estimate
+    thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG; // Pitch estimate
+    // Serial.print("Roll-estimate:");
+    // Serial.print(phiHat_deg);
+    // Serial.print("\t");
+    // Serial.print("Pitch-estimate:");
+    // Serial.print(thetaHat_deg);
+    // Serial.print("\t");
     Serial.println();
   }else{
     Serial.println("err");
