@@ -53,9 +53,14 @@ void loop() {
 
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
-  int rslt = bmi160.getAccelGyroData(accelGyro);
+  uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
+
+void offset(rawAccelGyro) {
+
+}
+
     rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
     rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
     rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
