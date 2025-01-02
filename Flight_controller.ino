@@ -57,15 +57,7 @@ void loop() {
     offset(rawAccelGyro, accelGyro);
 
     // Low-pass EMA Filter
-    void EMAFilter(float rawAccelGyro, float filteredAccelGyro) {
-      for (uint8_t i = 0; i < 6; i++) {
-        // Default to zero in low amplitude noise
-        if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
-          rawAccelGyro[i] = 0;
-        }
-        filteredAccelGyro[i] = 50 * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);
-      }
-    }
+    EMAFilter(rawAccelGyro, filteredAccelGyro)
 
     // Using gravity to estimate the euler angles
     phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
@@ -100,4 +92,14 @@ void offset(float* rawAccelGyro, int16_t* accelGyro) {
   rawAccelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
   rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4; // Offset added
   rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
+}
+
+void EMAFilter(float rawAccelGyro, float filteredAccelGyro) {
+  for (uint8_t i = 0; i < 6; i++) {
+    // Default to zero in low amplitude noise
+    if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
+      rawAccelGyro[i] = 0;
+    }
+    filteredAccelGyro[i] = 50 * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);
+  }
 }
