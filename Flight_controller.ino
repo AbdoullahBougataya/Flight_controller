@@ -74,7 +74,7 @@ void loop() {
   delay(50);
 }
 
-void offset() {
+void offset(int16_t* accelGyro, float* rawAccelGyro) {
   rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
   rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
   rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
