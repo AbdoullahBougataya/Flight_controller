@@ -63,6 +63,7 @@ void loop() {
     rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4; // Offset added
     rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
     for (int i = 0; i < 6; i++) {
+      // Default to zero in low amplitude noise
       if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
         rawAccelGyro[i] = 0;
       }
