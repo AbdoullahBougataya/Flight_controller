@@ -49,20 +49,20 @@ void loop() {
   dt = (currentTime - lastTime);
   lastTime = currentTime;
 
-
-  // gGet both accel and gyro data from bmi160
-  //parameter accelGyro is the pointer to store the data
+  // Get both accel and gyro data from bmi160
+  // Parameter accelGyro is the pointer to store the data
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
     offset(rawAccelGyro, accelGyro);
 
+    // Low-pass EMA Filter
     for (int i = 0; i < 6; i++) {
       // Default to zero in low amplitude noise
       if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
         rawAccelGyro[i] = 0;
       }
-      filteredAccelGyro[i] = 50 * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);  // Low-pass EMA Filter
+      filteredAccelGyro[i] = 50 * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);
     }
 
     // Using gravity to estimate the euler angles
