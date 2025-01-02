@@ -61,8 +61,8 @@ void loop(){
     float phiDot_rps = filteredAccelGyro[0] + sinf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[2];
     float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];
     // Integrating the Euler rates to get the euler angles
-    phiHat_rad += (50/1000.0) * phiDot_rps;
-    thetaHat_rad += (50/1000.0) * thetaDot_rps;
+    // phiHat_rad += (50/1000.0) * phiDot_rps;
+    // thetaHat_rad += (50/1000.0) * thetaDot_rps;
     Serial.print(phiHat_deg);
     Serial.print("\t");
     Serial.print(thetaHat_deg);
