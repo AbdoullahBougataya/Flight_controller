@@ -50,22 +50,13 @@ void loop() {
   dt = (currentTime - lastTime);
   lastTime = currentTime;
 
-    
-  delay(50);
-}
 
-void offset(rawAccelGyro) {
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
-    rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
-    rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
-    rawAccelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
-    rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4; // Offset added
-    rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
+    offset(rawAccelGyro);
     for (int i = 0; i < 6; i++) {
       // Default to zero in low amplitude noise
       if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
@@ -97,4 +88,17 @@ rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
   else {
     Serial.println("err");
   }
+}
+
+
+  delay(50);
+}
+
+void offset(rawAccelGyro) {
+  rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
+  rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
+  rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
+  rawAccelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
+  rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4; // Offset added
+  rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2; // Offset 0.03 substracted
 }
