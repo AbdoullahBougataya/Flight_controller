@@ -43,7 +43,7 @@ void loop(){
     rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS;
     rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS;
     rawAccelGyro[3] = ((accelGyro[3] / 16384.0) - 0.03) * G_MPS2;
-    rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2;
+    rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + 0.03) * G_MPS2 + 0.4;
     rawAccelGyro[5] = ((accelGyro[5] / 16384.0) - 0.03) * G_MPS2;
     for(int i = 0; i < 6; i++)
     {
@@ -57,12 +57,15 @@ void loop(){
     // Using gravity to estimate the euler angles
     phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG; // Roll estimate
     thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG; // Pitch estimate
-    // Serial.print("Roll-estimate:");
-    // Serial.print(phiHat_deg);
-    // Serial.print("\t");
-    // Serial.print("Pitch-estimate:");
-    // Serial.print(thetaHat_deg);
-    // Serial.print("\t");
+    Serial.print("Roll-estimate:");
+    Serial.print(phiHat_deg);
+    Serial.print("\t");
+    Serial.print("Pitch-estimate:");
+    Serial.print(thetaHat_deg);
+    Serial.print("\t");
+    // Using gyroscope to estimate the euler rates
+    float phiDot_rad = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]); // Roll rate (rad/s)
+    float thetaDot_rad =                                            cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2]; // Pitch rate (rad/s)
     Serial.println();
   }else{
     Serial.println("err");
