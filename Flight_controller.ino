@@ -19,6 +19,10 @@ float thetaHat_acc_rad = 0.0f;
 float phiHat_rad = 0.0f;
 float thetaHat_rad = 0.0f;
 
+int16_t accelGyro[6]={0};
+float filteredAccelGyro[6]={0};
+float rawAccelGyro[6]={0};
+
 void setup(){
   Serial.begin(115200);
   delay(100);
@@ -40,9 +44,6 @@ void loop(){
   dt = (currentTime - lastTime) / 1000.0; // Time in seconds
   lastTime = currentTime;
   int rslt;
-  int16_t accelGyro[6]={0};
-  float filteredAccelGyro[6]={0};
-  float rawAccelGyro[6]={0};
   //get both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   rslt = bmi160.getAccelGyroData(accelGyro);
