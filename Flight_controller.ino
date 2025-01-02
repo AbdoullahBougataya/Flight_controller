@@ -25,11 +25,7 @@ void setup(){
     while(1);
   }
 }
-static unsigned long lastTime = 0;
 void loop(){
-  unsigned long currentTime = millis();
-  float deltaTime = (currentTime - lastTime) / 1000.0; // Time in seconds
-  lastTime = currentTime;
   int rslt;
   int16_t accelGyro[6]={0};
   float filteredAccelGyro[6]={0};
@@ -71,6 +67,12 @@ void loop(){
     float thetaDot_rad =                                            cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2]; // Pitch rate (rad/s)
     phiHat_rad += deltaTime * phiDot_rad; // Roll estimate
     thetaHat_rad += deltaTime * thetaDot_rad; // Pitch estimate
+    Serial.print("Roll-estimate-rad:");
+    Serial.print(phiHat_rad);
+    Serial.print("\t");
+    Serial.print("Pitch-estimate-rad:");
+    Serial.print(thetaHat_rad);
+    Serial.print("\t");
     Serial.println();
   }else{
     Serial.println("err");
