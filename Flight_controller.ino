@@ -12,8 +12,8 @@ const int8_t addr = 0x68;
 
 // Define the time step
 float dt = 0.0;
-static unsigned long lastTime = 0;
-static unsigned long currentTime = 0;
+unsigned long lastTime = 0;
+unsigned long currentTime = 0;
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 };
@@ -94,7 +94,7 @@ void loop() {
   delay(50);
 }
 
-void offset(rawAccelGyro) {
+void offset(float rawAccelGyro) {
   rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
   rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
   rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
