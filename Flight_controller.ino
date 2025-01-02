@@ -54,10 +54,14 @@ void loop(){
       filteredAccelGyro[i] = 100 * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]); // Low-pass EMA Filter
       Serial.print(filteredAccelGyro[i]);Serial.print("\t");
     }
+    // Using gravity to estimate the euler angles
     phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG;
     thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG;
+    // Transforming Pitch, Roll and Yaw rates to euler rates
     float phiDot_rps = filteredAccelGyro[0] + sinf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[2];
     float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];
+    // Integrating the Euler rates to get the euler angles
+    phiHat_rad += ;
     Serial.print(phiHat_deg);
     Serial.print("\t");
     Serial.print(thetaHat_deg);
