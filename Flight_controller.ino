@@ -68,8 +68,6 @@ void loop() {
         rawAccelGyro[i] = 0;
       }
       filteredAccelGyro[i] = 50 * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);  // Low-pass EMA Filter
-      Serial.print(filteredAccelGyro[i]);
-      Serial.print("\t");
     }
 
     // Using gravity to estimate the euler angles
