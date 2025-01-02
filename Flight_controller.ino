@@ -54,6 +54,8 @@ void loop(){
     }
     phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG;
     thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG;
+    float phi
+    float
     Serial.print(phiHat_deg);
     Serial.print("\t");
     Serial.print(thetaHat_deg);
