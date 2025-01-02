@@ -39,8 +39,7 @@ void setup() {
   // Set and init the bmi160 i2c address
   if (bmi160.Init(addr) != BMI160_OK) {
     Serial.println("init false");
-    while (1)
-      ;
+    while (1);
   }
 }
 
@@ -51,12 +50,13 @@ void loop() {
   lastTime = currentTime;
 
 
-  //get both accel and gyro data from bmi160
+  // gGet both accel and gyro data from bmi160
   //parameter accelGyro is the pointer to store the data
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
     offset(rawAccelGyro, accelGyro);
+
     for (int i = 0; i < 6; i++) {
       // Default to zero in low amplitude noise
       if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
@@ -88,7 +88,6 @@ void loop() {
   else {
     Serial.println("err");
   }
-}
   delay(50);
 }
 
