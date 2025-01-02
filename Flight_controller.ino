@@ -54,11 +54,11 @@ void loop() {
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-    offset(rawAccelGyro, accelGyro);
+    offset();
 
-    EMAFilter(rawAccelGyro, filteredAccelGyro);
+    EMAFilter();
 
-    complimentaryFilter(phiHat_rad, thetaHat_rad);
+    complimentaryFilter();
 
     Serial.print("Roll-estimate:");
     Serial.print(phiHat_rad * RAD2DEG);
@@ -74,7 +74,7 @@ void loop() {
   delay(50);
 }
 
-void offset(float* rawAccelGyro, int16_t* accelGyro) {
+void offset() {
   rawAccelGyro[0] = (accelGyro[0] + 9) * DPS2RPS; // Offset 9 added
   rawAccelGyro[1] = (accelGyro[1] - 4) * DPS2RPS; // Offset 4 substracted
   rawAccelGyro[2] = (accelGyro[2] - 7) * DPS2RPS; // Offset 7 substracted
@@ -84,7 +84,7 @@ void offset(float* rawAccelGyro, int16_t* accelGyro) {
 }
 
 // Low-pass EMA Filter
-void EMAFilter(float rawAccelGyro, float filteredAccelGyro) {
+void EMAFilter() {
   for (uint8_t i = 0; i < 6; i++) {
     // Default to zero in low amplitude noise
     if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
@@ -94,7 +94,7 @@ void EMAFilter(float rawAccelGyro, float filteredAccelGyro) {
   }
 }
 
-void complimentaryFilter(float phiHat_rad, float thetaHat_rad) {
+void complimentaryFilter() {
   // Using gravity to estimate the Euler angles
   phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
   thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
