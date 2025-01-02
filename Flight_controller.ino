@@ -26,7 +26,9 @@ void setup(){
   }
 }
 
+unsigned long t1, t2;
 void loop(){
+  t1 = millis();
   int rslt;
   int16_t accelGyro[6]={0};
   float filteredAccelGyro[6]={0};
@@ -57,6 +59,8 @@ void loop(){
     // Using gravity to estimate the euler angles
     phiHat_deg = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]) * RAD2DEG;
     thetaHat_deg = asinf(filteredAccelGyro[3] / G_MPS2) * RAD2DEG;
+    t2 = millis();
+    Serial.print(t1 - t2);
     // Transforming Pitch, Roll and Yaw rates to euler rates
     float phiDot_rps = filteredAccelGyro[0] + sinf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * tanf(thetaHat_rad) * filteredAccelGyro[2];
     float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];
