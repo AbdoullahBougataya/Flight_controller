@@ -58,19 +58,7 @@ void loop() {
 
     EMAFilter(rawAccelGyro, filteredAccelGyro);
 
-  void complimentaryFilter()
-
-    // Using gravity to estimate the Euler angles
-    phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
-    thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
-
-    // Using gyroscope to estimate the euler rates
-    float phiDot_rps = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]);  // Roll rate (rad/s)
-    float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                              // Pitch rate (rad/s)
-
-    // Complementary filter implementation
-    phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
-    thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
+    complimentaryFilter(phiHat_rad, thetaHat_rad);
 
     Serial.print("Roll-estimate:");
     Serial.print(phiHat_rad * RAD2DEG);
@@ -104,4 +92,18 @@ void EMAFilter(float rawAccelGyro, float filteredAccelGyro) {
     }
     filteredAccelGyro[i] = (1 / ALPHA) * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);
   }
+}
+
+void complimentaryFilter(float phiHat_rad, float thetaHat_rad) {
+  // Using gravity to estimate the Euler angles
+  phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
+  thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
+
+  // Using gyroscope to estimate the euler rates
+  float phiDot_rps = filteredAccelGyro[0] + tanf(thetaHat_rad) * (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]);  // Roll rate (rad/s)
+  float thetaDot_rps = cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                              // Pitch rate (rad/s)
+
+  // Complementary filter implementation
+  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
+  thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
 }
