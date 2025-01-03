@@ -7,11 +7,9 @@
 /**
 * @fn complimentaryFilter
 * @brief Apply a complimentary filter
-* @param type  three type
-* @n     onlyAccel    :   only get the accel data
-* @n     onlyGyro     :   only get the gyro data
-* @n     bothAccelGyro:   get boath accel and gyro data
-* @param data  save returned data to parameter data
-* @return BMI160_OK(0) means succse
+* @param filteredAccelGyro Filtered input signal array
+* @param phiHat_rad  Output pitch of the complimentary filter
+* @param thetaHat_rad  Output roll of the complimentary filter
+* @param dt  Sampling period
 */
 void complimentaryFilter(float* filteredAccelGyro, float phiHat_rad, float thetaHat_rad, float dt);
