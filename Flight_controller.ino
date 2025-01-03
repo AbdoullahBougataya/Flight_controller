@@ -52,15 +52,18 @@ void loop() {
     offset(accelGyro, rawAccelGyro);
 
     EMAFilter(rawAccelGyro, filteredAccelGyro);
-
+    for(int i = 0; i < 6; i++)
+    {
+      Serial.print(filteredAccelGyro[i]);Serial.print("\t");
+    }
     complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
-    Serial.print("Roll-estimate:");
-    Serial.print(phiHat_rad * RAD2DEG);
-    Serial.print("\t");
-    Serial.print("Pitch-estimate:");
-    Serial.print(thetaHat_rad * RAD2DEG);
-    Serial.print("\t");
+    // Serial.print("Roll-estimate:");
+    // Serial.print(phiHat_rad * RAD2DEG);
+    // Serial.print("\t");
+    // Serial.print("Pitch-estimate:");
+    // Serial.print(thetaHat_rad * RAD2DEG);
+    // Serial.print("\t");
     Serial.println();
   }
   else {
