@@ -135,6 +135,8 @@
 #define BMI160_ACC_Z_OFFSET    -0.03
 // (°/s) to (rad/s)
 #define DPS2RPS                 0.01745329251994329576f
+// Earths gravitational acceleration
+#define G_MPS2                  9.81000000000000000000f
 
 /* Sensor select mask*/
 #define BMI160_SEN_SEL_MASK   UINT8_C(0x07)
