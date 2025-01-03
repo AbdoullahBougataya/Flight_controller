@@ -88,7 +88,7 @@ void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro) {
     if (rawAccelGyro[i] <= 0.3 && rawAccelGyro[i] >= -0.2) {
       rawAccelGyro[i] = 0;
     }
-    filteredAccelGyro[i] = (1 / ALPHA) * (ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i]);
+    filteredAccelGyro[i] = ALPHA * rawAccelGyro[i] + (1 - ALPHA) * filteredAccelGyro[i];
   }
 }
 
