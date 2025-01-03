@@ -12,7 +12,7 @@
   * @param thetaHat_rad  Output roll angle of the complimentary filter in (rad)
   * @param dt  Sampling period
   */
-void complimentaryFilter(float* filteredAccelGyro, float* phiHat_rad, float* thetaHat_rad, float dt);
+void complimentaryFilter(float* filteredAccelGyro, float phiHat_rad, float thetaHat_rad, float dt);
 
 /**
   * @fn EMAFilter

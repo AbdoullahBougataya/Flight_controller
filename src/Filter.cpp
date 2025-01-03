@@ -13,7 +13,7 @@ void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro) {
 }
 
 // Complimentary filter
-void complimentaryFilter(float* filteredAccelGyro, float* phiHat_rad, float* thetaHat_rad, float dt) {
+void complimentaryFilter(float* filteredAccelGyro, float phiHat_rad, float thetaHat_rad, float dt) {
   // Using gravity to estimate the Euler angles
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
   float thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
