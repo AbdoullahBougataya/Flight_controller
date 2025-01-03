@@ -239,6 +239,14 @@ public:
   int8_t getAccelGyroData(int16_t* data);
 
   /**
+   * @fn offset
+   * @brief Apply offset to the sensor output
+   * @param accelGyro Data from the sensor
+   * @param rawAccelGyro Offseted data
+   */
+  void offset(int16_t* accelGyro, float* rawAccelGyro);
+
+  /**
    * @fn getAccelGyroData
    * @brief get the accel and gyro data
    * @param data pointer to store the accel and gyro data
