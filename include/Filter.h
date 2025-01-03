@@ -5,19 +5,19 @@
 #define G_MPS2          9.81000000000000000000f // Gravitational acceleration (g)
 
 /**
-* @fn complimentaryFilter
-* @brief Apply a complimentary filter
-* @param filteredAccelGyro Filtered input signal array
-* @param phiHat_rad  Output pitch of the complimentary filter
-* @param thetaHat_rad  Output roll of the complimentary filter
-* @param dt  Sampling period
-*/
+  * @fn complimentaryFilter
+  * @brief Apply a complimentary filter
+  * @param filteredAccelGyro Filtered input signal array
+  * @param phiHat_rad  Output pitch of the complimentary filter
+  * @param thetaHat_rad  Output roll of the complimentary filter
+  * @param dt  Sampling period
+  */
 void complimentaryFilter(float* filteredAccelGyro, float phiHat_rad, float thetaHat_rad, float dt);
 
 /**
-* @fn EMAFilter
-* @brief Apply an EMA Filter to the data
-* @param rawAccelGyro Raw data
-* @param filteredAccelGyro  EMA Filtered signal
-*/
+  * @fn EMAFilter
+  * @brief Apply an EMA Filter to the data
+  * @param rawAccelGyro Raw data
+  * @param filteredAccelGyro  EMA Filtered signal
+  */
 void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro);
