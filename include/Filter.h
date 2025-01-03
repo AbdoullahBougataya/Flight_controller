@@ -17,7 +17,7 @@ void complimentaryFilter(float* filteredAccelGyro, float phiHat_rad, float theta
 /**
   * @fn EMAFilter
   * @brief Apply an EMA Filter to the data
-  * @param rawAccelGyro Raw data
-  * @param filteredAccelGyro  EMA Filtered signal
+  * @param rawAccelGyro Raw data in (rad/s)
+  * @param filteredAccelGyro  EMA Filtered signal in (rad/s)
   */
 void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro);
