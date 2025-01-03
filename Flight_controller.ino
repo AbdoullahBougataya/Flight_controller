@@ -5,9 +5,6 @@ BMI160 bmi160;
 const int8_t addr = 0x68;
 
 #define G_MPS2          9.81000000000000000000f   // Gravitational acceleration (g)
-#define ALPHA           0.02000000000000000000f   // Filter coefficient
-#define COMP_FLTR_ALPHA 0.50000000000000000000f   // Complementary filter coefficient
-#define DPS2RPS         0.01745329251994329576f   // Degrees to radians (per second)
 #define RAD2DEG         57.2957795130823208767f   // Radians to degrees (per second)
 
 // Define the time step
