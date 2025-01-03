@@ -655,7 +655,7 @@ void offset(int16_t* accelGyro, float* rawAccelGyro) {
   rawAccelGyro[0] = (accelGyro[0] + BMI160_GYRO_X_OFFSET) * DPS2RPS; // Offset 9 added
   rawAccelGyro[1] = (accelGyro[1] + BMI160_GYRO_Y_OFFSET) * DPS2RPS; // Offset 4 substracted
   rawAccelGyro[2] = (accelGyro[2] + BMI160_GYRO_Z_OFFSET) * DPS2RPS; // Offset 7 substracted
-  rawAccelGyro[3] = ((accelGyro[3] / 16384.0) + BMI160_ACC_X_OFFSET); // Offset 0.03 substracted
-  rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + BMI160_ACC_Y_OFFSET); // Offset added
-  rawAccelGyro[5] = ((accelGyro[5] / 16384.0) + BMI160_ACC_Z_OFFSET); // Offset 0.03 substracted
+  rawAccelGyro[3] = ((accelGyro[3] / 16384.0) + BMI160_ACC_X_OFFSET) * G_MPS2; // Offset 0.03 substracted
+  rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + BMI160_ACC_Y_OFFSET) * G_MPS2; // Offset added
+  rawAccelGyro[5] = ((accelGyro[5] / 16384.0) + BMI160_ACC_Z_OFFSET) * G_MPS2; // Offset 0.03 substracted
 }
