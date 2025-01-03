@@ -123,6 +123,7 @@
 #define BMI160_ACCEL_SEL    UINT8_C(0x01)
 #define BMI160_GYRO_SEL     UINT8_C(0x02)
 #define BMI160_TIME_SEL     UINT8_C(0x04)
+
 /* Sensor Offset */
 // Gyro offset
 #define BMI160_GYRO_X_OFFSET     9
@@ -132,6 +133,8 @@
 #define BMI160_ACC_X_OFFSET    -0.03
 #define BMI160_ACC_Y_OFFSET     0.03
 #define BMI160_ACC_Z_OFFSET    -0.03
+// (°/s) to (rad/s)
+#define DPS2RPS                 0.01745329251994329576f
 
 /* Sensor select mask*/
 #define BMI160_SEN_SEL_MASK   UINT8_C(0x07)
