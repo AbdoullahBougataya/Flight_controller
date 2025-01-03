@@ -126,9 +126,9 @@
 
 /* Sensor Offset */
 // Gyro offset
-#define BMI160_GYRO_X_OFFSET     9
-#define BMI160_GYRO_Y_OFFSET    -4
-#define BMI160_GYRO_Z_OFFSET    -7
+#define BMI160_GYRO_X_OFFSET INT8_C(9)
+#define BMI160_GYRO_Y_OFFSET INT8_C(-4)
+#define BMI160_GYRO_Z_OFFSET INT8_C(-7)
 // Accelerometer offset
 #define BMI160_ACC_X_OFFSET    -0.03
 #define BMI160_ACC_Y_OFFSET     0.03
