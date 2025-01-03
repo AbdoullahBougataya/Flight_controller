@@ -45,7 +45,6 @@ void loop() {
   lastTime = currentTime;
   // Define sensor data arrays
   int16_t accelGyro[6] = { 0 };
-  float filteredAccelGyro[6] = { 0 };
   float rawAccelGyro[6] = { 0 };
 
   // Get both accel and gyro data from bmi160
