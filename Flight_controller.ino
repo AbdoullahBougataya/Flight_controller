@@ -43,6 +43,10 @@ void loop() {
   currentTime = millis() / 1000.0;
   dt = (currentTime - lastTime);
   lastTime = currentTime;
+  // Define sensor data arrays
+  int16_t accelGyro[6] = { 0 };
+  float filteredAccelGyro[6] = { 0 };
+  float rawAccelGyro[6] = { 0 };
 
   // Get both accel and gyro data from bmi160
   // Parameter accelGyro is the pointer to store the data
@@ -52,18 +56,15 @@ void loop() {
     offset(accelGyro, rawAccelGyro);
 
     EMAFilter(rawAccelGyro, filteredAccelGyro);
-    for(int i = 0; i < 6; i++)
-    {
-      Serial.print(filteredAccelGyro[i]);Serial.print("\t");
-    }
+
     complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
-    // Serial.print("Roll-estimate:");
-    // Serial.print(phiHat_rad * RAD2DEG);
-    // Serial.print("\t");
-    // Serial.print("Pitch-estimate:");
-    // Serial.print(thetaHat_rad * RAD2DEG);
-    // Serial.print("\t");
+    Serial.print("Roll-estimate:");
+    Serial.print(phiHat_rad * RAD2DEG);
+    Serial.print("\t");
+    Serial.print("Pitch-estimate:");
+    Serial.print(thetaHat_rad * RAD2DEG);
+    Serial.print("\t");
     Serial.println();
   }
   else {
