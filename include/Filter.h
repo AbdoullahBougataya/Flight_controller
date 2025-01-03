@@ -13,3 +13,11 @@
 * @param dt  Sampling period
 */
 void complimentaryFilter(float* filteredAccelGyro, float phiHat_rad, float thetaHat_rad, float dt);
+
+/**
+* @fn EMAFilter
+* @brief Apply an EMA Filter to the data
+* @param rawAccelGyro Raw data
+* @param filteredAccelGyro  EMA Filtered signal
+*/
+void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro);
