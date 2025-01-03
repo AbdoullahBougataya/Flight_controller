@@ -66,13 +66,13 @@ void loop() {
     Serial.print(filteredAccelGyro[2] * RAD2DEG);
     Serial.print("\t");
     Serial.print("X-acc:");
-    Serial.print(filteredAccelGyro[3] * RAD2DEG);
+    Serial.print(filteredAccelGyro[3]);
     Serial.print("\t");
     Serial.print("Y-acc:");
-    Serial.print(filteredAccelGyro[4] * RAD2DEG);
+    Serial.print(filteredAccelGyro[4]);
     Serial.print("\t");
     Serial.print("Z-acc:");
-    Serial.print(filteredAccelGyro[5] * RAD2DEG);
+    Serial.print(filteredAccelGyro[5]);
     Serial.print("\t");
 
     complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
