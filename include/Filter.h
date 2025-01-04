@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 #define COMP_FLTR_ALPHA 0.05000000000000000000f // Complimentary filter coefficient
-#define EMA_ALPHA       0.01000000000000000000f // EMA filter coefficient
 #define G_MPS2          9.81000000000000000000f // Gravitational acceleration (g)
 
 /**
@@ -13,11 +12,3 @@
   * @param dt  Sampling period
   */
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
-
-/**
-  * @fn EMAFilter
-  * @brief Apply an EMA Filter to the data
-  * @param rawAccelGyro Raw data in (rad/s)
-  * @param filteredAccelGyro  EMA Filtered signal in (rad/s)
-  */
-void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro);
