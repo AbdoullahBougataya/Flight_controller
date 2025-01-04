@@ -97,7 +97,7 @@ int8_t BMI160::setSensConf(struct bmi160Dev *dev)
 
   dev->gyroCfg.odr = BMI160_GYRO_ODR_3200HZ;
   dev->gyroCfg.range = BMI160_GYRO_RANGE_2000_DPS;
-  dev->gyroCfg.bw = BMI160_GYRO_BW_OSR2_MODE;
+  dev->gyroCfg.bw = BMI160_GYRO_BW_OSR4_MODE;
 
   dev->gyroCfg.power = BMI160_GYRO_NORMAL_MODE;
 
