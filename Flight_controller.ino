@@ -54,26 +54,28 @@ void loop() {
   if (rslt == 0) {
     offset(accelGyro, rawAccelGyro);
 
+    EMAFilter(rawAccelGyro, filteredAccelGyro);
+
     Serial.print("PitchRate:");
-    Serial.print(rawAccelGyro[0] * RAD2DEG);
+    Serial.print(filteredAccelGyro[0] * RAD2DEG);
     Serial.print("\t");
     Serial.print("RollRate:");
-    Serial.print(rawAccelGyro[1] * RAD2DEG);
+    Serial.print(filteredAccelGyro[1] * RAD2DEG);
     Serial.print("\t");
     Serial.print("YawRate:");
-    Serial.print(rawAccelGyro[2] * RAD2DEG);
+    Serial.print(filteredAccelGyro[2] * RAD2DEG);
     Serial.print("\t");
     Serial.print("X-acc:");
-    Serial.print(rawAccelGyro[3]);
+    Serial.print(filteredAccelGyro[3]);
     Serial.print("\t");
     Serial.print("Y-acc:");
-    Serial.print(rawAccelGyro[4]);
+    Serial.print(filteredAccelGyro[4]);
     Serial.print("\t");
     Serial.print("Z-acc:");
-    Serial.print(rawAccelGyro[5]);
+    Serial.print(filteredAccelGyro[5]);
     Serial.print("\t");
 
-    complimentaryFilter(rawAccelGyro, phiHat_rad, thetaHat_rad, dt);
+    complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
     Serial.print("Pitch-estimate:");
     Serial.print(phiHat_rad * RAD2DEG);
