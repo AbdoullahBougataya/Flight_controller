@@ -10,7 +10,7 @@ void EMAFilter(float* rawAccelGyro, float* filteredAccelGyro) {
     }
     filteredAccelGyro[i] = EMA_ALPHA * rawAccelGyro[i] + (1 - EMA_ALPHA) * filteredAccelGyro[i];
     if (i < 3){
-      filteredAccelGyro[i] = fminf(fmaxf())
+      filteredAccelGyro[i] = fminf(fmaxf(, ));
     }
   }
 }
