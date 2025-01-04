@@ -88,5 +88,5 @@ void loop() {
   else {
     Serial.println("err");
   }
-  delay(25);
+  delay(10);
 }
