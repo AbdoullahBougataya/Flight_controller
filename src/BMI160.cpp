@@ -66,7 +66,7 @@ void BMI160::defaultParamSettg(struct bmi160Dev *dev)
 {
   /* Initializing accel and gyro params with
   * default values */
-  dev->accelCfg.bw = BMI160_ACCEL_BW_OSR2_AVG2;
+  dev->accelCfg.bw = BMI160_ACCEL_BW_NORMAL_AVG4;
   dev->accelCfg.odr = BMI160_ACCEL_ODR_100HZ;
   dev->accelCfg.power = BMI160_ACCEL_SUSPEND_MODE;
   dev->accelCfg.range = BMI160_ACCEL_RANGE_2G;
