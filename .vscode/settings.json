@@ -1,10 +1,6 @@
 {
     "code-runner.executorMapByFileExtension": {
-        ".ino": "cd $dir && arduino-cli compile --quiet --fqbn arduino:avr:uno $fileName | findstr /v "[92mUsed library[0m [92mVersion[0m [90mPath[0m
-        [93mWire[0m         1.0     [90mC:\Users\HP\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\Wire[0m
-
-        [92mUsed platform[0m [92mVersion[0m [90mPath[0m
-        [93marduino:avr[0m   1.8.6   [90mC:\Users\HP\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6[0m" && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
+        ".ino": "cd $dir && arduino-cli compile --quiet --fqbn arduino:avr:uno $fileName | findstr /v 'C:\\Users\\HP\\AppData' && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
         ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
         ".vbs": "cscript //Nologo",
         ".scala": "scala",
@@ -43,11 +39,7 @@
         ".gleam": "gleam run -m $fileNameWithoutExt"
     },
     "code-runner.executorMapByGlob": {
-        "*.ino": "cd $dir && arduino-cli compile --quiet --fqbn arduino:avr:uno $fileName | findstr /v "[92mUsed library[0m [92mVersion[0m [90mPath[0m
-        [93mWire[0m         1.0     [90mC:\Users\HP\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\Wire[0m
-
-        [92mUsed platform[0m [92mVersion[0m [90mPath[0m
-        [93marduino:avr[0m   1.8.6   [90mC:\Users\HP\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6[0m" && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
+        "*.ino": "cd $dir && arduino-cli compile --quiet --fqbn arduino:avr:uno $fileName | findstr /v "Les variables globales utilisent 536 octets (26%) de mémoire dynamique, ce qui laisse 1512 octets pour les variables locales. Le maximum est de 2048 octets." && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
         "pom.xml": "cd $dir && mvn clean package"
     }
 }
