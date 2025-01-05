@@ -1,6 +1,6 @@
 {
     "code-runner.executorMapByFileExtension": {
-        ".ino": "arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch",
+        ".ino": "arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno $fileName",
         ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
         ".vbs": "cscript //Nologo",
         ".scala": "scala",
