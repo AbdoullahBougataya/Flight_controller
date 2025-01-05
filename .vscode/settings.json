@@ -1,6 +1,6 @@
 {
     "code-runner.executorMapByFileExtension": {
-        ".ino": "cd $dir && arduino-cli compile --no-color --quiet --fqbn arduino:avr:uno $fileName | findstr /v 'arduino:avr' | findstr /v 'Wire' | findstr /v 'Used' && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
+        ".ino": "cd $dir && arduino-cli compile --no-color --quiet --fqbn arduino:avr:uno $fileName && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
         ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
         ".vbs": "cscript //Nologo",
         ".scala": "scala",
@@ -39,7 +39,7 @@
         ".gleam": "gleam run -m $fileNameWithoutExt"
     },
     "code-runner.executorMapByGlob": {
-        "*.ino": "cd $dir && arduino-cli compile --no-color --quiet --fqbn arduino:avr:uno $fileName | findstr /v 'arduino:avr' | findstr /v 'Wire' | findstr /v 'Used' && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
+        "*.ino": "cd $dir && arduino-cli compile --no-color --quiet --fqbn arduino:avr:uno $fileName && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
         "pom.xml": "cd $dir && mvn clean package"
     }
 }
