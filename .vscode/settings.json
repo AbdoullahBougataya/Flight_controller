@@ -37,5 +37,9 @@
         ".spwn": "spwn build",
         ".pkl": "cd $dir && pkl eval -f yaml $fileName -o $fileNameWithoutExt.yaml",
         ".gleam": "gleam run -m $fileNameWithoutExt"
+    },
+    "code-runner.executorMapByGlob": {
+        "*.ino": "cd $dir && arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt",
+        "pom.xml": "cd $dir && mvn clean package"
     }
 }
