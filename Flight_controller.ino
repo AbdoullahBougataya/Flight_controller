@@ -56,31 +56,10 @@ void loop() {
 
     EMAFilter(rawAccelGyro, filteredAccelGyro);
 
-    Serial.print("PitchRate:");
-    Serial.print(filteredAccelGyro[0] * RAD2DEG);
-    Serial.print("\t");
-    Serial.print("RollRate:");
-    Serial.print(filteredAccelGyro[1] * RAD2DEG);
-    Serial.print("\t");
-    Serial.print("YawRate:");
-    Serial.print(filteredAccelGyro[2] * RAD2DEG);
-    Serial.print("\t");
-    Serial.print("X-acc:");
-    Serial.print(filteredAccelGyro[3]);
-    Serial.print("\t");
-    Serial.print("Y-acc:");
-    Serial.print(filteredAccelGyro[4]);
-    Serial.print("\t");
-    Serial.print("Z-acc:");
-    Serial.print(filteredAccelGyro[5]);
-    Serial.print("\t");
-
     complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
-    Serial.print("Pitch-estimate:");
     Serial.print(phiHat_rad * RAD2DEG);
     Serial.print("\t");
-    Serial.print("Roll-estimate:");
     Serial.print(thetaHat_rad * RAD2DEG);
     Serial.print("\t");
     Serial.println();
