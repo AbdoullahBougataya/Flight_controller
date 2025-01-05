@@ -1,6 +1,6 @@
 {
     "code-runner.executorMapByFileExtension": {
-        ".ino": "cd $dir && arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt",
+        ".ino": "cd $dir && arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt.ino",
         ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
         ".vbs": "cscript //Nologo",
         ".scala": "scala",
@@ -39,7 +39,7 @@
         ".gleam": "gleam run -m $fileNameWithoutExt"
     },
     "code-runner.executorMapByGlob": {
-        "*.ino": "cd $dir && arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt",
+        "*.ino": "cd $dir && arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt.ino",
         "pom.xml": "cd $dir && mvn clean package"
     }
 }
