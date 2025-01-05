@@ -1,6 +1,6 @@
 {
     "code-runner.executorMapByFileExtension": {
-        ".ino": "arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt",
+        ".ino": "cd $dir && arduino-cli upload -p COM6 --fqbn arduino:avr:uno $fileNameWithoutExt",
         ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
         ".vbs": "cscript //Nologo",
         ".scala": "scala",
