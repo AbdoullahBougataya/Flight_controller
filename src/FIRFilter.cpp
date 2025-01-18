@@ -22,11 +22,22 @@ void FIRFilter_Init(FIRFilter *fir) {
 float FIRFilter_Update(FIRFilter * fir, float inp) {
     /* Store latest sample in buffer */
     fir->buf[fir->bufIndex] = inp;
-    /* Increment buffer index and wrap around if necessary */
 
+    /* Increment buffer index and wrap around if necessary */
+    fir->bufIndex++;
+
+    if (fir->bufIndex)
     /* Compute new output sample (convolution) */
 
     for (unint8_t n = 0, n < FIR_FILTER_LENGTH, n++) {
+
         /* Decrement index and wrap if necessary */
+
+        /* Multiply impulse response with shifted input sample and add to ouput */
+
     }
+
+    /* Return filtered ouput */
+
+
 }
