@@ -44,8 +44,10 @@ float FIRFilter_Update(FIRFilter * fir, float inp) {
         } else {
             sumIndex = FIR_FILTER_LENGTH - 1;
         }
+        
         /* Multiply impulse response with shifted input sample and add to ouput */
         fir->out += FIR_IMPULSE_RESPONSE[n] * fir->buf[sumIndex];
+
     }
 
     /* Return filtered ouput */
