@@ -26,9 +26,14 @@ float FIRFilter_Update(FIRFilter * fir, float inp) {
     /* Increment buffer index and wrap around if necessary */
     fir->bufIndex++;
 
-    if (fir->bufIndex)
-    /* Compute new output sample (convolution) */
+    if (fir->bufIndex == FIR_FILTER_LENGTH) {
 
+        fir->bufIndex = 0;
+
+    }
+    /* Compute new output sample (convolution) */
+    fir->out = 0.0f;
+    
     for (unint8_t n = 0, n < FIR_FILTER_LENGTH, n++) {
 
         /* Decrement index and wrap if necessary */
