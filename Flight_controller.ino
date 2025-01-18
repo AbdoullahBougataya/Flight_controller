@@ -2,7 +2,7 @@
 #include "./include/FIRFilter.h"
 #include <math.h>
 
-BMI160 bmi160;
+BMI160 imu;
 const int8_t addr = 0x68;
 
 #define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
@@ -16,13 +16,13 @@ void setup() {
   delay(100);
 
   // Initialize the hardware bmin160
-  if (bmi160.softReset() != BMI160_OK) {
+  if (imu.softReset() != BMI160_OK) {
     Serial.println("reset false");
     while (1);
   }
 
-  // Set and init the bmi160 i2c address
-  if (bmi160.Init(addr) != BMI160_OK) {
+  // Set and init the imu i2c address
+  if (imu.Init(addr) != BMI160_OK) {
     Serial.println("init false");
     while (1);
   }
@@ -33,9 +33,9 @@ void loop() {
   accelGyro[6] = { 0 };
   rawAccelGyro[6] = { 0 };
 
-  // Get both accel and gyro data from bmi160
+  // Get both accel and gyro data from imu
   // Parameter accelGyro is the pointer to store the data
-  uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
+  uint8_t rslt = imu.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
     Serial.print(accelGyro[0] * 3.14/180.0);Serial.print("\t");
