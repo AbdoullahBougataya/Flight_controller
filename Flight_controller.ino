@@ -9,12 +9,7 @@ const int8_t addr = 0x68;
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 };
-float filteredAccelGyro[6] = { 0 };
 float rawAccelGyro[6] = { 0 };
-
-// Declare sensor fusion variables
-float phiHat_rad = 0.0f;
-float thetaHat_rad = 0.0f;
 
 void setup() {
   Serial.begin(115200);
