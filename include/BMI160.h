@@ -124,15 +124,6 @@
 #define BMI160_GYRO_SEL     UINT8_C(0x02)
 #define BMI160_TIME_SEL     UINT8_C(0x04)
 
-/* Sensor Offset */
-// Gyro offset
-#define BMI160_GYRO_X_OFFSET INT8_C(9)
-#define BMI160_GYRO_Y_OFFSET INT8_C(-4)
-#define BMI160_GYRO_Z_OFFSET INT8_C(-7)
-// Accelerometer offset
-#define BMI160_ACC_X_OFFSET    -0.03
-#define BMI160_ACC_Y_OFFSET     0.07
-#define BMI160_ACC_Z_OFFSET    -0.03
 // (°/s) to (rad/s)
 #define DPS2RPS                 0.01745329251994329576f
 // Earths gravitational acceleration
@@ -302,11 +293,3 @@ public:
     struct bmi160SensorData* Oaccel;
     struct bmi160SensorData* Ogyro;
 };
-
-/**
-  * @fn offset
-  * @brief Apply offset to the sensor output
-  * @param accelGyro Data from the sensor
-  * @param rawAccelGyro Offseted data
-  */
-void offset(int16_t* accelGyro, float* rawAccelGyro);

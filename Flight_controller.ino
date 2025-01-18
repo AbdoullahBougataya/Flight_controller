@@ -39,10 +39,6 @@ void setup() {
 }
 
 void loop() {
-  // Calculate time stamp (in seconds)
-  currentTime = millis() / 1000.0;
-  dt = (currentTime - lastTime);
-  lastTime = currentTime;
   // Initialize sensor data arrays
   accelGyro[6] = { 0 };
   rawAccelGyro[6] = { 0 };
@@ -52,17 +48,7 @@ void loop() {
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-    offset(accelGyro, rawAccelGyro);
 
-    EMAFilter(rawAccelGyro, filteredAccelGyro);
-
-    complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
-
-    Serial.print(phiHat_rad * RAD2DEG);
-    Serial.print("\t");
-    Serial.print(thetaHat_rad * RAD2DEG);
-    Serial.print("\t");
-    Serial.println();
   }
   else {
     Serial.println("err");
