@@ -38,9 +38,9 @@ void loop() {
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-    Serial.print(accelGyro[i] * 3.14/180.0);Serial.print("\t");
-    Serial.print(accelGyro[i] * 3.14/180.0);Serial.print("\t");
-    Serial.print(accelGyro[i] * 3.14/180.0);Serial.print("\t");
+    Serial.print(accelGyro[0] * 3.14/180.0);Serial.print("\t");
+    Serial.print(accelGyro[1] * 3.14/180.0);Serial.print("\t");
+    Serial.print(accelGyro[2] * 3.14/180.0);Serial.print("\t");
     Serial.println();
   }
   else {
