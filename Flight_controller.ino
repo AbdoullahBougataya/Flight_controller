@@ -7,11 +7,6 @@ const int8_t addr = 0x68;
 
 #define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
 
-// Define the time step
-float dt = 0.0;
-unsigned long lastTime = 0;
-unsigned long currentTime = 0;
-
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 };
 float filteredAccelGyro[6] = { 0 };
