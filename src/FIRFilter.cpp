@@ -19,4 +19,14 @@ void FIRFilter_Init(FIRFilter *fir) {
     fir->out = 0.0f;
 }
 
-float FIR
+float FIRFilter_Update(FIRFilter * fir, float inp) {
+    /* Store latest sample in buffer */
+    fir->buf[fir->bufIndex] = inp;
+    /* Increment buffer index and wrap around if necessary */
+
+    /* Compute new output sample (convolution) */
+
+    for (unint8_t n = 0, n < FIR_FILTER_LENGTH, n++) {
+        /* Decrement index and wrap if necessary */
+    }
+}
