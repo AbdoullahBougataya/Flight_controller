@@ -14,6 +14,6 @@ typedef struct {
 } FIRFilter;
 
 void FIRFilter_Init(FIRFilter *fir);
-float FIRFilter_Update(FIRFilter *fir, float inp);
+float FIRFilter_Update(FIRFilter *fir, float input);
 
 #endif
