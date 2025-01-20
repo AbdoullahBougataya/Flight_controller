@@ -41,9 +41,9 @@ void loop() {
   imu.getAccelData(accelerometer);
   imu.getGyroData(gyroscope);
 
-  Serial.print(accelGyro[0] * 3.14/180.0);Serial.print("\t");
-  Serial.print(accelGyro[1] * 3.14/180.0);Serial.print("\t");
-  Serial.print(accelGyro[2] * 3.14/180.0);Serial.print("\t");
+  Serial.print(gyroscope[0] * 3.14/180.0);Serial.print("\t");
+  Serial.print(gyroscope[1] * 3.14/180.0);Serial.print("\t");
+  Serial.print(gyroscope[2] * 3.14/180.0);Serial.print("\t");
   Serial.println();
   delay(10);
 }
