@@ -1,5 +1,4 @@
 #include "./include/BMI160.h"
-#include "./include/FIRFilter.h"
 #include <math.h>
 
 BMI160 imu;
@@ -39,7 +38,6 @@ void loop() {
   rawGyroscope[3] = { 0 };
 
   // Get both accel and gyro data from imu
-  // Parameter accelGyro is the pointer to store the data
   uint8_t rslt = imu.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
