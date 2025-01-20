@@ -28,6 +28,7 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
+  attachInterrupt(0, updateAccelerometer, RISING)
 }
 
 void loop() {
