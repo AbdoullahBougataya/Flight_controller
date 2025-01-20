@@ -28,14 +28,13 @@
 #define BMI160_E_COM_FAIL                 INT8_C(-2)
 #define BMI160_E_DEV_NOT_FOUND            INT8_C(-3)
 #define BMI160_E_OUT_OF_RANGE             INT8_C(-4)
-// #define BMI160_E_INVALID_INPUT            INT8_C(-5)
-#define BMI160_E_ACCEL_ODR_BW_INVALID   INT8_C(-6)
-#define BMI160_E_GYRO_ODR_BW_INVALID    INT8_C(-7)
+#define BMI160_E_ACCEL_ODR_BW_INVALID     INT8_C(-6)
+#define BMI160_E_GYRO_ODR_BW_INVALID      INT8_C(-7)
 #define BMI160_E_LWP_PRE_FLTR_INT_INVALID INT8_C(-8)
-#define BMI160_E_LWP_PRE_FLTR_INVALID   INT8_C(-9)
+#define BMI160_E_LWP_PRE_FLTR_INVALID     INT8_C(-9)
 
 /** BMI160 unique chip identifier */
-#define BMI160_CHIP_ID                   UINT8_C(0xD1)
+#define BMI160_CHIP_ID                    UINT8_C(0xD1)
 
 // /** Soft reset command */
 #define BMI160_SOFT_RESET_CMD            UINT8_C(0xb6)
