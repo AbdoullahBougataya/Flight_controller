@@ -904,9 +904,9 @@ enum bmi160StepDetectMode {
   BMI160_STEP_DETECT_USER_DEFINE   /**< Non recommended User defined setting */
 };
 
-class DFRobot_BMI160{
+class BMI160{
 public:
-  DFRobot_BMI160();
+  BMI160();
 
   /**
    * @fn I2cInit
