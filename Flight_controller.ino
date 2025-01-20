@@ -17,13 +17,13 @@ void setup() {
   Serial.begin(115200);
   delay(100);
 
-  // Initialize the hardware bmin160
+  // Initialize the hardware BMI160
   if (imu.softReset() != BMI160_OK) {
     Serial.println("reset false");
     while (1);
   }
 
-  // Set and init the imu i2c address
+  // Set and init the imu I²C address
   if (imu.I2cInit(addr) != BMI160_OK) {
     Serial.println("init false");
     while (1);
