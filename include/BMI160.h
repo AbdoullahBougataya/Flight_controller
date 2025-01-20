@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include<SPI.h>
 
 /** Mask definitions */
 #define BMI160_ACCEL_BW_MASK                    UINT8_C(0x70)
