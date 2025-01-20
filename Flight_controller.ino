@@ -31,24 +31,24 @@ void setup() {
 }
 
 void loop() {
-  // Initialize sensor data arrays
-  accelerometer[3] = { 0 };
-  gyroscope[3] = { 0 };
+  // Reset sensor data arrays
   rawAccelerometer[3] = { 0 };
   rawGyroscope[3] = { 0 };
 
-  // Get both accel and gyro data from imu
-  imu.getAccelData(accelerometer);
-  imu.getGyroData(gyroscope);
-
-  Serial.print(gyroscope[0] * 3.14/180.0);Serial.print("\t");
-  Serial.print(gyroscope[1] * 3.14/180.0);Serial.print("\t");
-  Serial.print(gyroscope[2] * 3.14/180.0);Serial.print("\t");
+  Serial.print(accelerometer[0] * 3.14/180.0);Serial.print("\t");
+  Serial.print(accelerometer[1] * 3.14/180.0);Serial.print("\t");
+  Serial.print(accelerometer[2] * 3.14/180.0);Serial.print("\t");
   Serial.println();
   delay(10);
 }
 
-void updateAccelerometer(){
+void updateAccelerometer() {
+  accelerometer[3] = { 0 };
+  imu.getAccelData(accelerometer);
+}
 
+void updateGyroscope() {
+  gyroscope[3] = { 0 };
+  imu.getGyroData(gyroscope);
 }
 
