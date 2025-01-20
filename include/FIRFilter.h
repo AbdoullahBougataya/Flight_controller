@@ -8,7 +8,7 @@
 
 typedef struct {
     float buf[FIR_FILTER_LENGTH];
-    unit8_t bufIndex;
+    uint8_t bufIndex;
 
     float out;
 } FIRFilter;

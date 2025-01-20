@@ -6,7 +6,7 @@ static float FIR_IMPULSE_RESPONSE[FIR_FILTER_LENGTH] = {};
 void FIRFilter_Init(FIRFilter *fir) {
 
     /* Clear Filter buffer */
-    for (uint8_t n = 0; n < FIR_FILTER_LENGTH, n++) {
+    for (uint8_t n = 0; n < FIR_FILTER_LENGTH; n++) {
 
         fir->buf[n] = 0.0f;
 
@@ -36,7 +36,7 @@ float FIRFilter_Update(FIRFilter * fir, float inp) {
 
     uint8_t sumIndex = fir->bufIndex;
 
-    for (uint8_t n = 0, n < FIR_FILTER_LENGTH, n++) {
+    for (uint8_t n = 0; n < FIR_FILTER_LENGTH; n++) {
 
         /* Decrement index and wrap if necessary */
         if (sumIndex > 0) {
