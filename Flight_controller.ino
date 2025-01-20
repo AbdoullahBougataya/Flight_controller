@@ -8,8 +8,8 @@ const int8_t addr = 0x68;
 #define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
 
 // Define sensor data arrays
-int16_t accelerometer[3] = { 0 };
-int16_t gyroscope[3] = { 0 };
+volatile int16_t accelerometer[3] = { 0 };
+volatile int16_t gyroscope[3] = { 0 };
 float rawAccelerometer[3] = { 0 };
 float rawGyroscope[3] = { 0 };
 
@@ -47,3 +47,8 @@ void loop() {
   Serial.println();
   delay(10);
 }
+
+void updateAccelerometer(){
+
+}
+
