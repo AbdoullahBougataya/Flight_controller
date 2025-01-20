@@ -34,9 +34,9 @@ float FIRFilter_Update(FIRFilter * fir, float inp) {
     /* Compute new output sample (convolution) */
     fir->out = 0.0f;
 
-    unit8_t sumIndex = fir->bufIndex;
+    uint8_t sumIndex = fir->bufIndex;
 
-    for (unint8_t n = 0, n < FIR_FILTER_LENGTH, n++) {
+    for (uint8_t n = 0, n < FIR_FILTER_LENGTH, n++) {
 
         /* Decrement index and wrap if necessary */
         if (sumIndex > 0) {
@@ -44,7 +44,7 @@ float FIRFilter_Update(FIRFilter * fir, float inp) {
         } else {
             sumIndex = FIR_FILTER_LENGTH - 1;
         }
-        
+
         /* Multiply impulse response with shifted input sample and add to ouput */
         fir->out += FIR_IMPULSE_RESPONSE[n] * fir->buf[sumIndex];
 
