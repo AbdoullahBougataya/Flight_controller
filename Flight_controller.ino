@@ -11,7 +11,7 @@ const int8_t addr = 0x68;
 #define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
 
 // Define sensor data arrays
-int16_t accelGyro[6] = { 0 };
+int16_t accelGyro[3] = { 0 };
 float rawAccelGyro[6] = { 0 };
 
 void setup() {
@@ -25,7 +25,7 @@ void setup() {
   }
 
   // Set and init the imu i2c address
-  if (imu.Init(addr) != BMI160_OK) {
+  if (imu.I2cInit(addr) != BMI160_OK) {
     Serial.println("init false");
     while (1);
   }
