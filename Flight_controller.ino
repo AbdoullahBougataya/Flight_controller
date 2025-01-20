@@ -6,7 +6,6 @@ BMI160 imu;
 
 FIRFilter lpfAcc;
 
-
 const int8_t addr = 0x68;
 
 #define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
