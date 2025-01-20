@@ -38,16 +38,12 @@ void loop() {
   rawGyroscope[3] = { 0 };
 
   // Get both accel and gyro data from imu
-  uint8_t rslt = imu.getAccelGyroData(accelGyro);
+  imu.getAccelData(accelerometer);
+  imu.getGyroData(gyroscope);
 
-  if (rslt == 0) {
-    Serial.print(accelGyro[0] * 3.14/180.0);Serial.print("\t");
-    Serial.print(accelGyro[1] * 3.14/180.0);Serial.print("\t");
-    Serial.print(accelGyro[2] * 3.14/180.0);Serial.print("\t");
-    Serial.println();
-  }
-  else {
-    Serial.println("err");
-  }
+  Serial.print(accelGyro[0] * 3.14/180.0);Serial.print("\t");
+  Serial.print(accelGyro[1] * 3.14/180.0);Serial.print("\t");
+  Serial.print(accelGyro[2] * 3.14/180.0);Serial.print("\t");
+  Serial.println();
   delay(10);
 }
