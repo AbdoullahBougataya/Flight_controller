@@ -16,7 +16,7 @@ const uint8_t int_mask_lookup_table[13] = {
     BMI160_INT2_FIFO_WM_MASK
 };
 
-DFRobot_BMI160::DFRobot_BMI160()
+BMI160::BMI160()
 {
   Wire.begin();
   Obmi160=(struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
@@ -26,14 +26,14 @@ DFRobot_BMI160::DFRobot_BMI160()
   Ogyro = (struct bmi160SensorData*)malloc(sizeof(struct bmi160SensorData));
 }
 
-int8_t DFRobot_BMI160::I2cInit(int8_t i2c_addr)
+int8_t BMI160::I2cInit(int8_t i2c_addr)
 {
   Obmi160->id = i2c_addr;
   Obmi160->interface = BMI160_I2C_INTF;
-  return DFRobot_BMI160::I2cInit(Obmi160);
+  return BMI160::I2cInit(Obmi160);
 }
 
-int8_t DFRobot_BMI160::SPIInit()
+int8_t BMI160::SPIInit()
 {
   //SPI.begin();
   //pinMode(10,OUTPUT);
@@ -42,12 +42,12 @@ int8_t DFRobot_BMI160::SPIInit()
   return BMI160_OK;
 }
 
-int8_t DFRobot_BMI160::SPIInit(struct bmi160Dev *dev)
+int8_t BMI160::SPIInit(struct bmi160Dev *dev)
 {
   return BMI160_OK;
 }
 
-int8_t DFRobot_BMI160::I2cInit(struct bmi160Dev *dev)
+int8_t BMI160::I2cInit(struct bmi160Dev *dev)
 {
   int8_t rslt=BMI160_OK;
   uint8_t chip_id=0;
@@ -75,7 +75,7 @@ int8_t DFRobot_BMI160::I2cInit(struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::softReset()
+int8_t BMI160::softReset()
 {
   int8_t rslt=BMI160_OK;
   if (Obmi160 == NULL){
@@ -85,22 +85,22 @@ int8_t DFRobot_BMI160::softReset()
   return rslt;
 }
 
-int8_t DFRobot_BMI160::softReset(struct bmi160Dev *dev)
+int8_t BMI160::softReset(struct bmi160Dev *dev)
 {
   int8_t rslt=BMI160_OK;
   uint8_t data = BMI160_SOFT_RESET_CMD;
   if (dev==NULL){
     rslt = BMI160_E_NULL_PTR;
   }
-  rslt = DFRobot_BMI160::setRegs(BMI160_COMMAND_REG_ADDR, &data, 1, dev);
+  rslt = BMI160::setRegs(BMI160_COMMAND_REG_ADDR, &data, 1, dev);
   delay(BMI160_SOFT_RESET_DELAY_MS);
   if (rslt == BMI160_OK){
-    DFRobot_BMI160::defaultParamSettg(dev);
+    BMI160::defaultParamSettg(dev);
   }
   return rslt;
 }
 
-void DFRobot_BMI160::defaultParamSettg(struct bmi160Dev *dev)
+void BMI160::defaultParamSettg(struct bmi160Dev *dev)
 {
   /* Initializing accel and gyro params with
   * default values */
@@ -119,12 +119,12 @@ void DFRobot_BMI160::defaultParamSettg(struct bmi160Dev *dev)
   dev->prevGyroCfg = dev->gyroCfg;
 }
 
-int8_t DFRobot_BMI160::setSensConf()
+int8_t BMI160::setSensConf()
 {
-  return DFRobot_BMI160::setSensConf(Obmi160);
+  return BMI160::setSensConf(Obmi160);
 }
 
-int8_t DFRobot_BMI160::setSensConf(struct bmi160Dev *dev)
+int8_t BMI160::setSensConf(struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   dev->accelCfg.odr = BMI160_ACCEL_ODR_1600HZ;
@@ -140,32 +140,32 @@ int8_t DFRobot_BMI160::setSensConf(struct bmi160Dev *dev)
   dev->gyroCfg.power = BMI160_GYRO_NORMAL_MODE;
 
 
-  rslt = DFRobot_BMI160::setAccelConf(dev);
+  rslt = BMI160::setAccelConf(dev);
   if (rslt == BMI160_OK) {
-    rslt = DFRobot_BMI160::setGyroConf(dev);
+    rslt = BMI160::setGyroConf(dev);
     if (rslt == BMI160_OK) {
       /* write power mode for accel and gyro */
-      rslt = DFRobot_BMI160::setPowerMode(dev);
+      rslt = BMI160::setPowerMode(dev);
       if (rslt == BMI160_OK)
-        rslt = DFRobot_BMI160::checkInvalidSettg(dev);
+        rslt = BMI160::checkInvalidSettg(dev);
     }
   }
 
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setAccelConf(struct bmi160Dev *dev)
+int8_t BMI160::setAccelConf(struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   uint8_t data[2] = {0};
-  rslt = DFRobot_BMI160::checkAccelConfig(data, dev);
+  rslt = BMI160::checkAccelConfig(data, dev);
   if (rslt == BMI160_OK) {
-    rslt = DFRobot_BMI160::setRegs(BMI160_ACCEL_CONFIG_ADDR, &data[0], 1, dev);
+    rslt = BMI160::setRegs(BMI160_ACCEL_CONFIG_ADDR, &data[0], 1, dev);
     if (rslt == BMI160_OK) {
       dev->prevAccelCfg.odr = dev->accelCfg.odr;
       dev->prevAccelCfg.bw = dev->accelCfg.bw;
       delay(BMI160_ONE_MS_DELAY);
-      rslt = DFRobot_BMI160::setRegs(BMI160_ACCEL_RANGE_ADDR, &data[1], 1, dev);
+      rslt = BMI160::setRegs(BMI160_ACCEL_RANGE_ADDR, &data[1], 1, dev);
       if (rslt == BMI160_OK){
         dev->prevAccelCfg.range = dev->accelCfg.range;
       }
@@ -174,25 +174,25 @@ int8_t DFRobot_BMI160::setAccelConf(struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::checkAccelConfig(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::checkAccelConfig(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt;
 
   /* read accel Output data rate and bandwidth */
-  rslt = DFRobot_BMI160::getRegs(BMI160_ACCEL_CONFIG_ADDR, data, 2, dev);
+  rslt = BMI160::getRegs(BMI160_ACCEL_CONFIG_ADDR, data, 2, dev);
   if (rslt == BMI160_OK) {
-    rslt = DFRobot_BMI160::processAccelOdr(&data[0], dev);
+    rslt = BMI160::processAccelOdr(&data[0], dev);
     if (rslt == BMI160_OK) {
-      rslt = DFRobot_BMI160::processAccelBw(&data[0], dev);
+      rslt = BMI160::processAccelBw(&data[0], dev);
       if (rslt == BMI160_OK)
-        rslt = DFRobot_BMI160::processAccelRange(&data[1], dev);
+        rslt = BMI160::processAccelRange(&data[1], dev);
     }
   }
 
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processAccelOdr(uint8_t *data,  struct bmi160Dev *dev)
+int8_t BMI160::processAccelOdr(uint8_t *data,  struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t temp = 0;
@@ -212,7 +212,7 @@ int8_t DFRobot_BMI160::processAccelOdr(uint8_t *data,  struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processAccelBw(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::processAccelBw(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t temp = 0;
@@ -232,7 +232,7 @@ int8_t DFRobot_BMI160::processAccelBw(uint8_t *data, struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processAccelRange(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::processAccelRange(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t temp = 0;
@@ -252,22 +252,22 @@ int8_t DFRobot_BMI160::processAccelRange(uint8_t *data, struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setGyroConf(struct bmi160Dev *dev)
+int8_t BMI160::setGyroConf(struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data[2]={0};
 
-  rslt = DFRobot_BMI160::checkGyroConfig(data, dev);
+  rslt = BMI160::checkGyroConfig(data, dev);
 
   if (rslt == BMI160_OK) {
     // Write output data rate and bandwidth
-    rslt = DFRobot_BMI160::setRegs(BMI160_GYRO_CONFIG_ADDR, &data[0], 1, dev);
+    rslt = BMI160::setRegs(BMI160_GYRO_CONFIG_ADDR, &data[0], 1, dev);
     if (rslt == BMI160_OK) {
       dev->prevGyroCfg.odr = dev->gyroCfg.odr;
       dev->prevGyroCfg.bw = dev->gyroCfg.bw;
       delay(BMI160_ONE_MS_DELAY);
       // Write gyro range
-      rslt = DFRobot_BMI160::setRegs(BMI160_GYRO_RANGE_ADDR, &data[1], 1, dev);
+      rslt = BMI160::setRegs(BMI160_GYRO_RANGE_ADDR, &data[1], 1, dev);
       if (rslt == BMI160_OK)
         dev->prevGyroCfg.range = dev->gyroCfg.range;
     }
@@ -276,25 +276,25 @@ int8_t DFRobot_BMI160::setGyroConf(struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::checkGyroConfig(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::checkGyroConfig(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt;
 
   /* read gyro Output data rate and bandwidth */
-  rslt = DFRobot_BMI160::getRegs(BMI160_GYRO_CONFIG_ADDR, data, 2, dev);
+  rslt = BMI160::getRegs(BMI160_GYRO_CONFIG_ADDR, data, 2, dev);
   if (rslt == BMI160_OK) {
-    rslt = DFRobot_BMI160::processGyroOdr(&data[0], dev);
+    rslt = BMI160::processGyroOdr(&data[0], dev);
     if (rslt == BMI160_OK) {
-      rslt = DFRobot_BMI160::processGyroBw(&data[0], dev);
+      rslt = BMI160::processGyroBw(&data[0], dev);
       if (rslt == BMI160_OK)
-        rslt = DFRobot_BMI160::processGyroRange(&data[1], dev);
+        rslt = BMI160::processGyroRange(&data[1], dev);
     }
   }
 
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processGyroOdr(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::processGyroOdr(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t temp = 0;
@@ -314,7 +314,7 @@ int8_t DFRobot_BMI160::processGyroOdr(uint8_t *data, struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processGyroBw(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::processGyroBw(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t temp = 0;
@@ -332,7 +332,7 @@ int8_t DFRobot_BMI160::processGyroBw(uint8_t *data, struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processGyroRange(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::processGyroRange(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t temp = 0;
@@ -352,17 +352,17 @@ int8_t DFRobot_BMI160::processGyroRange(uint8_t *data, struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setPowerMode(struct bmi160Dev *dev)
+int8_t BMI160::setPowerMode(struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
-  rslt = DFRobot_BMI160::setAccelPwr(dev);
+  rslt = BMI160::setAccelPwr(dev);
   if (rslt == BMI160_OK){
-    rslt = DFRobot_BMI160::setGyroPwr(dev);
+    rslt = BMI160::setGyroPwr(dev);
   }
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setAccelPwr(struct bmi160Dev *dev)
+int8_t BMI160::setAccelPwr(struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   uint8_t data = 0;
@@ -370,10 +370,10 @@ int8_t DFRobot_BMI160::setAccelPwr(struct bmi160Dev *dev)
   if ((dev->accelCfg.power >= BMI160_ACCEL_SUSPEND_MODE) &&
     (dev->accelCfg.power <= BMI160_ACCEL_LOWPOWER_MODE)) {
     if (dev->accelCfg.power != dev->prevAccelCfg.power) {
-      rslt = DFRobot_BMI160::processUnderSampling(&data, dev);
+      rslt = BMI160::processUnderSampling(&data, dev);
       if (rslt == BMI160_OK) {
         /* Write accel power */
-        rslt = DFRobot_BMI160::setRegs(BMI160_COMMAND_REG_ADDR, &dev->accelCfg.power, 1, dev);
+        rslt = BMI160::setRegs(BMI160_COMMAND_REG_ADDR, &dev->accelCfg.power, 1, dev);
         /* Add delay of 5 ms */
         if (dev->prevAccelCfg.power == BMI160_ACCEL_SUSPEND_MODE){
           delay(BMI160_ACCEL_DELAY_MS);
@@ -388,13 +388,13 @@ int8_t DFRobot_BMI160::setAccelPwr(struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev)
+int8_t BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t temp = 0;
   uint8_t pre_filter = 0;
 
-  rslt = DFRobot_BMI160::getRegs(BMI160_ACCEL_CONFIG_ADDR, data, 1, dev);
+  rslt = BMI160::getRegs(BMI160_ACCEL_CONFIG_ADDR, data, 1, dev);
   if (rslt == BMI160_OK) {
     if (dev->accelCfg.power == BMI160_ACCEL_LOWPOWER_MODE) {
       temp = *data & ~BMI160_ACCEL_UNDERSAMPLING_MASK;
@@ -406,7 +406,7 @@ int8_t DFRobot_BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev
        * low power mode */
       if (rslt == BMI160_OK)
         /* Disable the Pre-filter data*/
-        rslt = DFRobot_BMI160::setRegs(BMI160_INT_DATA_0_ADDR, &pre_filter, 2, dev);
+        rslt = BMI160::setRegs(BMI160_INT_DATA_0_ADDR, &pre_filter, 2, dev);
     } else {
       if (*data & BMI160_ACCEL_UNDERSAMPLING_MASK) {
         temp = *data & ~BMI160_ACCEL_UNDERSAMPLING_MASK;
@@ -414,7 +414,7 @@ int8_t DFRobot_BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev
         if already enabled */
         *data = temp;
         /* Write data */
-        rslt = DFRobot_BMI160::setRegs(BMI160_ACCEL_CONFIG_ADDR, data, 1, dev);
+        rslt = BMI160::setRegs(BMI160_ACCEL_CONFIG_ADDR, data, 1, dev);
       }
     }
   }
@@ -422,14 +422,14 @@ int8_t DFRobot_BMI160::processUnderSampling(uint8_t *data, struct bmi160Dev *dev
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setGyroPwr(struct bmi160Dev *dev)
+int8_t BMI160::setGyroPwr(struct bmi160Dev *dev)
 {
   int8_t rslt = 0;
   if ((dev->gyroCfg.power == BMI160_GYRO_SUSPEND_MODE) || (dev->gyroCfg.power == BMI160_GYRO_NORMAL_MODE)
     || (dev->gyroCfg.power == BMI160_GYRO_FASTSTARTUP_MODE)) {
     if (dev->gyroCfg.power != dev->prevGyroCfg.power) {
       /* Write gyro power */
-      rslt = DFRobot_BMI160::setRegs(BMI160_COMMAND_REG_ADDR, &dev->gyroCfg.power, 1, dev);
+      rslt = BMI160::setRegs(BMI160_COMMAND_REG_ADDR, &dev->gyroCfg.power, 1, dev);
       if (dev->prevGyroCfg.power == BMI160_GYRO_SUSPEND_MODE) {
         /* Delay of 81 ms */
         delay(BMI160_GYRO_DELAY_MS);
@@ -450,13 +450,13 @@ int8_t DFRobot_BMI160::setGyroPwr(struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::checkInvalidSettg( struct bmi160Dev *dev)
+int8_t BMI160::checkInvalidSettg( struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data = 0;
 
   // read the error reg
-  rslt = DFRobot_BMI160::getRegs(BMI160_ERROR_REG_ADDR, &data, 1, dev);
+  rslt = BMI160::getRegs(BMI160_ERROR_REG_ADDR, &data, 1, dev);
 
   data = data >> 1;
   data = data & BMI160_ERR_REG_MASK;
@@ -472,7 +472,7 @@ int8_t DFRobot_BMI160::checkInvalidSettg( struct bmi160Dev *dev)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getSensorData(uint8_t type, int16_t* data)
+int8_t BMI160::getSensorData(uint8_t type, int16_t* data)
 {
   int8_t rslt=BMI160_OK;
   if (type==onlyAccel){
@@ -490,7 +490,7 @@ int8_t DFRobot_BMI160::getSensorData(uint8_t type, int16_t* data)
       data[2]=Oaccel->z;
     }
   }else if(type==bothAccelGyro){
-    rslt = DFRobot_BMI160::getSensorData((BMI160_ACCEL_SEL | BMI160_GYRO_SEL),Oaccel, Ogyro, Obmi160);
+    rslt = BMI160::getSensorData((BMI160_ACCEL_SEL | BMI160_GYRO_SEL),Oaccel, Ogyro, Obmi160);
     if(rslt == BMI160_OK){
       data[0]=Ogyro->x;
       data[1]=Ogyro->y;
@@ -506,7 +506,7 @@ int8_t DFRobot_BMI160::getSensorData(uint8_t type, int16_t* data)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getAccelData( int16_t* data)
+int8_t BMI160::getAccelData( int16_t* data)
 {
   int8_t rslt=BMI160_OK;
   rslt = getSensorData(BMI160_ACCEL_SEL, Oaccel, NULL, Obmi160);
@@ -518,7 +518,7 @@ int8_t DFRobot_BMI160::getAccelData( int16_t* data)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getAccelData( int16_t* data, uint32_t* timestamp)
+int8_t BMI160::getAccelData( int16_t* data, uint32_t* timestamp)
 {
   int8_t rslt=BMI160_OK;
   rslt = getSensorData((BMI160_ACCEL_SEL | BMI160_TIME_SEL), Oaccel, NULL, Obmi160);
@@ -531,7 +531,7 @@ int8_t DFRobot_BMI160::getAccelData( int16_t* data, uint32_t* timestamp)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getGyroData( int16_t* data)
+int8_t BMI160::getGyroData( int16_t* data)
 {
   int rslt = BMI160_OK;
   rslt = getSensorData(BMI160_GYRO_SEL, NULL, Ogyro, Obmi160);
@@ -543,7 +543,7 @@ int8_t DFRobot_BMI160::getGyroData( int16_t* data)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getGyroData( int16_t* data, uint32_t* timestamp)
+int8_t BMI160::getGyroData( int16_t* data, uint32_t* timestamp)
 {
   int rslt = BMI160_OK;
   rslt = getSensorData((BMI160_GYRO_SEL | BMI160_TIME_SEL), NULL, Ogyro, Obmi160);
@@ -556,7 +556,7 @@ int8_t DFRobot_BMI160::getGyroData( int16_t* data, uint32_t* timestamp)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getAccelGyroData( int16_t* data)
+int8_t BMI160::getAccelGyroData( int16_t* data)
 {
   int8_t rslt = BMI160_OK;
   rslt = getSensorData((BMI160_ACCEL_SEL | BMI160_GYRO_SEL),Oaccel, Ogyro, Obmi160);
@@ -571,7 +571,7 @@ int8_t DFRobot_BMI160::getAccelGyroData( int16_t* data)
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getAccelGyroData( int16_t* data, uint32_t* timestamp)
+int8_t BMI160::getAccelGyroData( int16_t* data, uint32_t* timestamp)
 {
   int8_t rslt = BMI160_OK;
   rslt = getSensorData((BMI160_ACCEL_SEL | BMI160_GYRO_SEL | BMI160_TIME_SEL),Oaccel, Ogyro, Obmi160);
@@ -590,7 +590,7 @@ int8_t DFRobot_BMI160::getAccelGyroData( int16_t* data, uint32_t* timestamp)
 
 
 
-int8_t DFRobot_BMI160::getSensorData(uint8_t select_sensor, struct bmi160SensorData *accel, struct bmi160SensorData *gyro,struct bmi160Dev *dev)
+int8_t BMI160::getSensorData(uint8_t select_sensor, struct bmi160SensorData *accel, struct bmi160SensorData *gyro,struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   uint8_t time_sel;
@@ -612,21 +612,21 @@ int8_t DFRobot_BMI160::getSensorData(uint8_t select_sensor, struct bmi160SensorD
       if (accel == NULL)
         rslt = BMI160_E_NULL_PTR;
       else
-        rslt = DFRobot_BMI160::getAccelData(len, accel, dev);
+        rslt = BMI160::getAccelData(len, accel, dev);
       break;
     case eBmi160GyroOnly:
       /* Null-pointer check */
       if (gyro == NULL)
         rslt = BMI160_E_NULL_PTR;
       else
-        rslt = DFRobot_BMI160::getGyroData(len, gyro, dev);
+        rslt = BMI160::getGyroData(len, gyro, dev);
       break;
     case eBmi160BothAccelAndGyro:
       /* Null-pointer check */
       if ((gyro == NULL) || (accel == NULL))
         rslt = BMI160_E_NULL_PTR;
       else
-        rslt = DFRobot_BMI160::getAccelGyroData(len, accel, gyro, dev);
+        rslt = BMI160::getAccelGyroData(len, accel, gyro, dev);
       break;
     default:
       rslt = BMI160_E_INVALID_INPUT;
@@ -639,7 +639,7 @@ int8_t DFRobot_BMI160::getSensorData(uint8_t select_sensor, struct bmi160SensorD
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getAccelData(uint8_t len, struct bmi160SensorData *accel, struct bmi160Dev *dev)
+int8_t BMI160::getAccelData(uint8_t len, struct bmi160SensorData *accel, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t idx = 0;
@@ -651,7 +651,7 @@ int8_t DFRobot_BMI160::getAccelData(uint8_t len, struct bmi160SensorData *accel,
   uint8_t msb;
   float msblsb;
 
-  rslt = DFRobot_BMI160::getRegs(BMI160_ACCEL_DATA_ADDR, data_array, 6 + len, dev);
+  rslt = BMI160::getRegs(BMI160_ACCEL_DATA_ADDR, data_array, 6 + len, dev);
 
   if (rslt == BMI160_OK){
     lsb = data_array[idx++];
@@ -679,7 +679,7 @@ int8_t DFRobot_BMI160::getAccelData(uint8_t len, struct bmi160SensorData *accel,
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getGyroData(uint8_t len, struct bmi160SensorData *gyro, struct bmi160Dev *dev)
+int8_t BMI160::getGyroData(uint8_t len, struct bmi160SensorData *gyro, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t idx = 0;
@@ -692,7 +692,7 @@ int8_t DFRobot_BMI160::getGyroData(uint8_t len, struct bmi160SensorData *gyro, s
   float msblsb;
   if (len == 0) {
     /* read gyro data only */
-    rslt = DFRobot_BMI160::getRegs(BMI160_GYRO_DATA_ADDR, data_array, 6, dev);
+    rslt = BMI160::getRegs(BMI160_GYRO_DATA_ADDR, data_array, 6, dev);
     if (rslt == BMI160_OK) {
       /* Gyro Data */
       lsb = data_array[idx++];
@@ -714,7 +714,7 @@ int8_t DFRobot_BMI160::getGyroData(uint8_t len, struct bmi160SensorData *gyro, s
     }
   } else {
     /* read gyro sensor data along with time */
-    rslt = DFRobot_BMI160::getRegs(BMI160_GYRO_DATA_ADDR, data_array, 12 + len, dev);
+    rslt = BMI160::getRegs(BMI160_GYRO_DATA_ADDR, data_array, 12 + len, dev);
     if (rslt == BMI160_OK) {
       /* Gyro Data */
       lsb = data_array[idx++];
@@ -746,7 +746,7 @@ int8_t DFRobot_BMI160::getGyroData(uint8_t len, struct bmi160SensorData *gyro, s
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getAccelGyroData(uint8_t len, struct bmi160SensorData *accel, struct bmi160SensorData *gyro, struct bmi160Dev *dev)
+int8_t BMI160::getAccelGyroData(uint8_t len, struct bmi160SensorData *accel, struct bmi160SensorData *gyro, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t idx = 0;
@@ -760,7 +760,7 @@ int8_t DFRobot_BMI160::getAccelGyroData(uint8_t len, struct bmi160SensorData *ac
 
   /* read both accel and gyro sensor data
    * along with time if requested */
-  rslt = DFRobot_BMI160::getRegs(BMI160_GYRO_DATA_ADDR, data_array, 12 + len, dev);
+  rslt = BMI160::getRegs(BMI160_GYRO_DATA_ADDR, data_array, 12 + len, dev);
   if (rslt == BMI160_OK) {
     /* Gyro Data */
     lsb = data_array[idx++];
@@ -812,7 +812,7 @@ int8_t DFRobot_BMI160::getAccelGyroData(uint8_t len, struct bmi160SensorData *ac
   return rslt;
 }
 
-int8_t DFRobot_BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
+int8_t BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
 {
 
   int8_t rslt = BMI160_OK;
@@ -823,9 +823,9 @@ int8_t DFRobot_BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, st
     //Configuring reg_addr for SPI Interface
     if (dev->interface == BMI160_SPI_INTF){
       reg_addr = (reg_addr | BMI160_SPI_RD_MASK);
-      rslt = DFRobot_BMI160::SPIGetRegs(dev, reg_addr, data, len);
+      rslt = BMI160::SPIGetRegs(dev, reg_addr, data, len);
     }else{
-      rslt = DFRobot_BMI160::I2cGetRegs(dev, reg_addr, data, len);
+      rslt = BMI160::I2cGetRegs(dev, reg_addr, data, len);
     }
     delay(1);
     if (rslt != BMI160_OK){
@@ -836,7 +836,7 @@ int8_t DFRobot_BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, st
   return rslt;
 }
 
-int8_t DFRobot_BMI160::I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
+int8_t BMI160::I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
 {
   Wire.beginTransmission(dev->id);
   Wire.write(reg_addr);
@@ -851,7 +851,7 @@ int8_t DFRobot_BMI160::I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8
   return BMI160_OK;
 }
 
-int8_t DFRobot_BMI160::setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
+int8_t BMI160::setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   uint8_t count = 0;
@@ -862,9 +862,9 @@ int8_t DFRobot_BMI160::setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, st
     //Configuring reg_addr for SPI Interface
     if (dev->interface == BMI160_SPI_INTF){
       reg_addr = (reg_addr & BMI160_SPI_WR_MASK);
-      rslt = DFRobot_BMI160::SPISetRegs(dev,reg_addr,data,len);
+      rslt = BMI160::SPISetRegs(dev,reg_addr,data,len);
     }else{
-      rslt = DFRobot_BMI160::I2cSetRegs(dev,reg_addr,data,len);
+      rslt = BMI160::I2cSetRegs(dev,reg_addr,data,len);
     }
     delay(1);
 
@@ -875,7 +875,7 @@ int8_t DFRobot_BMI160::setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, st
   return rslt;
 }
 
-int8_t DFRobot_BMI160::I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
+int8_t BMI160::I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
 {
   if ((dev->prevAccelCfg.power == BMI160_ACCEL_NORMAL_MODE)||(dev->prevGyroCfg.power == BMI160_GYRO_NORMAL_MODE)){
     Wire.beginTransmission(dev->id);
@@ -898,7 +898,7 @@ int8_t DFRobot_BMI160::I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8
   return BMI160_OK;
 }
 
-int8_t DFRobot_BMI160::SPIGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
+int8_t BMI160::SPIGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
 {
   digitalWrite(10,LOW);
   //SPI.transfer(0x6B);
@@ -911,17 +911,17 @@ int8_t DFRobot_BMI160::SPIGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8
   digitalWrite(10,HIGH);
   return BMI160_OK;
 }
-int8_t DFRobot_BMI160::SPISetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
+int8_t BMI160::SPISetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len)
 {
   return BMI160_OK;
 }
 
-int8_t DFRobot_BMI160::setInt(int intNum)
+int8_t BMI160::setInt(int intNum)
 {
   return setInt(Obmi160,intNum);
 }
 
-int8_t DFRobot_BMI160::setInt(struct bmi160Dev *dev, int intNum)
+int8_t BMI160::setInt(struct bmi160Dev *dev, int intNum)
 {
   int8_t rslt=BMI160_OK;
   if (dev == NULL){
@@ -949,11 +949,11 @@ int8_t DFRobot_BMI160::setInt(struct bmi160Dev *dev, int intNum)
   /* Select the Step Detector interrupt parameters, Kindly use the recommended settings for step detector */
   intConfig.intTypeCfg.accStepDetectInt.stepDetectorMode = BMI160_STEP_DETECT_NORMAL;
   intConfig.intTypeCfg.accStepDetectInt.stepDetectorEn = BMI160_ENABLE;// 1-enable, 0-disable the step detector
-  rslt = DFRobot_BMI160::setIntConfig(&intConfig, dev);
+  rslt = BMI160::setIntConfig(&intConfig, dev);
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setIntConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::setIntConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   switch (intConfig->intType) {
@@ -1012,7 +1012,7 @@ int8_t DFRobot_BMI160::setIntConfig(struct bmi160IntSettg *intConfig, struct bmi
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setAccelStepDetectInt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::setAccelStepDetectInt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
 
@@ -1042,7 +1042,7 @@ int8_t DFRobot_BMI160::setAccelStepDetectInt(struct bmi160IntSettg *intConfig, s
   return rslt;
 }
 
-int8_t DFRobot_BMI160::enableStepDetectInt(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
+int8_t BMI160::enableStepDetectInt(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data = 0;
@@ -1059,7 +1059,7 @@ int8_t DFRobot_BMI160::enableStepDetectInt(struct bmi160AccStepDetectIntCfg *ste
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setIntrPinConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::setIntrPinConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt;
 
@@ -1071,7 +1071,7 @@ int8_t DFRobot_BMI160::setIntrPinConfig(struct bmi160IntSettg *intConfig, struct
   return rslt;
 }
 
-int8_t DFRobot_BMI160::configIntOutCtrl(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::configIntOutCtrl(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t temp = 0;
@@ -1129,7 +1129,7 @@ int8_t DFRobot_BMI160::configIntOutCtrl(struct bmi160IntSettg *intConfig, struct
   return rslt;
 }
 
-int8_t DFRobot_BMI160::configIntLatch(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::configIntLatch(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t temp = 0;
@@ -1168,7 +1168,7 @@ int8_t DFRobot_BMI160::configIntLatch(struct bmi160IntSettg *intConfig, struct b
   return rslt;
 }
 
-int8_t DFRobot_BMI160::mapFeatureInterrupt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::mapFeatureInterrupt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data[3] = {0, 0, 0};
@@ -1207,7 +1207,7 @@ int8_t DFRobot_BMI160::mapFeatureInterrupt(struct bmi160IntSettg *intConfig, str
   return rslt;
 }
 
-int8_t DFRobot_BMI160::configStepDetect(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
+int8_t BMI160::configStepDetect(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t temp = 0;
@@ -1255,12 +1255,12 @@ int8_t DFRobot_BMI160::configStepDetect(struct bmi160AccStepDetectIntCfg *stepDe
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setStepPowerMode(uint8_t model)
+int8_t BMI160::setStepPowerMode(uint8_t model)
 {
-  return DFRobot_BMI160::setStepPowerMode(model,Obmi160);
+  return BMI160::setStepPowerMode(model,Obmi160);
 }
 
-int8_t DFRobot_BMI160::setStepPowerMode(uint8_t model,struct bmi160Dev *dev)
+int8_t BMI160::setStepPowerMode(uint8_t model,struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   if (model == stepNormalPowerMode){
@@ -1284,27 +1284,27 @@ int8_t DFRobot_BMI160::setStepPowerMode(uint8_t model,struct bmi160Dev *dev)
   dev->gyroCfg.range = BMI160_GYRO_RANGE_2000_DPS;
   dev->gyroCfg.bw = BMI160_GYRO_BW_NORMAL_MODE;
 
-  rslt = DFRobot_BMI160::setAccelConf(dev);
+  rslt = BMI160::setAccelConf(dev);
   if (rslt == BMI160_OK) {
-    rslt = DFRobot_BMI160::setGyroConf(dev);
+    rslt = BMI160::setGyroConf(dev);
     if (rslt == BMI160_OK) {
       /* write power mode for accel and gyro */
-      rslt = DFRobot_BMI160::setPowerMode(dev);
+      rslt = BMI160::setPowerMode(dev);
       if (rslt == BMI160_OK)
-        rslt = DFRobot_BMI160::checkInvalidSettg(dev);
+        rslt = BMI160::checkInvalidSettg(dev);
     }
   }
 
   return rslt;
 }
 
-int8_t DFRobot_BMI160::setStepCounter()
+int8_t BMI160::setStepCounter()
 {
   uint8_t step_enable = 1;//enable the step counter
-  return DFRobot_BMI160::setStepCounter(step_enable,Obmi160);
+  return BMI160::setStepCounter(step_enable,Obmi160);
 }
 
-int8_t DFRobot_BMI160::setStepCounter(uint8_t step_cnt_enable, struct bmi160Dev *dev)
+int8_t BMI160::setStepCounter(uint8_t step_cnt_enable, struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   uint8_t data = 0;
@@ -1331,12 +1331,12 @@ int8_t DFRobot_BMI160::setStepCounter(uint8_t step_cnt_enable, struct bmi160Dev 
   return rslt;
 }
 
-int8_t DFRobot_BMI160::readStepCounter(uint16_t *stepVal)
+int8_t BMI160::readStepCounter(uint16_t *stepVal)
 {
   return readStepCounter(stepVal,Obmi160);
 }
 
-int8_t DFRobot_BMI160::readStepCounter(uint16_t *stepVal, struct bmi160Dev *dev)
+int8_t BMI160::readStepCounter(uint16_t *stepVal, struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
   uint8_t data[2] = {0, 0};
