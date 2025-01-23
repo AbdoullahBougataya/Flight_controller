@@ -1,17 +1,27 @@
 #include "./include/BMI160.h"
 #include <math.h>
 
-BMI160 imu;
+#define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
 
+BMI160 imu;
 const int8_t addr = 0x68;
 
-#define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
+bool accelerometerDataReady = false;
+bool gyroscopeDataReady = false;
 
 // Define sensor data arrays
 volatile int16_t accelerometer[3] = { 0 };
 volatile int16_t gyroscope[3] = { 0 };
 float rawAccelerometer[3] = { 0 };
 float rawGyroscope[3] = { 0 };
+
+void updateAccelerometer() {
+  accelerometerDataReady = true;
+}
+
+void updateGyroscope() {
+  gyroscopeDataReady = true;
+}
 
 void setup() {
   Serial.begin(115200);
@@ -33,6 +43,16 @@ void setup() {
 }
 
 void loop() {
+  if(accelerometerDataReady) {
+    accelerometer[3] = { 0 };
+    imu.getAccelData(accelerometer);
+    accelerometerDataReady = false;
+  }
+  if(gyroscopeDataReady) {
+    gyroscope[3] = { 0 };
+    imu.getGyroData(gyroscope);
+    gyroscopeDataReady = false;
+  }
   // Reset sensor data arrays
   rawAccelerometer[3] = { 0 };
   rawGyroscope[3] = { 0 };
@@ -44,13 +64,4 @@ void loop() {
   delay(10);
 }
 
-void updateAccelerometer() {
-  accelerometer[3] = { 0 };
-  imu.getAccelData(accelerometer);
-}
-
-void updateGyroscope() {
-  gyroscope[3] = { 0 };
-  imu.getGyroData(gyroscope);
-}
 
