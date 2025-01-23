@@ -50,9 +50,9 @@ void loop() {
   rawAccelerometer[3] = { 0 };
   rawGyroscope[3] = { 0 };
 
-  Serial.print(accelerometer[0] / 16384.0);Serial.print("\t");
-  Serial.print(accelerometer[1] / 16384.0);Serial.print("\t");
-  Serial.print(accelerometer[2] / 16384.0);Serial.print("\t");
+  Serial.print((float)accelerometer[0] / 16384.0);Serial.print("\t");
+  Serial.print((float)accelerometer[1] / 16384.0);Serial.print("\t");
+  Serial.print((float)accelerometer[2] / 16384.0);Serial.print("\t");
   Serial.println();
   delay(10);
 }
