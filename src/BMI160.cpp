@@ -1020,12 +1020,19 @@ int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct
   if ((rslt != BMI160_OK) || (intConfig == NULL)) {
     rslt = BMI160_E_NULL_PTR;
   } else {
-    /* Configure Interrupt pins */
-    rslt = setIntrPinConfig(intConfig, dev);
+    /* updating the interrupt structure to local structure */
+    struct bmi160AccStepDetectIntCfg *stepDetectIntCfg =
+                &(intConfig->intTypeCfg.accStepDetectInt);
+
+    rslt = enableDataReadyInt(stepDetectIntCfg, dev);
     if (rslt == BMI160_OK) {
-      rslt = mapFeatureInterrupt(intConfig, dev);
-      if (rslt == BMI160_OK){
-        rslt = configStepDetect(stepDetectIntCfg, dev);
+      /* Configure Interrupt pins */
+      rslt = setIntrPinConfig(intConfig, dev);
+      if (rslt == BMI160_OK) {
+        rslt = mapFeatureInterrupt(intConfig, dev);
+        if (rslt == BMI160_OK){
+          rslt = configStepDetect(stepDetectIntCfg, dev);
+        }
       }
     }
   }
