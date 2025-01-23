@@ -1030,9 +1030,6 @@ int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct
       rslt = setIntrPinConfig(intConfig, dev);
       if (rslt == BMI160_OK) {
         rslt = mapFeatureInterrupt(intConfig, dev);
-        if (rslt == BMI160_OK){
-          rslt = configStepDetect(stepDetectIntCfg, dev);
-        }
       }
     }
   }
