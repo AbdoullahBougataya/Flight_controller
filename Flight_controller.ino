@@ -50,6 +50,7 @@ void setup() {
     Serial.println("set interrput fail");
     while(1);
   }
+
   attachInterrupt(0, updateGyroscope, FALLING);
   attachInterrupt(1, updateAccelerometer, FALLING);
 }
