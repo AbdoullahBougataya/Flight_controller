@@ -10,8 +10,8 @@ bool accelerometerDataReady = false;
 bool gyroscopeDataReady = false;
 
 // Define sensor data arrays
-volatile int16_t accelerometer[3] = { 0 };
-volatile int16_t gyroscope[3] = { 0 };
+int16_t accelerometer[3] = { 0 };
+int16_t gyroscope[3] = { 0 };
 float rawAccelerometer[3] = { 0 };
 float rawGyroscope[3] = { 0 };
 
