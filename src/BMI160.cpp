@@ -1048,7 +1048,7 @@ int8_t BMI160::enableDataReadyInt(struct bmi160IntSettg *intConfig, struct bmi16
     rslt = getRegs(BMI160_INT_ENABLE_1_ADDR, &data, 1, dev);
     if (rslt == BMI160_OK) {
       temp = data & ~BMI160_DATA_RDY_INT_EN_MASK;
-      data = temp | ((stepDetectIntCfg->stepDetectorEn << 3) & BMI160_DATA_RDY_INT_EN_MASK);
+      data = temp | ((dataReadyIntCfg->intDRDYEn << 3) & BMI160_DATA_RDY_INT_EN_MASK);
       /* Writing data to INT ENABLE 1 Address */
       rslt = setRegs(BMI160_INT_ENABLE_1_ADDR, &data, 1, dev);
     }
@@ -1058,7 +1058,7 @@ int8_t BMI160::enableDataReadyInt(struct bmi160IntSettg *intConfig, struct bmi16
     rslt = getRegs(BMI160_INT_ENABLE_2_ADDR, &data, 1, dev);
     if (rslt == BMI160_OK) {
       temp = data & ~BMI160_DATA_RDY_INT_EN_MASK;
-      data = temp | ((stepDetectIntCfg->stepDetectorEn << 3) & BMI160_DATA_RDY_INT_EN_MASK);
+      data = temp | ((dataReadyIntCfg->intDRDYEn << 3) & BMI160_DATA_RDY_INT_EN_MASK);
       /* Writing data to INT ENABLE 2 Address */
       rslt = setRegs(BMI160_INT_ENABLE_2_ADDR, &data, 1, dev);
     }
