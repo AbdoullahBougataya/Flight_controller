@@ -878,13 +878,9 @@ struct bmi160AccHighGIntCfg {
 
 struct bmi160DRDYIntCfg {
 #if LITTLE_ENDIAN == 1
-  uint16_t intDRDYEn :1;  /**< 1- step detector enable, 0- step detector disable */
+  uint16_t intDRDYEn :1;  /**< 1- data ready enable, 0- data ready disable */
 #elif BIG_ENDIAN == 1
-  uint16_t stepMinBuf :3;       /**< minimum step buffer size*/
-  uint16_t stepDetectorMode : 2;/**< enable step counter mode setting */
-  uint16_t steptimeMin : 3;     /**< minimal detectable step time */
-  uint16_t minThreshold : 2;    /**< minimum threshold */
-  uint16_t stepDetectorEn :1;   /**< 1- step detector enable, 0- step detector disable */
+  uint16_t intDRDYEn :1;  /**< 1- data ready enable, 0- data ready disable */
 #endif
 };
 
