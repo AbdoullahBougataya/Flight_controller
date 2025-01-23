@@ -28,8 +28,8 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
-  attachInterrupt(0, updateGyroscope, RISING);
-  attachInterrupt(1, updateAccelerometer, RISING);
+  attachInterrupt(0, updateGyroscope, FALLING);
+  attachInterrupt(1, updateAccelerometer, FALLING);
 }
 
 void loop() {
