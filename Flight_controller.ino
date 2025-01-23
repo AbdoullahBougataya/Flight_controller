@@ -1,5 +1,4 @@
 #include "./include/BMI160.h"
-#include "./include/Filter.h"
 #include <math.h>
 
 BMI160 bmi160;
