@@ -1206,7 +1206,7 @@ int8_t BMI160::mapFeatureInterrupt(struct bmi160IntSettg *intConfig, struct bmi1
       rslt = BMI160_E_OUT_OF_RANGE;
     }
     if (rslt == BMI160_OK)
-      rslt = setRegs(BMI160_INT_MAP_0_ADDR, data, 3, dev);
+      rslt = setRegs(BMI160_INT_MAP_1_ADDR, data, 3, dev);
   }
 
   return rslt;
