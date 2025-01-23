@@ -54,7 +54,7 @@ void loop() {
   if (rslt == 0) {
     offset(accelGyro, rawAccelGyro);
 
-    EMAFilter(rawAccelGyro, filteredAccelGyro);
+    rawAccelGyro = filteredAccelGyro;
 
     complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
