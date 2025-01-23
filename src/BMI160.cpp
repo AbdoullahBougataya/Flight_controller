@@ -1024,7 +1024,7 @@ int8_t BMI160::setAccelStepDetectInt(struct bmi160IntSettg *intConfig, struct bm
     struct bmi160AccStepDetectIntCfg *stepDetectIntCfg =
                 &(intConfig->intTypeCfg.accStepDetectInt);
 
-    rslt = enableStepDetectInt(stepDetectIntCfg, dev);
+    rslt = enableDataReadyInt(stepDetectIntCfg, dev);
     if (rslt == BMI160_OK) {
       /* Configure Interrupt pins */
       rslt = setIntrPinConfig(intConfig, dev);
@@ -1039,7 +1039,7 @@ int8_t BMI160::setAccelStepDetectInt(struct bmi160IntSettg *intConfig, struct bm
   return rslt;
 }
 
-int8_t BMI160::enableStepDetectInt(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
+int8_t BMI160::enableDataReadyInt(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data = 0;
