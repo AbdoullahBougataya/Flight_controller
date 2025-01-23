@@ -1024,7 +1024,7 @@ int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct
     struct bmi160DataReadyIntCfg *dataReadyIntCfg =
                 &(intConfig->intTypeCfg.dataReadyInt);
 
-    rslt = enableDataReadyInt(dataReadyIntCfg, dev);
+    rslt = enableDataReadyInt(intConfig, dataReadyIntCfg, dev);
     if (rslt == BMI160_OK) {
       /* Configure Interrupt pins */
       rslt = setIntrPinConfig(intConfig, dev);
@@ -1039,14 +1039,14 @@ int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct
   return rslt;
 }
 
-int8_t BMI160::enableDataReadyInt(struct bmi160DataReadyIntCfg *dataReadyIntCfg, struct bmi160Dev *dev)
+int8_t BMI160::enableDataReadyInt(struct bmi160IntSettg *intConfig, struct bmi160DataReadyIntCfg *dataReadyIntCfg, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data = 0;
   uint8_t temp = 0;
 
   /* Enable data ready interrupt in Int Enable 1 register */
-  if (dataReadyIntCfg->intChannel == BMI160_INT_CHANNEL_1) {
+  if (intConfig->intChannel == BMI160_INT_CHANNEL_1) {
     rslt = getRegs(BMI160_INT_ENABLE_1_ADDR, &data, 1, dev);
     if (rslt == BMI160_OK) {
       temp = data & ~BMI160_DATA_RDY_INT_EN_MASK;
@@ -1056,7 +1056,7 @@ int8_t BMI160::enableDataReadyInt(struct bmi160DataReadyIntCfg *dataReadyIntCfg,
     }
   }
   /* Enable data ready interrupt in Int Enable 2 register */
-  else if (dataReadyIntCfg->intChannel == BMI160_INT_CHANNEL_2) {
+  else if (intConfig->intChannel == BMI160_INT_CHANNEL_2) {
     rslt = getRegs(BMI160_INT_ENABLE_2_ADDR, &data, 1, dev);
     if (rslt == BMI160_OK) {
       temp = data & ~BMI160_DATA_RDY_INT_EN_MASK;
