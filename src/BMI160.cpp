@@ -946,9 +946,6 @@ int8_t BMI160::setInt(struct bmi160Dev *dev, int intNum)
   intConfig.intPinSettg.inputEn = BMI160_DISABLE;// Disabling interrupt pin to act as input
   intConfig.intPinSettg.latchDur =BMI160_LATCH_DUR_NONE;// non-latched output
 
-  /* Select the Step Detector interrupt parameters, Kindly use the recommended settings for step detector */
-  intConfig.intTypeCfg.accStepDetectInt.stepDetectorMode = BMI160_STEP_DETECT_NORMAL;
-  intConfig.intTypeCfg.accStepDetectInt.stepDetectorEn = BMI160_ENABLE;// 1-enable, 0-disable the step detector
   rslt = BMI160::setIntConfig(&intConfig, dev);
   return rslt;
 }
