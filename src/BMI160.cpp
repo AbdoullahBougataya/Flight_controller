@@ -1021,10 +1021,10 @@ int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct
     rslt = BMI160_E_NULL_PTR;
   } else {
     /* updating the interrupt structure to local structure */
-    struct bmi160AccStepDetectIntCfg *stepDetectIntCfg =
-                &(intConfig->intTypeCfg.accStepDetectInt);
+    struct bmi160DataReadyIntCfg *dataReadyIntCfg =
+                &(intConfig->intTypeCfg.dataReadyInt);
 
-    rslt = enableDataReadyInt(stepDetectIntCfg, dev);
+    rslt = enableDataReadyInt(dataReadyIntCfg, dev);
     if (rslt == BMI160_OK) {
       /* Configure Interrupt pins */
       rslt = setIntrPinConfig(intConfig, dev);
