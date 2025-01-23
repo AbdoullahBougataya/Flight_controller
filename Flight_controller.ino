@@ -4,7 +4,9 @@
 BMI160 bmi160;
 const int8_t addr = 0x68;
 
-#define RAD2DEG 57.2957795130823208767f   // Radians to degrees (per second)
+#define COMP_FLTR_ALPHA 0.01000000000000000000f  // Complimentary filter coefficient
+#define RAD2DEG        57.2957795130823208767f   // Radians to degrees (per second)
+#define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
 
 // Define the time step
 float dt = 0.0;
