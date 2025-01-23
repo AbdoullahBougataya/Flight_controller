@@ -15,7 +15,6 @@ unsigned long currentTime = 0;
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 };
-float filteredAccelGyro[6] = { 0 };
 float rawAccelGyro[6] = { 0 };
 
 // Declare sensor fusion variables
@@ -55,9 +54,7 @@ void loop() {
   if (rslt == 0) {
     offset(accelGyro, rawAccelGyro);
 
-    rawAccelGyro = filteredAccelGyro;
-
-    complimentaryFilter(filteredAccelGyro, phiHat_rad, thetaHat_rad, dt);
+    complimentaryFilter(rawAccelGyro, phiHat_rad, thetaHat_rad, dt);
 
     Serial.print(phiHat_rad * RAD2DEG);
     Serial.print("\t");
