@@ -876,6 +876,22 @@ struct bmi160AccHighGIntCfg {
 #endif
 };
 
+struct bmi160AccStepDetectIntCfg {
+#if LITTLE_ENDIAN == 1
+  uint16_t stepDetectorEn :1;  /**< 1- step detector enable, 0- step detector disable */
+  uint16_t minThreshold :2;    /**< minimum threshold */
+  uint16_t steptimeMin :3;     /**< minimal detectable step time */
+  uint16_t stepDetectorMode :2;/**< enable step counter mode setting */
+  uint16_t stepMinBuf :3;      /**< minimum step buffer size*/
+#elif BIG_ENDIAN == 1
+  uint16_t stepMinBuf :3;       /**< minimum step buffer size*/
+  uint16_t stepDetectorMode : 2;/**< enable step counter mode setting */
+  uint16_t steptimeMin : 3;     /**< minimal detectable step time */
+  uint16_t minThreshold : 2;    /**< minimum threshold */
+  uint16_t stepDetectorEn :1;   /**< 1- step detector enable, 0- step detector disable */
+#endif
+};
+
 union bmi160IntTypeCfg {
   struct bmi160AccTapIntCfg accTapInt;               /**< Tap interrupt structure */
   struct bmi160AccAnyMotIntCfg accAnyMotionInt;      /**< Slope interrupt structure */
