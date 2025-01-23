@@ -993,7 +993,7 @@ int8_t BMI160::setIntConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *
     break;
   case BMI160_ACC_GYRO_DATA_RDY_INT:
     /* Data ready interrupt */
-    rslt = set_accel_gyro_data_ready_int(intConfig, dev);
+    rslt = setAccelGyroDataReadyInt(intConfig, dev);
     break;
   case BMI160_ACC_GYRO_FIFO_FULL_INT:
      /* Fifo full interrupt */
@@ -1009,7 +1009,7 @@ int8_t BMI160::setIntConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *
   return rslt;
 }
 
-int8_t BMI160::setAccelStepDetectInt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
+int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
 
