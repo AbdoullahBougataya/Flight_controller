@@ -1179,7 +1179,7 @@ int8_t BMI160::mapFeatureInterrupt(struct bmi160IntSettg *intConfig, struct bmi1
   uint8_t data[3] = {0, 0, 0};
   uint8_t temp[3] = {0, 0, 0};
 
-  rslt = getRegs(BMI160_INT_MAP_0_ADDR, data, 3, dev);
+  rslt = getRegs(BMI160_INT_MAP_1_ADDR, data, 3, dev);
 
   if (rslt == BMI160_OK) {
     temp[0] = data[0] & ~int_mask_lookup_table[intConfig->intType];
