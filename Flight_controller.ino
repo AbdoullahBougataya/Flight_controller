@@ -40,13 +40,13 @@ void setup() {
   }
 
   //set interrput number to int1
-  if (bmi160.setInt(1) != BMI160_OK){
+  if (imu.setInt(1) != BMI160_OK){
     Serial.println("set interrput fail");
     while(1);
   }
 
   //set interrput number to int2
-  if (bmi160.setInt(2) != BMI160_OK){
+  if (imu.setInt(2) != BMI160_OK){
     Serial.println("set interrput fail");
     while(1);
   }
