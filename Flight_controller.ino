@@ -38,6 +38,18 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
+
+  //set interrput number to int1
+  if (bmi160.setInt(1) != BMI160_OK){
+    Serial.println("set interrput fail");
+    while(1);
+  }
+
+  //set interrput number to int2
+  if (bmi160.setInt(2) != BMI160_OK){
+    Serial.println("set interrput fail");
+    while(1);
+  }
   attachInterrupt(0, updateGyroscope, FALLING);
   attachInterrupt(1, updateAccelerometer, FALLING);
 }
