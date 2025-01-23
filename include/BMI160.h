@@ -876,7 +876,7 @@ struct bmi160AccHighGIntCfg {
 #endif
 };
 
-struct bmi160DRDYIntCfg {
+struct bmi160DataReadyIntCfg {
 #if LITTLE_ENDIAN == 1
   uint16_t intDRDYEn :1;  /**< 1- data ready enable, 0- data ready disable */
 #elif BIG_ENDIAN == 1
@@ -894,7 +894,7 @@ union bmi160IntTypeCfg {
   struct bmi160AccFlatDetectIntCfg accFlatInt;       /**< Flat interrupt structure */
   struct bmi160AccLowGIntCfg accLowGInt;             /**< Low-g interrupt structure */
   struct bmi160AccHighGIntCfg accHighGInt;           /**< High-g interrupt structure */
-  struct bmi160DataReadyIntCfg DRDYInt;                   /**< Data ready interrupt structure */
+  struct bmi160DataReadyIntCfg dataReadyInt;              /**< Data ready interrupt structure */
 };
 
 struct bmi160IntSettg {
