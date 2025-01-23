@@ -937,7 +937,7 @@ int8_t BMI160::setInt(struct bmi160Dev *dev, int intNum)
   }
 
   /* Select the Interrupt type */
-  intConfig.intType = BMI160_STEP_DETECT_INT;// Choosing Step Detector interrupt
+  intConfig.intType = BMI160_ACC_GYRO_DATA_RDY_INT;// Choosing Data ready interrupt
   /* Select the interrupt channel/pin settings */
   intConfig.intPinSettg.outputEn = BMI160_ENABLE;// Enabling interrupt pins to act as output pin
   intConfig.intPinSettg.outputMode = BMI160_DISABLE;// Choosing push-pull mode for interrupt pin
