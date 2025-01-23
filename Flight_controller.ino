@@ -56,16 +56,10 @@ void setup() {
 }
 
 void loop() {
-  if(accelerometerDataReady) {
-    accelerometer[3] = { 0 };
-    imu.getAccelData(accelerometer);
-    accelerometerDataReady = false;
-  }
-  if(gyroscopeDataReady) {
-    gyroscope[3] = { 0 };
-    imu.getGyroData(gyroscope);
-    gyroscopeDataReady = false;
-  }
+  accelerometer[3] = { 0 };
+  gyroscope[3] = { 0 };
+  imu.getAccelData(accelerometer);
+  imu.getGyroData(gyroscope);
   // Reset sensor data arrays
   rawAccelerometer[3] = { 0 };
   rawGyroscope[3] = { 0 };
