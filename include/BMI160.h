@@ -894,6 +894,7 @@ union bmi160IntTypeCfg {
   struct bmi160AccFlatDetectIntCfg accFlatInt;       /**< Flat interrupt structure */
   struct bmi160AccLowGIntCfg accLowGInt;             /**< Low-g interrupt structure */
   struct bmi160AccHighGIntCfg accHighGInt;           /**< High-g interrupt structure */
+  struct bmi160DRDYIntCfg DRDYInt;                   /**< Data ready interrupt str */
 };
 
 struct bmi160IntSettg {
