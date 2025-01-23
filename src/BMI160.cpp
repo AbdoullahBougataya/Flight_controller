@@ -945,7 +945,7 @@ int8_t BMI160::setInt(struct bmi160Dev *dev, int intNum)
   intConfig.intPinSettg.edgeCtrl = BMI160_ENABLE;// Choosing edge triggered output
   intConfig.intPinSettg.inputEn = BMI160_DISABLE;// Disabling interrupt pin to act as input
   intConfig.intPinSettg.latchDur =BMI160_LATCH_DUR_NONE;// non-latched output
-  intConfig.intTypeCfg.dataReadyInt.stepDetectorEn = BMI160_ENABLE;// 1-enable, 0-disable the DRDY
+  intConfig.intTypeCfg.dataReadyInt.intDRDYEn = BMI160_ENABLE;// 1-enable, 0-disable the DRDY
 
   rslt = BMI160::setIntConfig(&intConfig, dev);
   return rslt;
