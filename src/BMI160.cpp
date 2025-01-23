@@ -973,7 +973,7 @@ int8_t BMI160::setIntConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *
     break;
   case BMI160_STEP_DETECT_INT:
     /* Step detector interrupt */
-    //rslt = setAccelStepDetectInt(intConfig, dev);
+    //rslt = set_accel_step_detect_int(intConfig, dev);
     break;
   case BMI160_ACC_ORIENT_INT:
     /* Orientation interrupt */

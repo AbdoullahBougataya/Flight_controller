@@ -1081,7 +1081,7 @@ public:
 
     int8_t setInt(struct bmi160Dev *dev, int intNum);
     int8_t setIntConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev);
-    int8_t setAccelStepDetectInt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev);
+    int8_t setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev)
     int8_t enableStepDetectInt(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev);
     int8_t setIntrPinConfig(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev);
     int8_t configIntOutCtrl(struct bmi160IntSettg *intConfig, struct bmi160Dev *dev);
