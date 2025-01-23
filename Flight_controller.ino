@@ -6,11 +6,22 @@
 BMI160 imu;
 const int8_t addr = 0x68;
 
+bool accelerometerDataReady = false;
+bool gyroscopeDataReady = false;
+
 // Define sensor data arrays
 int16_t accelerometer[3] = { 0 };
 int16_t gyroscope[3] = { 0 };
 float rawAccelerometer[3] = { 0 };
 float rawGyroscope[3] = { 0 };
+
+void updateAccelerometer() {
+  accelerometerDataReady = true;
+}
+
+void updateGyroscope() {
+  gyroscopeDataReady = true;
+}
 
 void setup() {
   Serial.begin(115200);
@@ -39,13 +50,22 @@ void setup() {
     Serial.println("set interrput fail");
     while(1);
   }
+
+  attachInterrupt(0, updateGyroscope, FALLING);
+  attachInterrupt(1, updateAccelerometer, FALLING);
 }
 
 void loop() {
-  accelerometer[3] = { 0 };
-  gyroscope[3] = { 0 };
-  imu.getAccelData(accelerometer);
-  imu.getGyroData(gyroscope);
+  if(accelerometerDataReady) {
+    accelerometer[3] = { 0 };
+    imu.getAccelData(accelerometer);
+    accelerometerDataReady = false;
+  }
+  if(gyroscopeDataReady) {
+    gyroscope[3] = { 0 };
+    imu.getGyroData(gyroscope);
+    gyroscopeDataReady = false;
+  }
   // Reset sensor data arrays
   rawAccelerometer[3] = { 0 };
   rawGyroscope[3] = { 0 };
