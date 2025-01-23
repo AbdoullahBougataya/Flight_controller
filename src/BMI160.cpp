@@ -1039,13 +1039,19 @@ int8_t BMI160::setAccelGyroDataReadyInt(struct bmi160IntSettg *intConfig, struct
   return rslt;
 }
 
-int8_t BMI160::enableDataReadyInt(struct bmi160AccStepDetectIntCfg *stepDetectIntCfg, struct bmi160Dev *dev)
+int8_t BMI160::enableDataReadyInt(struct bmi160DataReadyIntCfg *dataReadyIntCfg, struct bmi160Dev *dev)
 {
   int8_t rslt;
   uint8_t data = 0;
   uint8_t temp = 0;
 
-  /* Enable data ready interrupt in Int Enable 2 register */
+  /* Enable data ready interrupt in Int Enable 1 register */
+  if (dataReadyIntCfg->intChannel == BMI160_INT_CHANNEL_1) {
+    rslt = getRegs(BMI160_INT_ENABLE_1_ADDR, &data, 1, dev);
+    if (rslt == BMI160_OK) {
+      
+    }
+  }
   rslt = getRegs(BMI160_INT_ENABLE_2_ADDR, &data, 1, dev);
   if (rslt == BMI160_OK) {
     /* Enable data ready interrupt in Int Enable 1 register */
