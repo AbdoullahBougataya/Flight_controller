@@ -1056,7 +1056,7 @@ int8_t BMI160::enableStepDetectInt(struct bmi160AccStepDetectIntCfg *stepDetectI
       /* Writing data to INT ENABLE 2 Address */
       rslt = setRegs(BMI160_INT_ENABLE_2_ADDR, &data, 1, dev);
       if (rslt == BMI160_OK) {
-        /* Writing data to INT ENABLE 2 Address */
+        /* Writing data to INT ENABLE 1 Address */
         rslt = setRegs(BMI160_INT_ENABLE_1_ADDR, &data, 1, dev);
       }
     }
