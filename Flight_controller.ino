@@ -40,6 +40,9 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
+  for (int i = 0; i < 2000; i++) {
+    
+  }
 }
 
 void loop() {
