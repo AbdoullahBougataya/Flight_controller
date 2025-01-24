@@ -1,6 +1,8 @@
 /*
   To do:
-  1. 
+  1. Implement additional signal processing for PID control.
+  2. Implement the PID control algorithms.
+  3. Implement PWM signal generation algorithms.
   In progress:
   1. Filters the sensor data.
   2. Perform sensor fusion
