@@ -5,8 +5,7 @@
 
 ## Get started
 
-To upload this code on your microcontroller, you should first install the [Arduino IDE](https://downloads.arduino.cc/arduino-ide/arduino-ide_2.3.4_Windows_64bit.exe), then change directory to `/API`. Then run: `go get github.com/mattn/go-sqlite3` after it finishes installing. run the command `go run main.go`. If everything is alright it should show `Server is running on port 8080` after asking you for permition. Make a get request to `http://localhost:8080/welcome` to get started.
-
+To upload this code on your microcontroller, you should first install the [Arduino IDE](https://downloads.arduino.cc/arduino-ide/arduino-ide_2.3.4_Windows_64bit.exe), then open up the file `Flight_controller.ino`, plug your Arduino compatible board to your computer, select the COM port from the list above and select you board name from the list. After that, connect the SDA of the BMI160 to the SDA of your board and the SCL (Maybe SCK) to the corresponding SCL on the board
 ## Walkthrough
 
 > The data scrapping and the database updating is made using [python](https://www.python.org/)
