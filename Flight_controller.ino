@@ -79,7 +79,7 @@ void setup() {
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 2000; i++) {
     Serial.println(i);
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
@@ -110,8 +110,8 @@ void loop() {
   lastTime = currentTime;
 
   // Initialize sensor data arrays
-  accelGyro[6] = { 0 };
-  accelGyroData[6] = { 0 };
+  memset(accelGyro, 0, sizeof(accelGyro));
+  memset(accelGyroData, 0, sizeof(accelGyroData));
 
   // Get both accel and gyro data from the BMI160
   // Parameter accelGyro is the pointer to store the data
