@@ -65,6 +65,7 @@ void loop() {
   currentTime = millis() / 1000.0;
   dt = (currentTime - lastTime);
   lastTime = currentTime;
+
   // Initialize sensor data arrays
   accelGyro[6] = { 0 };
   accelGyroData[6] = { 0 };
@@ -74,6 +75,7 @@ void loop() {
   rslt = imu.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
+    // Format and offset the accelerometer data
     offset(accelGyro, accelGyroData);
 
     // Substract the offsets from the Gyro readings
@@ -83,7 +85,8 @@ void loop() {
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
 
-    complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer rates into equivalent euler rates;
+    // A complimentary filter is a premitive technique of sensor fusion to use both the accelerometer and the gyroscope to predict the euler angles
+    complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
     Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
