@@ -1,6 +1,6 @@
 /*
   This code is partitioned into four parts:
-    * Constants & Global variables declarations.
+    * Constants & Global variables declarations. 📝
     * Initialization & setup section.
     * Looping and realtime processing.
     * Function declarations.
