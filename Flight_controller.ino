@@ -23,6 +23,7 @@
  */
 
 #include "./include/BMI160.h"
+#include "./include/FIRFilter.h"
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
