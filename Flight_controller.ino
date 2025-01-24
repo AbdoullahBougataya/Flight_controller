@@ -14,12 +14,12 @@ unsigned long lastTime = 0;
 unsigned long currentTime = 0;
 
 // Gyro rates offsets
-float gyroRateCumulativeOffset[3] = 0.0;
-float gyroRateOffset[3] = 0.0;
+float gyroRateCumulativeOffset[3] = { 0.0 };
+float gyroRateOffset[3] = { 0.0 };
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 };
-float rawAccelGyro[6] = { 0 };
+float accelGyroData[6] = { 0 };
 
 // Declare sensor fusion variables
 float phiHat_rad = 0.0f;
@@ -49,16 +49,16 @@ void loop() {
   lastTime = currentTime;
   // Initialize sensor data arrays
   accelGyro[6] = { 0 };
-  rawAccelGyro[6] = { 0 };
+  accelGyroData[6] = { 0 };
 
   // Get both accel and gyro data from bmi160
   // Parameter accelGyro is the pointer to store the data
   uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
-    offset(accelGyro, rawAccelGyro);
+    offset(accelGyro, accelGyroData);
 
-    complimentaryFilter(rawAccelGyro, phiHat_rad, thetaHat_rad, dt);
+    complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt);
 
     Serial.print(phiHat_rad * RAD2DEG);
     Serial.print("\t");
