@@ -1,6 +1,6 @@
 # Flight Controller
 
-> [!INFO]
+> ⓘ
 > This codebase is compatible with all Arduino compatible boards
 
 ## Get started
