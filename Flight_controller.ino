@@ -75,7 +75,7 @@ void setup() {
   }
 
   // FIRFilter_Init(&lpfAcc); // Initialize the FIRFilter
-  
+
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
@@ -87,16 +87,12 @@ void setup() {
 
     // Get both accel and gyro data from the BMI160
     // Parameter accelGyro is the pointer to store the data
-    rslt = imu.getAccelGyroData(accelGyro);
-
-    // if the data is succesfully extracted
-    if (rslt == 0) {
-      offset(accelGyro, accelGyroData);
-      for (int j = 0; j < 3; j++) {
-        gyroRateCumulativeOffset[j] += accelGyroData[j];
-      }
-      delay(1);
+    imu.getAccelGyroData(accelGyro);
+    offset(accelGyro, accelGyroData);
+    for (int j = 0; j < 3; j++) {
+      gyroRateCumulativeOffset[j] += accelGyroData[j];
     }
+    delay(1);
   }
   // Calculate the average offset
   for (int i = 0; i < 3; i++) {
