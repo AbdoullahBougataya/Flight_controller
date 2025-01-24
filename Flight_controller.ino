@@ -1,5 +1,5 @@
 /*
-  This code is partitioned into four parts:
+  This code is partitioned into four sections:
     * Constants & Global variables declarations. 📝
     * Initialization & setup section. 📌
     * Looping and realtime processing. 🔁
@@ -24,6 +24,8 @@
 
 #include "./include/BMI160.h"
 #include <math.h>
+
+// Section 1: Constants & Global variables declarations.
 
 BMI160 imu;
 const int8_t addr = 0x68;
@@ -50,6 +52,8 @@ float accelGyroData[6] = { 0 };
 // Declare sensor fusion variables
 float phiHat_rad = 0.0f;
 float thetaHat_rad = 0.0f;
+
+// Section 2: Initialization & setup section.
 
 void setup() {
   Serial.begin(115200);
@@ -83,6 +87,8 @@ void setup() {
     gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 2000;
   }
 }
+
+// Section 3: Looping and realtime processing.
 
 void loop() {
   // Calculate time stamp (in seconds)
@@ -125,6 +131,8 @@ void loop() {
   }
   delay(10);
 }
+
+// Section 4: Function declarations.
 
 // Complimentary filter
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt) {
