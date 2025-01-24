@@ -43,12 +43,19 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
+
+  // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
   for (int i = 0; i < 2000; i++) {
     imu.getAccelGyroData(accelGyro);
     offset(accelGyro, accelGyroData);
     for (int j = 0; j < 3; i++) {
       gyroRateCumulativeOffset[j] += accelGyroData[j];
     }
+    delay(1);
+  }
+  // Calculate the average offset
+  for (int i = 0; i < 3; i++) {
+    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 2000;
   }
 }
 
