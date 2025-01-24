@@ -122,7 +122,7 @@ void loop() {
     }
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
-    FIRFilter_Update(&lpFilter, ); // Update the FIRFilter 
+    FIRFilter_Update(&lpFilter, accelGyroData[3]); // Update the FIRFilter
 
     /*
        A complimentary filter is a premitive technique of sensor fusion
