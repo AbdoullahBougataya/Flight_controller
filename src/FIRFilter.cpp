@@ -1,7 +1,7 @@
 #include"../include/FIRFilter.h"
 #include <math.h>
 
-static float FIR_IMPULSE_RESPONSE[FIR_FILTER_LENGTH] = {};
+static float FIR_IMPULSE_RESPONSE[FIR_FILTER_LENGTH] = {-0.0032906f, -0.0052635f};
 
 void FIRFilter_Init(FIRFilter *fir) {
 
