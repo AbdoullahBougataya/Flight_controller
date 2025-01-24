@@ -44,7 +44,7 @@ uint8_t rslt = 0; // Define the result of the data extraction from the imu
 float gyroRateOffset[3] = { 0.0 }; // Gyro rates offsets
 
 // Define the time step
-float dt = 0.0;
+unsigned long dt = 0;
 unsigned long lastTime = 0;
 unsigned long currentTime = 0;
 
@@ -80,7 +80,7 @@ void setup() {
 
   // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
   Serial.println("Calibrating...");
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 200; i++) {
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
     memset(accelGyroData, 0, sizeof(accelGyroData));
@@ -89,14 +89,14 @@ void setup() {
     // Parameter accelGyro is the pointer to store the data
     imu.getAccelGyroData(accelGyro);
     offset(accelGyro, accelGyroData);
-    for (int j = 0; j < 3; j++) {
+    for (byte j = 0; j < 3; j++) {
       gyroRateCumulativeOffset[j] += accelGyroData[j];
     }
     delay(1);
   }
   // Calculate the average offset
-  for (int i = 0; i < 3; i++) {
-    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 100;
+  for (byte i = 0; i < 3; i++) {
+    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 200;
   }
 }
 
@@ -104,9 +104,9 @@ void setup() {
 
 void loop() {
 
-  // Calculate time stamp (in seconds)
-  currentTime = millis() / 1000.0;
-  dt = (currentTime - lastTime);
+  // Calculate time stamp (in milliseconds)
+  currentTime = millis();
+  dt = currentTime - lastTime;
   lastTime = currentTime;
 
   // Initialize sensor data arrays
@@ -124,7 +124,7 @@ void loop() {
     offset(accelGyro, accelGyroData);
 
     // Substract the offsets from the Gyro readings
-    for (int i = 0; i < 3; i++) {
+    for (byte i = 0; i < 3; i++) {
       accelGyroData[i] -= gyroRateOffset[i];
     }
 
@@ -139,7 +139,7 @@ void loop() {
     complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     // Print the euler angles to the serial monitor
-    // Serial.print(dt);Serial.print("\t");
+    Serial.print(dt);Serial.print("\t");
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
     Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
     Serial.println();
@@ -154,7 +154,7 @@ void loop() {
 // Section 4: Function declarations.
 
 // Complimentary filter (Check Phil's Lab video for more details)
-void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt) {
+void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, unsigned long dt) {
   // Using gravity to estimate the Euler angles
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
   float thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
@@ -164,7 +164,7 @@ void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   float thetaDot_rps =  cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                               // Pitch rate (rad/s)
 
   // Complementary filter implementation (Just like mixing the data from the gyroscope and the accelerometer with COMP_FLTR_ALPHA proportions)
-  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
-  thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
+  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + (dt/1000) * phiDot_rps);          // Roll estimate
+  thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + (dt / 1000.0) * thetaDot_rps);  // Pitch estimate
 }
 
