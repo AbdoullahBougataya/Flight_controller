@@ -79,8 +79,8 @@ void setup() {
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
-  for (int i = 0; i < 2000; i++) {
-    Serial.println(i);
+  Serial.println("Calibrating...");
+  for (int i = 0; i < 100; i++) {
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
     memset(accelGyroData, 0, sizeof(accelGyroData));
@@ -96,7 +96,7 @@ void setup() {
   }
   // Calculate the average offset
   for (int i = 0; i < 3; i++) {
-    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 2000;
+    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 100;
   }
 }
 
