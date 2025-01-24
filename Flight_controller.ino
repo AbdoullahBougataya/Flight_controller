@@ -14,7 +14,7 @@ unsigned long lastTime = 0;
 unsigned long currentTime = 0;
 
 // Gyro rates offsets
-float gyroXRateCumulativeOffset = 0.0;
+float gyroRateCumulativeOffset = 0.0;
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 };
