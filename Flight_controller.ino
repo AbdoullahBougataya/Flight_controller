@@ -81,12 +81,12 @@ void loop() {
       accelGyroData[i] -= gyroRateOffset[i];
     }
 
-    complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt);
+    /* TODO: A corresponding low pass filter will be required to make the data smoother */
 
-    Serial.print(phiHat_rad * RAD2DEG);
-    Serial.print("\t");
-    Serial.print(thetaHat_rad * RAD2DEG);
-    Serial.print("\t");
+    complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer rates into equivalent euler rates;
+
+    Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
+    Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
     Serial.println();
   }
   else {
