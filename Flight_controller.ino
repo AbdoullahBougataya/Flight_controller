@@ -8,6 +8,9 @@ const int8_t addr = 0x68;
 #define RAD2DEG        57.2957795130823208767f   // Radians to degrees (per second)
 #define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
 
+// Define the result of the data extraction
+uint8_t rslt = 0;
+
 // Define the time step
 float dt = 0.0;
 unsigned long lastTime = 0;
@@ -41,7 +44,11 @@ void setup() {
     while (1);
   }
   for (int i = 0; i < 2000; i++) {
-
+    imu.getAccelGyroData(accelGyro);
+    offset(accelGyro, accelGyroData);
+    for (int j = 0; j < 3; i++) {
+      gyroRateCumulativeOffset[j] += accelGyroData[j];
+    }
   }
 }
 
@@ -56,7 +63,7 @@ void loop() {
 
   // Get both accel and gyro data from bmi160
   // Parameter accelGyro is the pointer to store the data
-  uint8_t rslt = imu.getAccelGyroData(accelGyro);
+  rslt = imu.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
     offset(accelGyro, accelGyroData);
