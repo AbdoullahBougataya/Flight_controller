@@ -3,17 +3,17 @@
     * Constants & Global variables declarations. 📝
     * Initialization & setup section. 📌
     * Looping and realtime processing. 🔁
-    * Function declarations. 
+    * Function declarations. ▶️
            -------------------------------------------
   Tasks:
-    To do:
+    To do 🎯:
       1. Implement additional signal processing for PID control.
       2. Implement the PID control algorithms.
       3. Implement PWM signal generation algorithms.
-    In progress:
+    In progress ⏳:
       1. Filters the sensor data.
       2. Perform sensor fusion
-    Done:
+    Done ✅:
       1. Initialize the sensors.
       2. Calibrate the gyroscope.
            -------------------------------------------
