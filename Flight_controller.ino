@@ -29,7 +29,7 @@
 
 BMI160 imu; // Declaring the imu object
 
-FIRFilter lpFilter; // Declaring the filter object
+// FIRFilter lpFilter; // Declaring the filter object
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -72,8 +72,7 @@ void setup() {
     while (1);
   }
 
-  // Initialize the FIRFilter
-  FIRFilter_Init(&lpFilter);
+  // FIRFilter_Init(&lpFilter); // Initialize the FIRFilter
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
@@ -122,7 +121,7 @@ void loop() {
     }
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
-    FIRFilter_Update(&lpFilter, accelGyroData[3]); // Update the FIRFilter
+    // FIRFilter_Update(&lpFilter, accelGyroData[3]); // Update the FIRFilter
 
     /*
        A complimentary filter is a premitive technique of sensor fusion
@@ -132,6 +131,7 @@ void loop() {
     complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     // Print the euler angles to the serial monitor
+    Serial.print(dt);Serial.print("\t");
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
     Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
     Serial.println();
