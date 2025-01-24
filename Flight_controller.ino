@@ -17,7 +17,6 @@ unsigned long lastTime = 0;
 unsigned long currentTime = 0;
 
 // Gyro rates offsets
-float gyroRateCumulativeOffset[3] = { 0.0 };
 float gyroRateOffset[3] = { 0.0 };
 
 // Define sensor data arrays
@@ -43,6 +42,8 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
+
+  float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
   for (int i = 0; i < 2000; i++) {
@@ -74,6 +75,11 @@ void loop() {
 
   if (rslt == 0) {
     offset(accelGyro, accelGyroData);
+
+    // Substract the offsets from the Gyro readings
+    for (int i = 0; i < 3; i++) {
+      accelGyroData[i] -= gyroRateOffset[i];
+    }
 
     complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt);
 
