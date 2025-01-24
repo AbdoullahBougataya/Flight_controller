@@ -110,7 +110,6 @@ void loop() {
   // Parameter accelGyro is the pointer to store the data
   rslt = imu.getAccelGyroData(accelGyro);
 
-  FIRFilter_Update(&lpFilter, );
 
   // if the data is succesfully extracted
   if (rslt == 0) {
@@ -123,6 +122,7 @@ void loop() {
     }
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
+    FIRFilter_Update(&lpFilter, ); // Update the FIRFilter 
 
     /*
        A complimentary filter is a premitive technique of sensor fusion
