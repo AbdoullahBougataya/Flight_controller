@@ -131,7 +131,7 @@ void loop() {
     complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     // Print the euler angles to the serial monitor
-    Serial.print(dt);Serial.print("\t");
+    // Serial.print(dt);Serial.print("\t");
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
     Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
     Serial.println();
