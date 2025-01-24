@@ -1,7 +1,7 @@
 #include "./include/BMI160.h"
 #include <math.h>
 
-BMI160 bmi160;
+BMI160 imu;
 const int8_t addr = 0x68;
 
 #define COMP_FLTR_ALPHA 0.01000000000000000000f  // Complimentary filter coefficient
@@ -30,18 +30,18 @@ void setup() {
   delay(100);
 
   // Initialize the hardware bmin160
-  if (bmi160.softReset() != BMI160_OK) {
+  if (imu.softReset() != BMI160_OK) {
     Serial.println("reset false");
     while (1);
   }
 
   // Set and init the bmi160 i2c address
-  if (bmi160.Init(addr) != BMI160_OK) {
+  if (imu.Init(addr) != BMI160_OK) {
     Serial.println("init false");
     while (1);
   }
   for (int i = 0; i < 2000; i++) {
-    
+
   }
 }
 
@@ -56,7 +56,7 @@ void loop() {
 
   // Get both accel and gyro data from bmi160
   // Parameter accelGyro is the pointer to store the data
-  uint8_t rslt = bmi160.getAccelGyroData(accelGyro);
+  uint8_t rslt = imu.getAccelGyroData(accelGyro);
 
   if (rslt == 0) {
     offset(accelGyro, accelGyroData);
