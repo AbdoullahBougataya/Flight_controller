@@ -85,7 +85,11 @@ void loop() {
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
 
-    // A complimentary filter is a premitive technique of sensor fusion to use both the accelerometer and the gyroscope to predict the euler angles
+    /*
+       A complimentary filter is a premitive technique of sensor fusion
+       to use both the accelerometer and the gyroscope to predict the
+       euler angles (phi: roll, theta: pitch)
+    */
     complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
@@ -104,7 +108,7 @@ void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
   float thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
 
-  // Using gyroscope to estimate the euler rates
+  // Using gyroscope to estimate the euler rates (Transforming body rates to euler rates)
   float phiDot_rps   = (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]) * tanf(thetaHat_rad) + filteredAccelGyro[0];  // Roll rate (rad/s)
   float thetaDot_rps =  cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                               // Pitch rate (rad/s)
 
