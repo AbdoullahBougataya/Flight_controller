@@ -1,3 +1,21 @@
+/*
+  What does this code do?
+  1. Initialize the sensors.
+  2. Calibrate the gyroscope.
+  3. Filters the sensor data.
+  4. Perform sensor fusion
+
+  This code is partitioned into four parts:
+    * Constants & Global variables declarations.
+    * Initialization & setup section.
+    * Looping and realtime processing.
+    * Function declarations.
+  
+  The flight controller code was highly inspired from various source in the internet, most notably:
+    * Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
+    * Phil's Lab series on DSP using STM32 (Included more advanced topics like the Filtering, EKF, Compilmentary...).
+ */
+
 #include "./include/BMI160.h"
 #include <math.h>
 
