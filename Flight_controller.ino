@@ -29,6 +29,8 @@
 
 BMI160 imu; // Declaring the imu object
 
+FIRFilter lpFilter; // Declaring the filter object
+
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 #define COMP_FLTR_ALPHA 0.01000000000000000000f  // Complimentary filter coefficient
@@ -69,6 +71,9 @@ void setup() {
     Serial.println("init false");
     while (1);
   }
+
+  // Initialize the FIRFilter
+  FIRFilter_Init(&lpFilter);
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
