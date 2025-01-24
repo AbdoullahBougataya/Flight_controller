@@ -5,8 +5,9 @@
 
 ## Get started
 
-To upload this code on your microcontroller, you should first install the [Arduino IDE](https://downloads.arduino.cc/arduino-ide/arduino-ide_2.3.4_Windows_64bit.exe), then open up the file `Flight_controller.ino`, plug your Arduino compatible board to your computer, select the COM port from the list above and select you board name from the list. After that, connect the SDA of the BMI160 to the SDA of your board and the SCL (Maybe SCK) to the corresponding SCL on the board and connect the SA0 to the Ground (GND), 
-## Walkthrough
+To upload this code on your microcontroller, you should first install the [Arduino IDE](https://downloads.arduino.cc/arduino-ide/arduino-ide_2.3.4_Windows_64bit.exe), then open up the file `Flight_controller.ino`, plug your Arduino compatible board to your computer, select the COM port from the list above and select you board name from the list. After that, connect the SDA of the BMI160 to the SDA of your board and the SCL (Maybe SCK) to the corresponding SCL on the board and connect the SA0 to the Ground (GND)...After connecting all the wires to their corresponding pins. press the right arrow to upload the code to your board. After uploading the code to the board, open a serial monitor and set it up on 115200 Baud rate.
+
+## Files structure
 
 > The data scrapping and the database updating is made using [python](https://www.python.org/)
 * The file `scrapper.py` returns a function called `scrapper()`, this is the function that scrappes the net (Wikipedia in this example) for data about the orbitale rocket engines.
