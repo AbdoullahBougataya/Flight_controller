@@ -80,12 +80,15 @@ void setup() {
 
   // For two seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
   for (int i = 0; i < 2000; i++) {
-    imu.getAccelGyroData(accelGyro);
-    offset(accelGyro, accelGyroData);
-    for (int j = 0; j < 3; i++) {
-      gyroRateCumulativeOffset[j] += accelGyroData[j];
+    rslt = imu.getAccelGyroData(accelGyro);
+    // if the data is succesfully extracted
+    if (rslt == 0) {
+      offset(accelGyro, accelGyroData);
+      for (int j = 0; j < 3; i++) {
+        gyroRateCumulativeOffset[j] += accelGyroData[j];
+      }
+      delay(1);
     }
-    delay(1);
   }
 
   // Calculate the average offset
