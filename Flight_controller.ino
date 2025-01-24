@@ -1,4 +1,10 @@
 /*
+  This code is partitioned into four parts:
+    * Constants & Global variables declarations.
+    * Initialization & setup section.
+    * Looping and realtime processing.
+    * Function declarations.
+           -------------------------------------------
   Tasks:
     To do:
       1. Implement additional signal processing for PID control.
@@ -10,13 +16,7 @@
     Done:
       1. Initialize the sensors.
       2. Calibrate the gyroscope.
-
-  This code is partitioned into four parts:
-    * Constants & Global variables declarations.
-    * Initialization & setup section.
-    * Looping and realtime processing.
-    * Function declarations.
-
+           -------------------------------------------
   The flight controller code was highly inspired from various source in the internet, most notably:
     * Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
     * Phil's Lab series on DSP using STM32 (Included more advanced topics like the Filtering, EKF, Compilmentary...).
@@ -140,3 +140,4 @@ void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
   thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
 }
+
