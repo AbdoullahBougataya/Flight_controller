@@ -106,7 +106,7 @@ void loop() {
 
   // Calculate time stamp (in milliseconds)
   currentTime = millis();
-  dt = currentTime - lastTime;
+  dt = (currentTime - lastTime) & 0xFFFFFFFF;
   lastTime = currentTime;
 
   // Initialize sensor data arrays
