@@ -31,6 +31,8 @@ BMI160 imu; // Declaring the imu object
 
 // FIRFilter lpfAcc; // Declaring the filter object
 
+void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
+
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 #define COMP_FLTR_ALPHA 0.01000000000000000000f  // Complimentary filter coefficient
