@@ -1,6 +1,6 @@
 /*
   To do:
-  
+  1. 
   In progress:
   1. Filters the sensor data.
   2. Perform sensor fusion
