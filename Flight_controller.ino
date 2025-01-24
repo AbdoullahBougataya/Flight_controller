@@ -110,6 +110,8 @@ void loop() {
   // Parameter accelGyro is the pointer to store the data
   rslt = imu.getAccelGyroData(accelGyro);
 
+  FIRFilter_Update(&lpFilter, );
+
   // if the data is succesfully extracted
   if (rslt == 0) {
     // Format and offset the accelerometer data
