@@ -138,7 +138,7 @@ void loop() {
 
 // Section 4: Function declarations.
 
-// Complimentary filter
+// Complimentary filter (Check Phil's Lab video for more details)
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt) {
   // Using gravity to estimate the Euler angles
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
