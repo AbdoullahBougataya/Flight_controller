@@ -104,7 +104,7 @@ void loop() {
   // Get both accel and gyro data from the BMI160
   // Parameter accelGyro is the pointer to store the data
   rslt = imu.getAccelGyroData(accelGyro);
-  
+
   // if the data is succesfully extracted
   if (rslt == 0) {
     // Format and offset the accelerometer data
@@ -124,14 +124,16 @@ void loop() {
     */
     complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
+    // Print the euler angles to the serial monitor
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
     Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
     Serial.println();
   }
   else {
-    Serial.println("err");
+    // Print an error otherwise
+    Serial.println("!!! Data extraction failed !!!");
   }
-  delay(10);
+  delay(10); // 10 ms delay to perceive the data readed
 }
 
 // Section 4: Function declarations.
