@@ -24,7 +24,6 @@
 
 #include "./include/BMI160.h"
 #include "./include/FIRFilter.h"
-#include "./include/IIRFilter.h"
 #include "./include/RCFilter.h"
 #include <math.h>
 
@@ -34,7 +33,6 @@ BMI160 imu; // Declaring the imu object
 
 FIRFilter lpfAcc; // Declaring the FIR filter object
 RCFilter lpfAccRC; // Declaring the RC filter object
-IIRFilter lpfAccIIR; // Declaring the IIR filter object
 
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
@@ -81,7 +79,6 @@ void setup() {
 
   FIRFilter_Init(&lpfAcc); // Initialize the FIRFilter
   RCFilter_Init(&lpfAccRC, 5.0f, 36.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 36.5 ms
-  IIRFilter_Init(&lpfAccIIR, 1.0f, 0.9f); // Initialize the IIRFilter alpha = 1.0; beta = 0.9
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
