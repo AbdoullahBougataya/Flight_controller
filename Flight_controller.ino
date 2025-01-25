@@ -31,7 +31,8 @@
 
 BMI160 imu; // Declaring the imu object
 
-FIRFilter lpfAcc; // Declaring the filter object
+FIRFilter lpfAcc; // Declaring the FIR filter object
+FIRFilter lpfAccRC; // Declaring the RC filter object
 
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
@@ -77,6 +78,7 @@ void setup() {
   }
 
   FIRFilter_Init(&lpfAcc); // Initialize the FIRFilter
+  RCFilter_Init(&lpfAccRC, 5.0f, 36.5f); // Initialize the RCFilter
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
