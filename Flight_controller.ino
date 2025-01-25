@@ -23,7 +23,6 @@
  */
 
 #include "./include/BMI160.h"
-#include "./include/FIRFilter.h"
 #include "./include/RCFilter.h"
 #include <math.h>
 
@@ -31,8 +30,7 @@
 
 BMI160 imu; // Declaring the imu object
 
-FIRFilter lpfAcc; // Declaring the FIR filter object
-RCFilter lpfAccRC; // Declaring the RC filter object
+RCFilter lpFRC[6]; // Declaring the RC filter object
 
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
@@ -77,8 +75,9 @@ void setup() {
     while (1);
   }
 
-  FIRFilter_Init(&lpfAcc); // Initialize the FIRFilter
-  RCFilter_Init(&lpfAccRC, 5.0f, 36.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 36.5 ms
+  for (int i = 0; i < 6; i++) {
+    RCFilter_Init(&lpFRC[i], 5.0f, 36.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 36.5 ms
+  }
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
@@ -132,8 +131,9 @@ void loop() {
       accelGyroData[i] -= gyroRateOffset[i];
     }
 
-    /* TODO: A corresponding low pass filter will be required to make the data smoother */
-    accelGyroData[3] = RCFilter_Update(&lpfAccRC, accelGyroData[3]); // Update the RCFilter
+    for (int i = 0; i < 6; i++){
+      accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+    }
 
     /*
        A complimentary filter is a premitive technique of sensor fusion
