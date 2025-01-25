@@ -136,7 +136,7 @@ void loop() {
     }
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
-    IIRFilter_Update(&lpfAccIIR, accelGyroData[3]); // Update the IIRFilter
+    accelGyroData[3] = IIRFilter_Update(&lpfAccIIR, accelGyroData[3]); // Update the IIRFilter
 
     /*
        A complimentary filter is a premitive technique of sensor fusion

@@ -12,4 +12,6 @@ typedef struct {
 
 void IIRFilter_Init(IIRFilter *filt, float alpha, float beta);
 
-void IIRFilter_Update(IIRFilter *filt, float input);
+float IIRFilter_Update(IIRFilter *filt, float input);
+
+#endif
