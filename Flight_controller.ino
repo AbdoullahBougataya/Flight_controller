@@ -34,6 +34,7 @@ BMI160 imu; // Declaring the imu object
 
 FIRFilter lpfAcc; // Declaring the FIR filter object
 RCFilter lpfAccRC; // Declaring the RC filter object
+IIRFilter lpfAccIIR; // Declaring the IIR filter object
 
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
@@ -80,6 +81,7 @@ void setup() {
 
   FIRFilter_Init(&lpfAcc); // Initialize the FIRFilter
   RCFilter_Init(&lpfAccRC, 5.0f, 36.5f); // Initialize the RCFilter
+  IIRFilter_Init(&lpfAccIIR, 1.0f, 0.1f); // Initialize the IIRFilter
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
@@ -134,7 +136,7 @@ void loop() {
     }
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
-    RCFilter_Update(&lpfAccRC, accelGyroData[3]); // Update the RCFilter
+    IIRFilter_Update(&lpfAccIIR, accelGyroData[3]); // Update the IIRFilter
 
     /*
        A complimentary filter is a premitive technique of sensor fusion
