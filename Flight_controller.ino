@@ -151,7 +151,6 @@ void loop() {
     // Print an error otherwise
     Serial.println("!!! Data extraction failed !!!");
   }
-  delay(10); // 10 ms delay to perceive the data readed
 }
 
 // Section 4: Function declarations.
