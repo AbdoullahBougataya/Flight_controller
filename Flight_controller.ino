@@ -76,7 +76,7 @@ void setup() {
   }
 
   for (int i = 0; i < 6; i++) {
-    RCFilter_Init(&lpFRC[i], 5.0f, 36.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 36.5 ms
+    RCFilter_Init(&lpFRC[i], 5.0f, 26.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 26.5 ms
   }
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
