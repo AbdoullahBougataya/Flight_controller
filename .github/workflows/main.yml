@@ -5,4 +5,12 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Compile Arduino Sketches
+        uses: arduino/compile-sketches@v1.1.2
+        with:
+          fqbn: "arduino:avr:uno"
+          
