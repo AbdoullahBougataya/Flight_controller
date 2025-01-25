@@ -16,7 +16,7 @@ int8_t BMI160::Init(int8_t i2c_addr)
 
 int8_t BMI160::Init(struct bmi160Dev *dev)
 {
-  int8_t rslt=BMI160_OK;
+  int8_t rslt = BMI160_OK;
   uint8_t chip_id=0;
   uint8_t data=0;
   if (dev==NULL){
