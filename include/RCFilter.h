@@ -1,6 +1,9 @@
 #ifndef RC_FILTER_H
 #define RC_FILTER_H
 
+#include <Arduino.h>
+#include <stdint.h>
+
 #define PI          3.14159265358979323846f  // Pi
 
 typedef struct {

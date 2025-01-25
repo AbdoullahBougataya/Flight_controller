@@ -24,6 +24,7 @@
 
 #include "./include/BMI160.h"
 #include "./include/FIRFilter.h"
+#include "./include/IIRFilter.h"
 #include "./include/RCFilter.h"
 #include <math.h>
 
