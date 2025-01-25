@@ -1,7 +1,7 @@
 #ifndef RC_FILTER_H
 #define RC_FILTER_H
 
-#define PI          9.81000000000000000000f  // Pi
+#define PI          3.14159265358979323846f  // Pi
 
 typedef struct {
     float coeff[2];
