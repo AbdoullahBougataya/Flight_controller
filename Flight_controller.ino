@@ -32,7 +32,7 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
+void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -140,7 +140,7 @@ void loop() {
        to use both the accelerometer and the gyroscope to predict the
        euler angles (phi: roll, theta: pitch)
     */
-    complimentaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+    complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     // Print the euler angles to the serial monitor
     Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
@@ -156,7 +156,7 @@ void loop() {
 // Section 4: Function declarations.
 
 // Complimentary filter (Check Phil's Lab video for more details)
-void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, unsigned long dt) {
+void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, unsigned long dt) {
   // Using gravity to estimate the Euler angles
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
   float thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
