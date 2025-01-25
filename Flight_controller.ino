@@ -32,7 +32,7 @@
 BMI160 imu; // Declaring the imu object
 
 FIRFilter lpfAcc; // Declaring the FIR filter object
-FIRFilter lpfAccRC; // Declaring the RC filter object
+RCFilter lpfAccRC; // Declaring the RC filter object
 
 void complimentaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
