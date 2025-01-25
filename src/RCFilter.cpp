@@ -12,7 +12,7 @@ void RCFilter_Init(RCFilter * filt, float cutoffFreqHz, float sampleTimeMS) {
 float RCFilter_Update(RCFilter * filt, float inp) {
 
     /* Shift output samples */
-
+    filt->out[1] = filt->out[0];
     /* Compute new output sample */
 
     /* Return filtered sample */
