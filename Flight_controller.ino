@@ -80,8 +80,8 @@ void setup() {
   }
 
   FIRFilter_Init(&lpfAcc); // Initialize the FIRFilter
-  RCFilter_Init(&lpfAccRC, 5.0f, 36.5f); // Initialize the RCFilter
-  IIRFilter_Init(&lpfAccIIR, 1.0f, 0.1f); // Initialize the IIRFilter
+  RCFilter_Init(&lpfAccRC, 5.0f, 36.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 36.5 ms
+  IIRFilter_Init(&lpfAccIIR, 1.0f, 0.9f); // Initialize the IIRFilter alpha = 1.0; beta = 0.9
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
