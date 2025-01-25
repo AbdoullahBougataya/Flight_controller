@@ -133,7 +133,7 @@ void loop() {
     }
 
     /* TODO: A corresponding low pass filter will be required to make the data smoother */
-    FIRFilter_Update(&lpfAcc, accelGyroData[3]); // Update the FIRFilter
+    RCFilter_Update(&lpfAccRC, accelGyroData[3]); // Update the RCFilter
 
     /*
        A complimentary filter is a premitive technique of sensor fusion
