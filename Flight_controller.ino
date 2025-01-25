@@ -11,11 +11,11 @@
       2. Implement the PID control algorithms.
       3. Implement PWM signal generation algorithms.
     In progress ⏳:
-      1. Filters the sensor data.
       2. Perform sensor fusion
     Done ✅:
       1. Initialize the sensors.
       2. Calibrate the gyroscope.
+      3. Filters the sensor data.
            -------------------------------------------
   The flight controller code was highly inspired from various source in the internet, most notably:
     * Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
@@ -36,7 +36,7 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
-#define COMP_FLTR_ALPHA 0.01000000000000000000f  // Complimentary filter coefficient
+#define COMP_FLTR_ALPHA 0.03000000000000000000f  // Complimentary filter coefficient
 #define RAD2DEG        57.2957795130823208767f   // Radians to degrees (per second)
 #define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
 
