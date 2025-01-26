@@ -12,12 +12,12 @@
       2. Implement the PID control algorithms.
       3. Implement PWM signal generation algorithms.
     In progress ⏳:
-      1. Implement FreeRTOS
-      2. Perform sensor fusion
+      1. Perform sensor fusion
     Done ✅:
       1. Initialize the sensors.
       2. Calibrate the gyroscope.
       3. Filters the sensor data.
+      4. Implement FreeRTOS
            -------------------------------------------
   The flight controller code was highly inspired from various source in the internet, most notably:
     * Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
@@ -132,6 +132,7 @@ void setup() {
 
 void loop() {
 
+// Checking if there is data ready in the sensor
   if (dataReady)
   {
     dataReady = false; // Reseting the dataReady flag
@@ -170,7 +171,8 @@ void loop() {
 
 // Section 4: Tasks definitions.
 
-void TaskBlink(void *pvParameters) // This is a task.
+// This task makes the Arduino LED blink
+void TaskBlink(void *pvParameters)
 {
   (void) pvParameters;
 
@@ -186,6 +188,7 @@ void TaskBlink(void *pvParameters) // This is a task.
   }
 }
 
+// This task prints the euler angles to the serial monitor
 void TaskPrintSensorData( void *pvParameters )
 {
   (void) pvParameters;
