@@ -2,7 +2,7 @@
 
 # Flight Controller
 
-[![Build Arduino Sketch](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml/badge.svg)](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml)
+[![Build Status](https://img.shields.io/badge/build-passing-cyan?style=flat-square&logo=arduino&logoColor=cyan)](https://github.com/AbdoullahBougataya/Flight_controller/.github/workflows/main.yml)
 
 > [!TIP]
 > This codebase is compatible with all Arduino compatible boards
