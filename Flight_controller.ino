@@ -124,6 +124,7 @@ void loop() {
 
   if (dataReady)
   {
+    dataReady = false; // Reseting the dataReady flag
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
     memset(accelGyroData, 0, sizeof(accelGyroData));
@@ -163,7 +164,6 @@ void loop() {
       // Print an error otherwise
       Serial.println("!!! Data extraction failed !!!");
     }
-    dataReady = false;
   }
 }
 
