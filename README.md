@@ -7,7 +7,7 @@
 
 ## Overview
 
-This repository contains the software component of a DIY Flight Controller designed for people interested in building a custom Flight controller. The software includes features for flight stabilization, sensor integration, PID control and signal processing, making it suitable for quadcopters.
+This repository contains the software component of a DIY Flight Controller designed for people interested in building their custom Flight controller. This project came as an application to what we have learned (and what we are going to learn) as Control & Automation engineering students. The software includes features for flight stabilization, sensor integration, PID control and signal processing, making it suitable for quadcopter drones.
 
 ## Project structure
 ``` sh
