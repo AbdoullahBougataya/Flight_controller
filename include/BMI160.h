@@ -144,6 +144,9 @@
 /* Sensor select mask*/
 #define BMI160_SEN_SEL_MASK   UINT8_C(0x07)
 
+/* Data Ready interrupt masks */
+#define BMI160_INT_
+
 /* Error code mask */
 #define BMI160_ERR_REG_MASK   UINT8_C(0x0F)
 
