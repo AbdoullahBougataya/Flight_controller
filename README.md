@@ -1,3 +1,5 @@
+<div align='center'><img src='https://github.com/AbdoullahBougataya/Flight_controller/blob/main/img/Quadimg.jpg' alt="Quadcopter" width="400" height="400" style="display: block; margin: 0 auto"/></div>
+
 # Flight Controller
 
 [![Build Arduino Sketch](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml/badge.svg)](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml)
