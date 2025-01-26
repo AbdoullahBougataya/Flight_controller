@@ -70,22 +70,19 @@ void AccelGyroISR();
 void setup() {
   xTaskCreate(TaskBlink, "Blink", 128, NULL, 1, NULL);
   xTaskCreate(TaskPrintSensorData, "PrintSensorData", 128, NULL, 2, NULL);
-  delay(100); // Controller startup delay
+
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
-    Serial.println("reset false");
     while (1);
   }
 
   // Initialize the BMI160 on I²C
   if (imu.Init(addr) != BMI160_OK) {
-    Serial.println("init false");
     while (1);
   }
 
   // Initialize the BMI160 interrupt 1
   if (imu.setInt() != BMI160_OK) {
-    Serial.println("interrupt false");
     while (1);
   }
 
@@ -98,7 +95,6 @@ void setup() {
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For five seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
-  Serial.println("Calibrating...");
   for (int i = 0; i < 200; i++) {
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
@@ -155,15 +151,6 @@ void loop() {
         euler angles (phi: roll, theta: pitch)
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, 10.0f); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
-
-      // Print the euler angles to the serial monitor
-      Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.println();
-    }
-    else {
-      // Print an error otherwise
-      Serial.println("!!! Data extraction failed !!!");
     }
   }
 }
@@ -191,6 +178,14 @@ void TaskPrintSensorData( void *pvParameters )
   (void) pvParameters;
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
+  vTaskDelay(7);
+  for (;;)
+  {
+    // Print the euler angles to the serial monitor
+    Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
+    Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
+    Serial.println();
+  }
 }
 
 // Section 5: Function declarations.
