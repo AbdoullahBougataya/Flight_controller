@@ -75,6 +75,14 @@ void setup() {
     while (1);
   }
 
+  // Initialize the BMI160 interrupt 1
+  if (imu.setInt() != BMI160_OK) {
+    Serial.println("interrupt false");
+    while (1);
+  }
+
+
+
   for (int i = 0; i < 6; i++) {
     RCFilter_Init(&lpFRC[i], 5.0f, 26.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 26.5 ms
   }
@@ -154,6 +162,10 @@ void loop() {
 }
 
 // Section 4: Function declarations.
+
+//
+void 
+
 
 // Complimentary filter (Check Phil's Lab video for more details)
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, unsigned long dt) {

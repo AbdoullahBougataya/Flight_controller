@@ -274,6 +274,13 @@ public:
    */
   int8_t softReset();
 
+  /**
+   * @fn setInt
+   * @brief setup the bmi160 interrupt 1
+   * @return BMI160_OK(0) means success
+   */
+  int8_t setInt();
+
   private:
     int8_t Init(struct bmi160Dev *dev);
 
@@ -311,7 +318,7 @@ public:
     int8_t I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
     int8_t I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
 
-
+    int8_t setInt(struct bmi160Dev *dev);
 
     struct bmi160Dev* Obmi160;
     struct bmi160SensorData* Oaccel;
