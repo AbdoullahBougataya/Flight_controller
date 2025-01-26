@@ -25,7 +25,6 @@
 #include "./include/BMI160.h"
 #include "./include/RCFilter.h"
 #include <math.h>
-#include <Arduino_FreeRTOS.h>
 
 // Section 1: Constants & Global variables declarations.
 
