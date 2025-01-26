@@ -153,6 +153,9 @@
 /** Mask definitions for INT_OUT_CTRL register */
 #define BMI160_INT1_PULL_PUSH_ACTIVE_HIGH_EDGE_TRIG UINT8_C(0x0B)
 
+/** Mask definitions for INT_LATCH register */
+#define BMI160_INT1_NON_LATCHED_MASK               UINT8_C(0x00)
+
 /* Error code mask */
 #define BMI160_ERR_REG_MASK   UINT8_C(0x0F)
 
