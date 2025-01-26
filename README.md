@@ -7,7 +7,7 @@
 
 ## Overview
 
-This repository has the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. *The software has features for flight stabilization, sensor integration, PID control, and signal processing*. Compatible with quadcopter drones.
+This repository has the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. **The software has features for flight stabilization, sensor integration, PID control, and signal processing**. Compatible with quadcopter drones.
 
 ## Project structure
 ``` sh
@@ -28,13 +28,13 @@ This repository has the software part of a DIY flight controller. It's for peopl
 
 ## Features
 
-- Real-time flight stabilization using *PID control*.
-- Supports the *BMI160 IMU* (Inertial Measurement Unit) sensor.
-- Supports the *BMP390 Barometric sensor* (Altimeter).
-- Communication via *standard RC protocols* (PPM).
-- Simple sensor communications *using I²C*.
-- Integration with *GPS modules for navigation*.
-- Cross-platform compatibility with *Arduino boards*.
+- Real-time flight stabilization using **PID control**.
+- Supports the **BMI160 IMU** (Inertial Measurement Unit) sensor.
+- Supports the **BMP390 Barometric sensor** (Altimeter).
+- Communication via **standard RC protocols** (PPM).
+- Simple sensor communications **using I²C**.
+- Integration with **GPS modules for navigation**.
+- Cross-platform compatibility with **Arduino boards**.
 
 ## Getting Started
 
@@ -66,24 +66,24 @@ _Waiting for the image_
 
 ## Usage
 
-1. Connect the hardware components as per the [Hardware Configuration](#Hardware Configuration).
-2. Power on the flight controller and *wait 5 seconds* for the sensors to calibrate.
+1. Connect the hardware components as per the [Hardware Configuration](#Hardware%20Configuration).
+2. Power on the flight controller and **wait 5 seconds** for the sensors to calibrate.
 3. Use your RC transmitter to control the drone.
 
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
 
-1. *Fork* the repository.
+1. **Fork** the repository.
 2. Create a new branch for your *feature* or *bugfix*.
-3. *Submit a pull request* with a detailed description of your changes.
+3. **Submit a pull request** with a detailed description of your changes.
 
 ## License
 
-This project is licensed under the *GPL v2.0 License*. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GPL v2.0 License**. See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
-- *Carbon aeronautics* series on making a Quadcopter using Teensy (Arduino compatible).
-- *Phil's Lab* series on DSP using STM32.
+- **Carbon aeronautics** series on making a Quadcopter using Teensy (Arduino compatible).
+- **Phil's Lab** series on DSP using STM32.
 
