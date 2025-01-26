@@ -37,7 +37,7 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 
 
 #define COMP_FLTR_ALPHA 0.03000000000000000000f  // Complimentary filter coefficient
-#define RAD2DEG         57.2957795130823208767f  // Radians to degrees (per second)
+#define RAD2DEG        57.2957795130823208767f  // Radians to degrees (per second)
 #define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
 #define SAMPLING_PERIOD 0.01000000000000000000f  // Sampling period of the sensor in seconds
 
