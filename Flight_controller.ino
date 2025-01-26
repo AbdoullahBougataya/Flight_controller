@@ -36,6 +36,7 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define COMP_FLTR_ALPHA 0.03000000000000000000f  // Complimentary filter coefficient
 #define RAD2DEG        57.2957795130823208767f   // Radians to degrees (per second)
 #define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
+#define SAMPLING_PERIOD 0.01000000000000000000f  // Sampling period of the sensor in seconds
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -89,7 +90,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING);
 
   for (int i = 0; i < 6; i++) {
-    RCFilter_Init(&lpFRC[i], 5.0f, 26.5f); // Initialize the RCFilter fc = 5 Hz ; Ts = 26.5 ms
+    RCFilter_Init(&lpFRC[i], 5.0f, 10.0f); // Initialize the RCFilter fc = 5 Hz ; Ts = 10 ms
   }
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
@@ -124,45 +125,47 @@ void loop() {
   currentTime = millis();
   dt = (currentTime - lastTime) & 0xFFFFFFFF;
   lastTime = currentTime;
+  if (dataReady)
+  {
+    // Initialize sensor data arrays
+    memset(accelGyro, 0, sizeof(accelGyro));
+    memset(accelGyroData, 0, sizeof(accelGyroData));
 
-  // Initialize sensor data arrays
-  memset(accelGyro, 0, sizeof(accelGyro));
-  memset(accelGyroData, 0, sizeof(accelGyroData));
-
-  // Get both accel and gyro data from the BMI160
-  // Parameter accelGyro is the pointer to store the data
-  rslt = imu.getAccelGyroData(accelGyro);
+    // Get both accel and gyro data from the BMI160
+    // Parameter accelGyro is the pointer to store the data
+    rslt = imu.getAccelGyroData(accelGyro);
 
 
-  // if the data is succesfully extracted
-  if (rslt == 0) {
-    // Format and offset the accelerometer data
-    offset(accelGyro, accelGyroData);
+    // if the data is succesfully extracted
+    if (rslt == 0) {
+      // Format and offset the accelerometer data
+      offset(accelGyro, accelGyroData);
 
-    // Substract the offsets from the Gyro readings
-    for (byte i = 0; i < 3; i++) {
-      accelGyroData[i] -= gyroRateOffset[i];
+      // Substract the offsets from the Gyro readings
+      for (byte i = 0; i < 3; i++) {
+        accelGyroData[i] -= gyroRateOffset[i];
+      }
+
+      for (int i = 0; i < 6; i++){
+        accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+      }
+
+      /*
+        A complimentary filter is a premitive technique of sensor fusion
+        to use both the accelerometer and the gyroscope to predict the
+        euler angles (phi: roll, theta: pitch)
+      */
+      complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, 10.0f); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+
+      // Print the euler angles to the serial monitor
+      Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
+      Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
+      Serial.println();
     }
-
-    for (int i = 0; i < 6; i++){
-      accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+    else {
+      // Print an error otherwise
+      Serial.println("!!! Data extraction failed !!!");
     }
-
-    /*
-       A complimentary filter is a premitive technique of sensor fusion
-       to use both the accelerometer and the gyroscope to predict the
-       euler angles (phi: roll, theta: pitch)
-    */
-    complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, dt); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
-
-    // Print the euler angles to the serial monitor
-    Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
-    Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-    Serial.println();
-  }
-  else {
-    // Print an error otherwise
-    Serial.println("!!! Data extraction failed !!!");
   }
 }
 
