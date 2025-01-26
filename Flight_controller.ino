@@ -166,6 +166,7 @@ void loop() {
       // Print an error otherwise
       Serial.println("!!! Data extraction failed !!!");
     }
+    dataReady = false;
   }
 }
 
@@ -177,7 +178,7 @@ void AccelGyroISR() {
 }
 
 // Complimentary filter (Check Phil's Lab video for more details)
-void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, unsigned long dt) {
+void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt) {
   // Using gravity to estimate the Euler angles
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
   float thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
@@ -187,7 +188,7 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   float thetaDot_rps =  cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                               // Pitch rate (rad/s)
 
   // Complementary filter implementation (Just like mixing the data from the gyroscope and the accelerometer with COMP_FLTR_ALPHA proportions)
-  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + (dt/1000.0) * phiDot_rps);          // Roll estimate
+  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + (dt / 1000.0) * phiDot_rps);          // Roll estimate
   thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + (dt / 1000.0) * thetaDot_rps);  // Pitch estimate
 }
 
