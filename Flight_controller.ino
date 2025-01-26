@@ -46,11 +46,6 @@ uint8_t rslt = 0; // Define the result of the data extraction from the imu
 
 float gyroRateOffset[3] = { 0.0 }; // Gyro rates offsets
 
-// Define the time step
-unsigned long dt = 0;
-unsigned long lastTime = 0;
-unsigned long currentTime = 0;
-
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0 }; // Data that is going to be processed
@@ -87,7 +82,7 @@ void setup() {
     while (1);
   }
 
-  attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING); // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
 
   for (int i = 0; i < 6; i++) {
     RCFilter_Init(&lpFRC[i], 5.0f, 10.0f); // Initialize the RCFilter fc = 5 Hz ; Ts = 10 ms
@@ -121,10 +116,6 @@ void setup() {
 
 void loop() {
 
-  // Calculate time stamp (in milliseconds)
-  currentTime = millis();
-  dt = (currentTime - lastTime) & 0xFFFFFFFF;
-  lastTime = currentTime;
   if (dataReady)
   {
     // Initialize sensor data arrays
