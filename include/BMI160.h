@@ -148,6 +148,9 @@
 #define BMI160_DATA_RDY_INT_EN_MASK             UINT8_C(0x10)
 
 /** Mask definitions for INT_MAP register */
+#define BMI160_INT1_DATA_READY_MASK             UINT8_C(0x80)
+
+/** Mask definitions for INT_OUT_CTRL register */
 
 
 /* Error code mask */
