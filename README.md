@@ -59,8 +59,30 @@ Follow these steps to set up and run the Flight Controller software.
 3. Install the Wire and the FreeRTOS libraries.
 4. Compile and upload the code to your microcontroller.
 
+## Hardware Configuration
+
+_Waiting for the image_
+
 ## Usage
 
-1. Connect the hardware components as per the [hardware setup guide](#link-to-hardware-setup-guide).
+1. Connect the hardware components as per the [Hardware Configuration](#Hardware Configuration).
 2. Power on the flight controller and wait 5 seconds for the sensors to calibrate.
 3. Use your RC transmitter to control the drone.
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Submit a pull request with a detailed description of your changes.
+
+## License
+
+This project is licensed under the GPL v2.0 License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
+- Phil's Lab series on DSP using STM32.
+
