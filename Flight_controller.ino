@@ -71,22 +71,30 @@ void setup() {
   xTaskCreate(TaskBlink, "Blink", 128, NULL, 1, NULL);
   xTaskCreate(TaskPrintSensorData, "PrintSensorData", 128, NULL, 2, NULL);
 
+  // initialize serial communication at 115200 bits per second:
+  Serial.begin(115200);
+  delay(100);
+
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
+    Serial.println("Reset error");
     while (1);
   }
 
   // Initialize the BMI160 on I²C
   if (imu.Init(addr) != BMI160_OK) {
+    Serial.println("Init error");
     while (1);
   }
 
   // Initialize the BMI160 interrupt 1
   if (imu.setInt() != BMI160_OK) {
+    Serial.println("Interrupt error");
     while (1);
   }
-
-  attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING); // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
+  
+  // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
+  attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING);
 
   for (int i = 0; i < 6; i++) {
     RCFilter_Init(&lpFRC[i], 5.0f, 10.0f); // Initialize the RCFilter fc = 5 Hz ; Ts = 10 ms
@@ -176,9 +184,6 @@ void TaskBlink(void *pvParameters) // This is a task.
 void TaskPrintSensorData( void *pvParameters )
 {
   (void) pvParameters;
-  // initialize serial communication at 115200 bits per second:
-  Serial.begin(115200);
-  vTaskDelay(7);
   for (;;)
   {
     // Print the euler angles to the serial monitor
