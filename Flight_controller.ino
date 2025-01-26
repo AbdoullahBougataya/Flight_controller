@@ -59,6 +59,7 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 
 // Define the tasks
 void TaskBlink( void *pvParameters );
+void TaskAnalogRead( void *pvParameters );
 
 // Functions
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
@@ -67,9 +68,9 @@ void AccelGyroISR();
 // Section 2: Initialization & setup section.
 
 void setup() {
+  xTaskCreate(TaskBlink, "Blink", 128, NULL, 2, NULL);
   Serial.begin(115200); // Setup the baud rate of the serial monitor
   delay(100); // Controller startup delay
-  xTaskCreate(TaskBlink, "Blink", 128, NULL, 2, NULL);
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
     Serial.println("reset false");
