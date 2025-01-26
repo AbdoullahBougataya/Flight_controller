@@ -73,7 +73,7 @@ void setup() {
 
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
-  delay(100);
+  vTaskDelay(100 / portTICK_PERIOD_MS); // Use vTaskDelay instead of delay
 
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
@@ -92,7 +92,7 @@ void setup() {
     Serial.println("Interrupt error");
     while (1);
   }
-  
+
   // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
   attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING);
 
@@ -115,7 +115,7 @@ void setup() {
     for (byte j = 0; j < 3; j++) {
       gyroRateCumulativeOffset[j] += accelGyroData[j];
     }
-    delay(1);
+    vTaskDelay(1 / portTICK_PERIOD_MS); // Use vTaskDelay instead of delay
   }
   // Calculate the average offset
   for (byte i = 0; i < 3; i++) {
