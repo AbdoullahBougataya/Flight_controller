@@ -11,16 +11,17 @@
 #define BMI160_GYRO_RANGE_MSK                   UINT8_C(0x07)
 
 // /** BMI160 Register map */
-#define BMI160_CHIP_ID_ADDR   UINT8_C(0x00)
-#define BMI160_ERROR_REG_ADDR   UINT8_C(0x02)
-#define BMI160_GYRO_DATA_ADDR   UINT8_C(0x0C)
-#define BMI160_ACCEL_DATA_ADDR    UINT8_C(0x12)
-#define BMI160_ACCEL_CONFIG_ADDR  UINT8_C(0x40)
-#define BMI160_ACCEL_RANGE_ADDR   UINT8_C(0x41)
-#define BMI160_GYRO_CONFIG_ADDR   UINT8_C(0x42)
-#define BMI160_GYRO_RANGE_ADDR    UINT8_C(0x43)
+#define BMI160_CHIP_ID_ADDR              UINT8_C(0x00)
+#define BMI160_ERROR_REG_ADDR            UINT8_C(0x02)
+#define BMI160_GYRO_DATA_ADDR            UINT8_C(0x0C)
+#define BMI160_ACCEL_DATA_ADDR           UINT8_C(0x12)
+#define BMI160_ACCEL_CONFIG_ADDR         UINT8_C(0x40)
+#define BMI160_ACCEL_RANGE_ADDR          UINT8_C(0x41)
+#define BMI160_GYRO_CONFIG_ADDR          UINT8_C(0x42)
+#define BMI160_GYRO_RANGE_ADDR           UINT8_C(0x43)
 #define BMI160_INT_DATA_0_ADDR           UINT8_C(0x58)
-#define BMI160_COMMAND_REG_ADDR    UINT8_C(0x7E)
+#define BMI160_COMMAND_REG_ADDR          UINT8_C(0x7E)
+#define BMI160_INT_ENABLE_0_ADDR         UINT8_C(0x50)
 
 // /** Error code definitions */
 #define BMI160_OK                         INT8_C(0)
