@@ -34,6 +34,8 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 
+void AccelGyroISR();
+
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 #define COMP_FLTR_ALPHA 0.03000000000000000000f  // Complimentary filter coefficient
@@ -163,9 +165,10 @@ void loop() {
 
 // Section 4: Function declarations.
 
-//
-void 
-
+// Accelerometer and Gyroscope interrupt service routine
+void AccelGyroISR() {
+  dataReady = true;
+}
 
 // Complimentary filter (Check Phil's Lab video for more details)
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, unsigned long dt) {
