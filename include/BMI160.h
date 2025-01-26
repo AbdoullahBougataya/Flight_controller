@@ -22,7 +22,7 @@
 #define BMI160_INT_DATA_0_ADDR           UINT8_C(0x58)
 #define BMI160_COMMAND_REG_ADDR          UINT8_C(0x7E)
 #define BMI160_INT_ENABLE_1_ADDR         UINT8_C(0x51)
-#define BMI160_INT_MAP_0_ADDR            UINT8_C(0x55)
+#define BMI160_INT_MAP_1_ADDR            UINT8_C(0x56)
 #define BMI160_INT_OUT_CTRL_ADDR         UINT8_C(0x53)
 #define BMI160_INT_LATCH_ADDR            UINT8_C(0x54)
 
@@ -147,7 +147,7 @@
 /** Mask definitions for INT_EN registers */
 #define BMI160_DATA_RDY_INT_EN_MASK             UINT8_C(0x10)
 
-/** Mask definitions for INT_OUT_CTRL register */
+/** Mask definitions for INT_MAP register */
 
 
 /* Error code mask */
