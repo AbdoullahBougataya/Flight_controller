@@ -583,10 +583,21 @@ int8_t BMI160::setInt(int intNum)
 int8_t BMI160::setInt(struct bmi160Dev *dev, int intNum)
 {
   int8_t rslt=BMI160_OK;
-  if (dev == NULL){
+  uint8_t data[4] = {0};
+  if (dev == NULL)
+  {
     rslt = BMI160_E_NULL_PTR;
+  } else {
+    data[0] = BMI160_DATA_RDY_INT_EN_MASK;
+    rslt = setRegs(BMI160_INT_ENABLE_1_ADDR, &data[0], 1, dev);
+    if (rslt == BMI160_OK)
+    {
+        data = BMI160_INT1_DATA_READY_MASK;
+        rslt = setRegs(BMI160_INT_ENABLE_1_ADDR, data, 1, dev);
+    }
   }
-  
+
+  return rslt;
 }
 
 int8_t BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
