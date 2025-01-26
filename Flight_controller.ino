@@ -3,6 +3,7 @@
     * Constants & Global variables declarations. 📝
     * Initialization & setup section. 📌
     * Looping and realtime processing. 🔁
+    * Tasks definition. 📋
     * Function declarations. ▶️
            -------------------------------------------
   Tasks:
@@ -56,6 +57,9 @@ float accelGyroData[6] = { 0 }; // Data that is going to be processed
 float phiHat_rad = 0.0f; // Euler Roll
 float thetaHat_rad = 0.0f; // Euler Pitch
 
+// Define the tasks
+void TaskBlink( void *pvParameters );
+
 // Functions
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 void AccelGyroISR();
@@ -65,7 +69,7 @@ void AccelGyroISR();
 void setup() {
   Serial.begin(115200); // Setup the baud rate of the serial monitor
   delay(100); // Controller startup delay
-
+  xTaskCreate(TaskBlink, "Blink", 128, NULL, 2, NULL);
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
     Serial.println("reset false");
@@ -163,7 +167,25 @@ void loop() {
   }
 }
 
-// Section 4: Function declarations.
+// Section 4: Tasks definitions.
+
+void TaskBlink(void *pvParameters) // This is a task.
+{
+  (void) pvParameters;
+
+  // initialize digital pin 13 as an output.
+  pinMode(13, OUTPUT);
+
+  for (;;) // A Task shall never return or exit.
+  {
+    digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
+    vTaskDelay( 100 / portTICK_PERIOD_MS ); // wait for the tenth of a second
+    digitalWrite(13, LOW); // turn the LED off by making the voltage LOW
+    vTaskDelay( 100 / portTICK_PERIOD_MS ); // wait for the tenth of a second
+  }
+}
+
+// Section 5: Function declarations.
 
 // Accelerometer and Gyroscope interrupt service routine
 void AccelGyroISR() {
