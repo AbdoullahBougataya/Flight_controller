@@ -151,7 +151,7 @@
 #define BMI160_INT1_DATA_READY_MASK             UINT8_C(0x80)
 
 /** Mask definitions for INT_OUT_CTRL register */
-
+#define BMI160_INT1_PULL_PUSH_ACTIVE_HIGH_EDGE_TRIG UINT8_C(0x0B)
 
 /* Error code mask */
 #define BMI160_ERR_REG_MASK   UINT8_C(0x0F)
