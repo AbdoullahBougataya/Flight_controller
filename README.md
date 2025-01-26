@@ -7,7 +7,7 @@
 
 ## Overview
 
-This repository has the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. **The software has features for flight stabilization, sensor integration, PID control, and signal processing**. Compatible with quadcopter drones.
+This repository is the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. **The software has features for flight stabilization, sensor integration, PID control, and signal processing**. Compatible with quadcopter drones.
 
 ## Project structure
 ``` sh
@@ -66,7 +66,7 @@ _Waiting for the image_
 
 ## Usage
 
-1. Connect the hardware components as per the [Hardware Configuration](#Hardware%20Configuration).
+1. Connect the hardware components as per the [Hardware Configuration](#Hardware-Configuration).
 2. Power on the flight controller and **wait 5 seconds** for the sensors to calibrate.
 3. Use your RC transmitter to control the drone.
 
