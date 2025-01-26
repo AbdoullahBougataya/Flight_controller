@@ -58,16 +58,18 @@ float phiHat_rad = 0.0f; // Euler Roll
 float thetaHat_rad = 0.0f; // Euler Pitch
 
 // Define the tasks
-void TaskBlink( void *pvParameters );
-void TaskPrintSensorData( void *pvParameters );
+void TaskBlink( void *pvParameters ); // This task makes the LED blink
+void TaskPrintSensorData( void *pvParameters ); // This task prints the euler angles to the serial monitor
 
 // Functions
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
-void AccelGyroISR();
+void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving data from the sensor
 
 // Section 2: Initialization & setup section.
 
 void setup() {
+
+  // Initiating the Tasks in FreeRTOS (Change 128 to change the stack size if stack overflow is encountered)
   xTaskCreate(TaskBlink, "Blink", 128, NULL, 1, NULL);
   xTaskCreate(TaskPrintSensorData, "PrintSensorData", 128, NULL, 2, NULL);
 
@@ -104,6 +106,7 @@ void setup() {
 
   // For five seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
   for (int i = 0; i < 200; i++) {
+
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
     memset(accelGyroData, 0, sizeof(accelGyroData));
@@ -111,9 +114,11 @@ void setup() {
     // Get both accel and gyro data from the BMI160
     // Parameter accelGyro is the pointer to store the data
     imu.getAccelGyroData(accelGyro);
+
+    // Formatting the data
     offset(accelGyro, accelGyroData);
     for (byte j = 0; j < 3; j++) {
-      gyroRateCumulativeOffset[j] += accelGyroData[j];
+      gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
     }
     vTaskDelay(1 / portTICK_PERIOD_MS); // Use vTaskDelay instead of delay
   }
