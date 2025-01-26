@@ -89,15 +89,15 @@ int8_t BMI160::setSensConf()
 int8_t BMI160::setSensConf(struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
-  dev->accelCfg.odr = BMI160_ACCEL_ODR_200HZ;
+  dev->accelCfg.odr = BMI160_ACCEL_ODR_100HZ;
   dev->accelCfg.range = BMI160_ACCEL_RANGE_2G;
   dev->accelCfg.bw = BMI160_ACCEL_BW_OSR2_AVG2;
 
   dev->accelCfg.power = BMI160_ACCEL_NORMAL_MODE;
 
-  dev->gyroCfg.odr = BMI160_GYRO_ODR_200HZ;
+  dev->gyroCfg.odr = BMI160_GYRO_ODR_100HZ;
   dev->gyroCfg.range = BMI160_GYRO_RANGE_2000_DPS;
-  dev->gyroCfg.bw = BMI160_GYRO_BW_OSR4_MODE;
+  dev->gyroCfg.bw = BMI160_GYRO_BW_OSR2_MODE;
 
   dev->gyroCfg.power = BMI160_GYRO_NORMAL_MODE;
 
