@@ -59,7 +59,7 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 
 // Define the tasks
 void TaskBlink( void *pvParameters );
-void TaskAnalogRead( void *pvParameters );
+void TaskPrintSensorData( void *pvParameters );
 
 // Functions
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
@@ -68,8 +68,8 @@ void AccelGyroISR();
 // Section 2: Initialization & setup section.
 
 void setup() {
-  xTaskCreate(TaskBlink, "Blink", 128, NULL, 2, NULL);
-  Serial.begin(115200); // Setup the baud rate of the serial monitor
+  xTaskCreate(TaskBlink, "Blink", 128, NULL, 1, NULL);
+  xTaskCreate(TaskPrintSensorData, "PrintSensorData", 128, NULL, 2, NULL);
   delay(100); // Controller startup delay
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
@@ -180,10 +180,17 @@ void TaskBlink(void *pvParameters) // This is a task.
   for (;;) // A Task shall never return or exit.
   {
     digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
-    vTaskDelay( 100 / portTICK_PERIOD_MS ); // wait for the tenth of a second
+    vTaskDelay(100 / portTICK_PERIOD_MS); // wait for the tenth of a second
     digitalWrite(13, LOW); // turn the LED off by making the voltage LOW
-    vTaskDelay( 100 / portTICK_PERIOD_MS ); // wait for the tenth of a second
+    vTaskDelay(100 / portTICK_PERIOD_MS); // wait for the tenth of a second
   }
+}
+
+void TaskPrintSensorData( void *pvParameters )
+{
+  (void) pvParameters;
+  // initialize serial communication at 115200 bits per second:
+  Serial.begin(115200);
 }
 
 // Section 5: Function declarations.
