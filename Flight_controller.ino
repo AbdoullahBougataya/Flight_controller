@@ -11,6 +11,7 @@
       2. Implement the PID control algorithms.
       3. Implement PWM signal generation algorithms.
     In progress ⏳:
+      1. Implement FreeRTOS
       2. Perform sensor fusion
     Done ✅:
       1. Initialize the sensors.
@@ -24,6 +25,7 @@
 
 #include "./include/BMI160.h"
 #include "./include/RCFilter.h"
+#include <Arduino_FreeRTOS.h>
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
