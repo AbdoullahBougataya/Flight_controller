@@ -43,7 +43,7 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
-bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
+volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
 
 uint8_t rslt = 0; // Define the result of the data extraction from the imu
 
