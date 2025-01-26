@@ -575,6 +575,10 @@ int8_t BMI160::getAccelGyroData(uint8_t len, struct bmi160SensorData *accel, str
   return rslt;
 }
 
+int8_t BMI160::setInt() {
+  
+}
+
 int8_t BMI160::getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
 {
 

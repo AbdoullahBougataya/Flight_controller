@@ -10,7 +10,7 @@
 #define BMI160_GYRO_ODR_MASK                    UINT8_C(0x0F)
 #define BMI160_GYRO_RANGE_MSK                   UINT8_C(0x07)
 
-// /** BMI160 Register map */
+/** BMI160 Register map */
 #define BMI160_CHIP_ID_ADDR              UINT8_C(0x00)
 #define BMI160_ERROR_REG_ADDR            UINT8_C(0x02)
 #define BMI160_GYRO_DATA_ADDR            UINT8_C(0x0C)
@@ -26,13 +26,12 @@
 #define BMI160_INT_OUT_CTRL_ADDR         UINT8_C(0x53)
 #define BMI160_INT_LATCH_ADDR            UINT8_C(0x54)
 
-// /** Error code definitions */
+/** Error code definitions */
 #define BMI160_OK                         INT8_C(0)
 #define BMI160_E_NULL_PTR                 INT8_C(-1)
 #define BMI160_E_COM_FAIL                 INT8_C(-2)
 #define BMI160_E_DEV_NOT_FOUND            INT8_C(-3)
 #define BMI160_E_OUT_OF_RANGE             INT8_C(-4)
-// #define BMI160_E_INVALID_INPUT            INT8_C(-5)
 #define BMI160_E_ACCEL_ODR_BW_INVALID   INT8_C(-6)
 #define BMI160_E_GYRO_ODR_BW_INVALID    INT8_C(-7)
 #define BMI160_E_LWP_PRE_FLTR_INT_INVALID INT8_C(-8)
@@ -41,7 +40,7 @@
 /** BMI160 unique chip identifier */
 #define BMI160_CHIP_ID                   UINT8_C(0xD1)
 
-// /** Soft reset command */
+/** Soft reset command */
 #define BMI160_SOFT_RESET_CMD            UINT8_C(0xb6)
 #define BMI160_SOFT_RESET_DELAY_MS       UINT8_C(15)
 
@@ -123,7 +122,7 @@
 #define BMI160_GYRO_BW_MAX               UINT8_C(2)
 #define BMI160_GYRO_RANGE_MAX            UINT8_C(4)
 
-// /* Sensor & time select definition*/
+/* Sensor & time select definition*/
 #define BMI160_ACCEL_SEL    UINT8_C(0x01)
 #define BMI160_GYRO_SEL     UINT8_C(0x02)
 #define BMI160_TIME_SEL     UINT8_C(0x04)
