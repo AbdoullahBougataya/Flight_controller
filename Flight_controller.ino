@@ -32,15 +32,12 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
-
-void AccelGyroISR();
-
-const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 #define COMP_FLTR_ALPHA 0.03000000000000000000f  // Complimentary filter coefficient
 #define RAD2DEG        57.2957795130823208767f   // Radians to degrees (per second)
 #define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
+
+const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 uint8_t rslt = 0; // Define the result of the data extraction from the imu
 
@@ -58,6 +55,10 @@ float accelGyroData[6] = { 0 }; // Data that is going to be processed
 // Declare sensor fusion variables
 float phiHat_rad = 0.0f; // Euler Roll
 float thetaHat_rad = 0.0f; // Euler Pitch
+
+// Functions
+void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
+void AccelGyroISR();
 
 // Section 2: Initialization & setup section.
 
