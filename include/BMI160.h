@@ -21,7 +21,7 @@
 #define BMI160_GYRO_RANGE_ADDR           UINT8_C(0x43)
 #define BMI160_INT_DATA_0_ADDR           UINT8_C(0x58)
 #define BMI160_COMMAND_REG_ADDR          UINT8_C(0x7E)
-#define BMI160_INT_ENABLE_0_ADDR         UINT8_C(0x50)
+#define BMI160_INT_ENABLE_1_ADDR         UINT8_C(0x51)
 #define BMI160_INT_MAP_0_ADDR            UINT8_C(0x55)
 #define BMI160_INT_OUT_CTRL_ADDR         UINT8_C(0x53)
 #define BMI160_INT_LATCH_ADDR            UINT8_C(0x54)
