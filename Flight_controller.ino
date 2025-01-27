@@ -111,7 +111,7 @@ void setup() {
     for (byte j = 0; j < 3; j++) {
       gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
     }
-    vTaskDelay(1 / portTICK_PERIOD_MS); // Use vTaskDelay instead of delay
+    delay(1);
   }
   // Calculate the average offset
   for (byte i = 0; i < 3; i++) {
