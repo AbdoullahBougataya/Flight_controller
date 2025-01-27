@@ -65,7 +65,7 @@ void setup() {
 
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
-  vTaskDelay(100 / portTICK_PERIOD_MS); // Use vTaskDelay instead of delay
+  delay(100);
 
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
@@ -156,11 +156,14 @@ void loop() {
         euler angles (phi: roll, theta: pitch)
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, 10.0f); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+
+      // Print the euler angles to the serial monitor
+      Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
+      Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
+      Serial.println();
     }
   }
 }
-
-// Section 4: Tasks definitions.
 
 // Section 4: Function declarations.
 
