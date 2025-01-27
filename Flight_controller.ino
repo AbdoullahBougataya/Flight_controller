@@ -26,7 +26,6 @@
 
 #include "./include/BMI160.h"
 #include "./include/RCFilter.h"
-#include <Arduino_FreeRTOS.h>
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
@@ -56,10 +55,6 @@ float accelGyroData[6] = { 0 }; // Data that is going to be processed
 float phiHat_rad = 0.0f; // Euler Roll
 float thetaHat_rad = 0.0f; // Euler Pitch
 
-// Define the tasks
-void TaskBlink( void *pvParameters ); // This task makes the LED blink
-void TaskPrintSensorData( void *pvParameters ); // This task prints the euler angles to the serial monitor
-
 // Functions
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
 void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving data from the sensor
@@ -67,10 +62,6 @@ void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving dat
 // Section 2: Initialization & setup section.
 
 void setup() {
-
-  // Initiating the Tasks in FreeRTOS (Change 128 to change the stack size if stack overflow is encountered)
-  xTaskCreate(TaskBlink, "Blink", 128, NULL, 1, NULL);
-  xTaskCreate(TaskPrintSensorData, "PrintSensorData", 128, NULL, 2, NULL);
 
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
@@ -171,37 +162,7 @@ void loop() {
 
 // Section 4: Tasks definitions.
 
-// This task makes the Arduino LED blink
-void TaskBlink(void *pvParameters)
-{
-  (void) pvParameters;
-
-  // initialize digital pin 13 as an output.
-  pinMode(13, OUTPUT);
-
-  for (;;) // A Task shall never return or exit.
-  {
-    digitalWrite(13, HIGH); // turn the LED on (HIGH is the voltage level)
-    vTaskDelay(100 / portTICK_PERIOD_MS); // wait for the tenth of a second
-    digitalWrite(13, LOW); // turn the LED off by making the voltage LOW
-    vTaskDelay(100 / portTICK_PERIOD_MS); // wait for the tenth of a second
-  }
-}
-
-// This task prints the euler angles to the serial monitor
-void TaskPrintSensorData( void *pvParameters )
-{
-  (void) pvParameters;
-  for (;;)
-  {
-    // Print the euler angles to the serial monitor
-    Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
-    Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-    Serial.println();
-  }
-}
-
-// Section 5: Function declarations.
+// Section 4: Function declarations.
 
 // Accelerometer and Gyroscope interrupt service routine
 void AccelGyroISR() {
