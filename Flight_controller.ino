@@ -104,6 +104,7 @@ void setup() {
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For five seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
+  Serial.print("Calibrating...");
   for (int i = 0; i < 200; i++) {
 
     // Initialize sensor data arrays
