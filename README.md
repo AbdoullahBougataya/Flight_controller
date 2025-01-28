@@ -36,7 +36,7 @@ This repository is the software part of a DIY flight controller. It's for people
 - Communication via **standard RC protocols** (PPM/PWM).
 - Simple sensor communications **using I²C**.
 - Integration with **GPS** (**G**eo**p**ositioning **S**ervice) modules for navigation.
-- Cross-platform compatibility with **Arduino boards**(UNO).
+- Cross-platform compatibility with **Arduino language** compatible boards (UNO, MEGA, ESP32, Teensy...).
 
 ## Getting Started
 
