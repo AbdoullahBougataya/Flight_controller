@@ -27,7 +27,7 @@ typedef struct {
     float out;
 } PIDController;
 
-void PIDController_Init(PIDController *pid);
+void PIDController_Init(PIDController *pid, float dt, float limMin, float limMax);
 float PIDController_Update(PIDController *pid, float setpoint, float measurement);
 
 #endif
