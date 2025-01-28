@@ -11,6 +11,7 @@ void PIDController_Init(PIDController *pid) {
     out = 0.0f;
 }
 
-void PIDController_Update(PIDController *pid, float setpoint, float measurement) {
-    // Error signal
+void PIDController_Update(PIDController *pid, float error) {
+    // Proportional
+    
 }

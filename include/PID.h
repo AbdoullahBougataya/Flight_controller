@@ -28,6 +28,6 @@ typedef struct {
 } PIDController;
 
 void PIDController_Init(PIDController *pid);
-void PIDController_Update(PIDController *pid, float setpoint, float measurement);
+void PIDController_Update(PIDController *pid, float error);
 
 #endif
