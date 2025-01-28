@@ -3,7 +3,6 @@
     * Constants & Global variables declarations. 📝
     * Initialization & setup section. 📌
     * Looping and realtime processing. 🔁
-    * Tasks definition. 📋
     * Function declarations. ▶️
            -------------------------------------------
   Tasks:
@@ -11,7 +10,7 @@
       1. Implement additional signal processing for PID control.
       2. Implement the PID control algorithms.
       3. Implement PWM signal generation algorithms.
-      4. Take instructions from the RC controller.
+      4. Take instructions in real time from the RC controller.
     In progress ⏳:
       1. Perform sensor fusion
     Done ✅:
@@ -62,7 +61,7 @@ float phiHat_rad = 0.0f; // Euler Roll
 float thetaHat_rad = 0.0f; // Euler Pitch
 
 // Functions
-void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt);
+void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt, float alpha);
 void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving data from the sensor
 
 // Section 2: Initialization & setup section.
