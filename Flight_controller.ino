@@ -160,7 +160,7 @@ void loop() {
         to use both the accelerometer and the gyroscope to predict the
         euler angles (phi: roll, theta: pitch)
       */
-      complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, 10.0f); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+      complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
@@ -188,7 +188,7 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   float thetaDot_rps =  cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                               // Pitch rate (rad/s)
 
   // Complementary filter implementation (Just like mixing the data from the gyroscope and the accelerometer with COMP_FLTR_ALPHA proportions)
-  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + (dt / 1000.0) * phiDot_rps);          // Roll estimate
-  thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + (dt / 1000.0) * thetaDot_rps);  // Pitch estimate
+  phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
+  thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
 }
 
