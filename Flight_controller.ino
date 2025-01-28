@@ -38,11 +38,11 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
 #define SAMPLING_PERIOD                   0.01000000000000000000f  // Sampling period of the sensor in seconds
-#define SERIAL_BANDWIDTH_115200      115200 // The serial monitor's bandwidth
-#define STARTUP_DELAY                   100 // 100 ms for the microcontroller to start
-#define INTERRUPT_1_MCU_PIN               2 // The pin that receives the interrupt 1 signal from the IMU
-#define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f // The cutoff frequency for the RC low pass filter
-#define GYRO_CALIBRATION_SAMPLES_200    200 // It takes 200 samples to calibrate the gyroscope
+#define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
+#define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
+#define INTERRUPT_1_MCU_PIN               2                        // The pin that receives the interrupt 1 signal from the IMU
+#define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
+#define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -191,4 +191,3 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   phiHat_rad = COMP_FLTR_ALPHA * phiHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
   thetaHat_rad = COMP_FLTR_ALPHA * thetaHat_acc_rad + (1.0f - COMP_FLTR_ALPHA) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
 }
-
