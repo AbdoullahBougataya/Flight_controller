@@ -11,9 +11,10 @@ void PIDController_Init(PIDController *pid) {
     out = 0.0f;
 }
 
-void PIDController_Update(PIDController *pid, float error) {
+void PIDController_Update(PIDController *pid, float setpoint, float measurement) {
     // Error
-    error = 
+    float error = setpoint -measurement;
+
     // Proportional
     float proportional = pid->Kp * error;
 
@@ -44,5 +45,7 @@ void PIDController_Update(PIDController *pid, float error) {
     }
 
     // Derivative
-    pid->differentiator = (2.0f * pid->Kd * (measurement - pid->prevMeasurement))
+    pid->differentiator = (2.0f * pid->Kd * (measurement - pid->prevMeasurement)
+                        + (2.0f * pid->tau - pid->T) * pid->differentiator)
+                        / (2.0f * pid->tau + pid->T);
 }
