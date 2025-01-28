@@ -33,8 +33,6 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-PIDController pid; // Declaring the PID object
-
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
 #define PI                                3.14159265358979323846f  // Pi
