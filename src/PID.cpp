@@ -48,4 +48,6 @@ void PIDController_Update(PIDController *pid, float setpoint, float measurement)
     pid->differentiator = (2.0f * pid->Kd * (measurement - pid->prevMeasurement)
                         + (2.0f * pid->tau - pid->T) * pid->differentiator)
                         / (2.0f * pid->tau + pid->T);
+    // Compute the output
+    pid->out = proportional + pid->integrator + pid->differentiator;
 }
