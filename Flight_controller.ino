@@ -190,7 +190,7 @@ void AccelGyroISR() {
   dataReady = true;
 }
 
-// Complimentary filter (Check Phil's Lab video for more details)
+// Complementary filter (Check Phil's Lab video for more details)
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt, float alpha) {
   // Using gravity to estimate the Euler angles
   float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
