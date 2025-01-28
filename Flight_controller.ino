@@ -41,7 +41,7 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define SERIAL_BANDWIDTH_115200      115200 // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100 // 100 ms for the microcontroller to start
 #define INTERRUPT_1_MCU_PIN               2 // The pin that receives the interrupt 1 signal from the IMU
-#define RC_LOW_PASS_FLTR_CUTOFF_FREQUENCY 5.00000000000000000000f // The cutoff frequency for the RC low pass filter
+#define RC_LOW_PASS_FLTR_CUTOFF_5HZ 5.00000000000000000000f // The cutoff frequency for the RC low pass filter
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -93,7 +93,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), AccelGyroISR, RISING);
 
   for (int i = 0; i < 6; i++) {
-    RCFilter_Init(&lpFRC[i], 5.0f, 10.0f); // Initialize the RCFilter fc = 5 Hz ; Ts = 10 ms
+    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_5HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
