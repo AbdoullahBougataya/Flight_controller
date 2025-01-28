@@ -7,7 +7,7 @@
 typedef struct {
     float coeff[2];
     float out[2];
-} RCFilter;
+} CompFilter;
 
 /**
   * @fn RCFilter_Init
@@ -16,7 +16,7 @@ typedef struct {
   * @param cutoffFreqHz The cutoff frequency in [Hz]
   * @param sampleTime The sampling period in [s]
   */
-void RCFilter_Init(RCFilter * filt, float cutoffFreqHz, float sampleTime);
+void RCFilter_Init(CompFilter * filt, float cutoffFreqHz, float sampleTime);
 
 /**
   * @fn RCFilter_Update
@@ -25,6 +25,6 @@ void RCFilter_Init(RCFilter * filt, float cutoffFreqHz, float sampleTime);
   * @param inp The input signal
   * @return The filtered signal
   */
-float RCFilter_Update(RCFilter * filt, float inp);
+float RCFilter_Update(CompFilter * filt, float inp);
 
 #endif
