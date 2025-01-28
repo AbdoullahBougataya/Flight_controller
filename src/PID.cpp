@@ -12,6 +12,8 @@ void PIDController_Init(PIDController *pid) {
 }
 
 void PIDController_Update(PIDController *pid, float error) {
+    // Error
+    error = 
     // Proportional
     float proportional = pid->Kp * error;
 
