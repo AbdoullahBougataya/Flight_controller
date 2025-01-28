@@ -13,7 +13,7 @@ void PIDController_Init(PIDController *pid) {
 
 float PIDController_Update(PIDController *pid, float setpoint, float measurement) {
     // Error
-    float error = setpoint -measurement;
+    float error = setpoint - measurement;
 
     // Proportional
     float proportional = pid->Kp * error;
