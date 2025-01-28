@@ -4,9 +4,10 @@
 #include <Arduino.h>
 #include <stdint.h>
 
+#define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
+
 typedef struct {
     float alpha;
-    float coeff[2];
     float out[2];
 } CompFilter;
 
