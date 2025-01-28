@@ -51,16 +51,16 @@ PIDController pid; // Declaring the PID object
 /*     The PID controller settings        */
 /*========================================*/
 /*        Controller coefficients         */
-/**/pid->Kp = 1.0f;                       //
-/**/pid->Ki = 0.6f;                       //
-/**/pid->Kd = 0.0f;                       //
+/**/pid.Kp = 1.0f;                        //
+/**/pid.Ki = 0.6f;                        //
+/**/pid.Kd = 0.0f;                        //
 /*----------------------------------------*/
 /*Derivative low-pass filter time constant*/
-/**/pid->tau = 1.0f;                      //
+/**/pid.tau = 1.0f;                       //
 /*----------------------------------------*/
 /*               Clampings                */
-/**/pid->limMin = -1.0f;                  //
-/**/pid->limMax =  1.0f;                  //
+/**/pid.limMin = -1.0f;                   //
+/**/pid.limMax =  1.0f;                   //
 /*========================================*/
 
 float PID_output = 0.0f;
