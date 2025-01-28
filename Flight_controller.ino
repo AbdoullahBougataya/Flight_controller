@@ -110,12 +110,14 @@ void setup() {
 
     // Get both accel and gyro data from the BMI160
     // Parameter accelGyro is the pointer to store the data
-    imu.getAccelGyroData(accelGyro);
-
-    // Formatting the data
-    offset(accelGyro, accelGyroData);
-    for (byte j = 0; j < 3; j++) {
-      gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
+    rslt = imu.getAccelGyroData(accelGyro);
+    if (rslt)
+    {
+      // Formatting the data
+      offset(accelGyro, accelGyroData);
+      for (byte j = 0; j < 3; j++) {
+        gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
+      }
     }
     delay(1);
   }
@@ -191,7 +193,7 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   // Complementary filter implementation [Just like mixing the data from the gyroscope and the accelerometer with alpha proportions](alpha should be between 0 and 1)
   phiHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * phiHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
   thetaHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * thetaHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
-  
+
   // Bound the values of the pitch and roll
   phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
   thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
