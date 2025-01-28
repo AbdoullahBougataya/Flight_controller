@@ -32,7 +32,7 @@ This repository is the software part of a DIY flight controller. It's for people
 
 - Real-time flight stabilization using **PID control**.
 - Supports the **BMI160 IMU** (Inertial Measurement Unit) sensor.
-- Supports the **BMP390 Barometric sensor** (Altimeter).
+- Supports the **BMP280 Barometric sensor** (Altimeter).
 - Communication via **standard RC protocols** (PPM).
 - Simple sensor communications **using I²C**.
 - Integration with **GPS modules for navigation**.
@@ -48,7 +48,7 @@ Follow these steps to set up and run the Flight Controller software.
 - Required hardware:
   - Microcontroller (e.g., [Arduino UNO](https://store.arduino.cc/products/arduino-uno-rev3), [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)...)
   - [BMI160](https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi160/) IMU
-  - [BMP390](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/pressure-sensors-bmp390.html) Barometric sensor
+  - [BMP280](https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/pressure-sensors-bmp280.html) Barometric sensor
   - GPS module (optional)
   - RC transmitter and receiver
 
@@ -59,8 +59,7 @@ Follow these steps to set up and run the Flight Controller software.
    git clone https://github.com/AbdoullahBougataya/Flight_controller.git
    ```
 2. Open the project in your preferred IDE.
-3. Install the [Wire](https://docs.arduino.cc/language-reference/en/functions/communication/wire/) and the [FreeRTOS](https://docs.arduino.cc/libraries/freertos/) libraries.
-4. Compile and upload the code to your microcontroller.
+3. Compile and upload the code to your microcontroller.
 
 ## Hardware Configuration
 
