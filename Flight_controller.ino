@@ -169,6 +169,8 @@ void loop() {
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
+
+
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
       Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
@@ -206,4 +208,10 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   // Bound the values of the pitch and roll
   phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
   thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
+  if (abs(phiHat_rad) < 1) {
+    phiHat_rad = 0;
+  }
+  if (abs(thetaHat_rad) < 1) {
+    thetaHat_rad = 0;
+  }
 }
