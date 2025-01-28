@@ -197,7 +197,7 @@ void loop() {
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
       Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.print(PID_output);Serial.print("\t");
+      Serial.print(PID_output * RAD2DEG);Serial.print("\t");
       Serial.println();
     }
     else
