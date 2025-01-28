@@ -23,9 +23,9 @@
     * Phil's Lab series on DSP using STM32 (Included more advanced topics like the Filtering, EKF, Compilmentary...).
  */
 
-#include "../../include/BMI160.h"
-#include "../../include/RCFilter.h"
-#include "../../include/PID.h"
+#include "../include/BMI160.h"
+#include "../include/RCFilter.h"
+#include "../include/PID.h"
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
