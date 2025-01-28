@@ -31,12 +31,12 @@ This repository is the software part of a DIY flight controller. It's for people
 ## Features
 
 - Real-time flight stabilization using **PID control**.
-- Supports the **BMI160 IMU** (Inertial Measurement Unit) sensor.
+- Supports the **BMI160 IMU** (**I**nertial **M**easurement **U**nit) sensor.
 - Supports the **BMP280 Barometric sensor** (Altimeter).
-- Communication via **standard RC protocols** (PPM).
+- Communication via **standard RC protocols** (PPM/PWM).
 - Simple sensor communications **using I²C**.
-- Integration with **GPS modules for navigation**.
-- Cross-platform compatibility with **Arduino boards**.
+- Integration with **GPS** (**G**eo**p**ositioning **S**ervice) modules for navigation.
+- Cross-platform compatibility with **Arduino boards**(UNO).
 
 ## Getting Started
 
