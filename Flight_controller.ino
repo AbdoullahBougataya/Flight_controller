@@ -11,13 +11,13 @@
       1. Implement additional signal processing for PID control.
       2. Implement the PID control algorithms.
       3. Implement PWM signal generation algorithms.
+      4. Take instructions from the RC controller.
     In progress ⏳:
       1. Perform sensor fusion
     Done ✅:
       1. Initialize the sensors.
       2. Calibrate the gyroscope.
       3. Filters the sensor data.
-      4. Implement FreeRTOS
            -------------------------------------------
   The flight controller code was highly inspired from various source in the internet, most notably:
     * Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
@@ -151,7 +151,7 @@ void loop() {
         accelGyroData[i] -= gyroRateOffset[i];
       }
 
-      for (int i = 0; i < 6; i++){
+      for (int i = 0; i < 6; i++) {
         accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
       }
 
