@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 typedef struct {
+    float alpha;
     float coeff[2];
     float out[2];
 } CompFilter;
