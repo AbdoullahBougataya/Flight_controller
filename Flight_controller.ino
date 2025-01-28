@@ -34,15 +34,16 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-#define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
+#define PI                                3.14159265358979323846f  // Pi
 #define SAMPLING_PERIOD                   0.01000000000000000000f  // Sampling period of the sensor in seconds
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
 #define INTERRUPT_1_MCU_PIN               2                        // The pin that receives the interrupt 1 signal from the IMU
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
+#define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -190,6 +191,8 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   // Complementary filter implementation [Just like mixing the data from the gyroscope and the accelerometer with alpha proportions](alpha should be between 0 and 1)
   phiHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * phiHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
   thetaHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * thetaHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
+  
+  // Bound the values of the pitch and roll
   phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
   thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
 }
