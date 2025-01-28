@@ -25,7 +25,6 @@
 
 #include "./include/BMI160.h"
 #include "./include/RCFilter.h"
-#include "./include/PID.h"
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
@@ -46,9 +45,6 @@ PIDController pid; // Declaring the PID object
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
-
-
-float PID_output = 0.0f;
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -73,21 +69,6 @@ void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving dat
 // Section 2: Initialization & setup section.
 
 void setup() {
-  /*========================================*/
-  /*     The PID controller settings        */
-  /*========================================*/
-  /*        Controller coefficients         */
-  /**/pid.Kp = 1.0f;                        //
-  /**/pid.Ki = 0.6f;                        //
-  /**/pid.Kd = 0.0f;                        //
-  /*----------------------------------------*/
-  /*Derivative low-pass filter time constant*/
-  /**/pid.tau = 1.0f;                       //
-  /*----------------------------------------*/
-  /*               Clampings                */
-  /**/pid.limMin = -1.0f;                   //
-  /**/pid.limMax =  1.0f;                   //
-  /*========================================*/
   // initialize serial communication at 115200 bits per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
@@ -116,8 +97,6 @@ void setup() {
   for (int i = 0; i < 6; i++) {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_5HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
-
-  PIDController_Init(&pid, SAMPLING_PERIOD);
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
@@ -169,7 +148,6 @@ void loop() {
     // Parameter accelGyro is the pointer to store the data
     rslt = imu.getAccelGyroData(accelGyro);
 
-
     // if the data is succesfully extracted
     if (rslt == 0) {
       // Format and offset the accelerometer data
@@ -191,13 +169,9 @@ void loop() {
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
-      // Update the PID controller
-      PID_output = PIDController_Update(&pid, 0.0f, phiHat_rad);
-
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
       Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.print(PID_output * RAD2DEG);Serial.print("\t");
       Serial.println();
     }
     else
@@ -232,6 +206,8 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   // Bound the values of the pitch and roll
   phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
   thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
+
+  // If the angle is absolutly less than 1, then it zeroes out
   if (abs(phiHat_rad) < 1) {
     phiHat_rad = 0;
   }
