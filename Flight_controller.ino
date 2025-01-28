@@ -111,13 +111,18 @@ void setup() {
     // Get both accel and gyro data from the BMI160
     // Parameter accelGyro is the pointer to store the data
     rslt = imu.getAccelGyroData(accelGyro);
-    if (rslt)
+    if (rslt == 0)
     {
       // Formatting the data
       offset(accelGyro, accelGyroData);
       for (byte j = 0; j < 3; j++) {
         gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
       }
+    }
+    else
+    {
+      Serial.print("!!! Data reading error !!!");
+      Serial.println();
     }
     delay(1);
   }
@@ -168,6 +173,11 @@ void loop() {
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
       Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
+      Serial.println();
+    }
+    else
+    {
+      Serial.print("!!! Data reading error !!!");
       Serial.println();
     }
   }
