@@ -63,6 +63,8 @@ PIDController pid; // Declaring the PID object
 /**/pid->limMax =  1.0f;                  //
 /*========================================*/
 
+float PID_output = 0.0f;
+
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
