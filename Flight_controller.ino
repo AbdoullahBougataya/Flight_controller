@@ -34,10 +34,14 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-#define COMP_FLTR_ALPHA 0.03000000000000000000f  // Complimentary filter coefficient
-#define RAD2DEG        57.29577951308232087680f  // Radians to degrees (per second)
-#define G_MPS2          9.81000000000000000000f  // Gravitational acceleration (g)
-#define SAMPLING_PERIOD 0.01000000000000000000f  // Sampling period of the sensor in seconds
+#define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
+#define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
+#define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
+#define SAMPLING_PERIOD                   0.01000000000000000000f  // Sampling period of the sensor in seconds
+#define SERIAL_BANDWIDTH_115200      115200 // The serial monitor's bandwidth
+#define STARTUP_DELAY                   100 // 100 ms for the microcontroller to start
+#define INTERRUPT_1_MCU_PIN               2 // The pin that receives the interrupt 1 signal from the IMU
+#define RC_LOW_PASS_FLTR_CUTOFF_FREQUENCY 5.00000000000000000000f // The cutoff frequency for the RC low pass filter
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -64,8 +68,8 @@ void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving dat
 void setup() {
 
   // initialize serial communication at 115200 bits per second:
-  Serial.begin(115200);
-  delay(100);
+  Serial.begin(SERIAL_BANDWIDTH_115200);
+  delay(STARTUP_DELAY);
 
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
@@ -86,7 +90,7 @@ void setup() {
   }
 
   // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
-  attachInterrupt(digitalPinToInterrupt(2), AccelGyroISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), AccelGyroISR, RISING);
 
   for (int i = 0; i < 6; i++) {
     RCFilter_Init(&lpFRC[i], 5.0f, 10.0f); // Initialize the RCFilter fc = 5 Hz ; Ts = 10 ms
