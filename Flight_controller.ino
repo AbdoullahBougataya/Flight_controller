@@ -41,7 +41,8 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define SERIAL_BANDWIDTH_115200      115200 // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100 // 100 ms for the microcontroller to start
 #define INTERRUPT_1_MCU_PIN               2 // The pin that receives the interrupt 1 signal from the IMU
-#define RC_LOW_PASS_FLTR_CUTOFF_5HZ 5.00000000000000000000f // The cutoff frequency for the RC low pass filter
+#define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f // The cutoff frequency for the RC low pass filter
+#define GYRO_CALIBRATION_SAMPLES_200    200 // It takes 200 samples to calibrate the gyroscope
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -100,7 +101,7 @@ void setup() {
 
   // For five seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
   Serial.print("Calibrating...");
-  for (int i = 0; i < 200; i++) {
+  for (int i = 0; i < GYRO_CALIBRATION_SAMPLES_200; i++) {
 
     // Initialize sensor data arrays
     memset(accelGyro, 0, sizeof(accelGyro));
@@ -119,7 +120,7 @@ void setup() {
   }
   // Calculate the average offset
   for (byte i = 0; i < 3; i++) {
-    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / 200;
+    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / GYRO_CALIBRATION_SAMPLES_200;
   }
 }
 
