@@ -47,21 +47,6 @@ PIDController pid; // Declaring the PID object
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
 
-/*========================================*/
-/*     The PID controller settings        */
-/*========================================*/
-/*        Controller coefficients         */
-/**/pid.Kp = 1.0f;                        //
-/**/pid.Ki = 0.6f;                        //
-/**/pid.Kd = 0.0f;                        //
-/*----------------------------------------*/
-/*Derivative low-pass filter time constant*/
-/**/pid.tau = 1.0f;                       //
-/*----------------------------------------*/
-/*               Clampings                */
-/**/pid.limMin = -1.0f;                   //
-/**/pid.limMax =  1.0f;                   //
-/*========================================*/
 
 float PID_output = 0.0f;
 
@@ -88,7 +73,21 @@ void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving dat
 // Section 2: Initialization & setup section.
 
 void setup() {
-
+  /*========================================*/
+  /*     The PID controller settings        */
+  /*========================================*/
+  /*        Controller coefficients         */
+  /**/pid.Kp = 1.0f;                        //
+  /**/pid.Ki = 0.6f;                        //
+  /**/pid.Kd = 0.0f;                        //
+  /*----------------------------------------*/
+  /*Derivative low-pass filter time constant*/
+  /**/pid.tau = 1.0f;                       //
+  /*----------------------------------------*/
+  /*               Clampings                */
+  /**/pid.limMin = -1.0f;                   //
+  /**/pid.limMax =  1.0f;                   //
+  /*========================================*/
   // initialize serial communication at 115200 bits per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
