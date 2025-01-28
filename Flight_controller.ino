@@ -190,7 +190,8 @@ void loop() {
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
-
+      // Update the PID controller
+      PIDController_Update(pid, 0.0f, phiHat_rad);
 
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
