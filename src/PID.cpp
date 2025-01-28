@@ -1,6 +1,9 @@
 #include "../include/PID.h"
 
-void PIDController_Init(PIDController *pid) {
+void PIDController_Init(PIDController *pid, float dt) {
+    // Set the sampling period
+    pid->T = dt;
+    
     // Reset all variables
     integrator = 0.0f;
     prevError = 0.0f;
