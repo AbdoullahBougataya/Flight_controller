@@ -190,6 +190,6 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   // Complementary filter implementation [Just like mixing the data from the gyroscope and the accelerometer with alpha proportions](alpha should be between 0 and 1)
   phiHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * phiHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (phiHat_rad + dt * phiDot_rps);          // Roll estimate
   thetaHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * thetaHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (thetaHat_rad + dt * thetaDot_rps);  // Pitch estimate
-  phiHat_rad = fminf(fmaxf(phiHat_rad,),);
-  thetaHat_rad = fminf(fmaxf(thetaHat_rad,),);
+  phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
+  thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
 }
