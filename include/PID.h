@@ -15,7 +15,7 @@ typedef struct {
     float limMax;
 
     // Sample time (in seconds)
-    float T
+    float T;
 
     // Controller "Memory"
     float integrator;

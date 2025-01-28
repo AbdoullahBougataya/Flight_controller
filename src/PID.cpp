@@ -3,15 +3,15 @@
 void PIDController_Init(PIDController *pid, float dt) {
     // Set the sampling period
     pid->T = dt;
-    
+
     // Reset all variables
-    integrator = 0.0f;
-    prevError = 0.0f;
+    pid->integrator = 0.0f;
+    pid->prevError = 0.0f;
 
-    differentiator = 0.0f;
-    prevMeasurement = 0.0f;
+    pid->differentiator = 0.0f;
+    pid->prevMeasurement = 0.0f;
 
-    out = 0.0f;
+    pid->out = 0.0f;
 }
 
 float PIDController_Update(PIDController *pid, float setpoint, float measurement) {

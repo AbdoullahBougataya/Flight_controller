@@ -25,6 +25,7 @@
 
 #include "./include/BMI160.h"
 #include "./include/RCFilter.h"
+#include "./include/PID.h"
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
@@ -32,6 +33,8 @@
 BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
+
+PIDController pid; // Declaring the PID object
 
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
@@ -43,6 +46,22 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
+
+/*========================================*/
+/*     The PID controller settings        */
+/*========================================*/
+/*        Controller coefficients         */
+/**/pid->Kp = 1.0f;                       //
+/**/pid->Ki = 0.6f;                       //
+/**/pid->Kd = 0.0f;                       //
+/*----------------------------------------*/
+/*Derivative low-pass filter time constant*/
+/**/pid->tau = 1.0f;                      //
+/*----------------------------------------*/
+/*               Clampings                */
+/**/pid->limMin = -1.0f;                  //
+/**/pid->limMax =  1.0f;                  //
+/*========================================*/
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
