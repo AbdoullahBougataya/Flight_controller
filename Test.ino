@@ -214,12 +214,15 @@ void loop() {
       rollPID = PIDController_Update(&pid, SETPOINT, phiHat_rad * RAD2DEG);
 
       // Set the motor throttle from the MMA (Motor Mixing Algorithm)
-      M1 = THROTTLE + (int)(rollPID * 10);
-      M2 = THROTTLE - (int)(rollPID * 10);
+      M1 = fminf(fmaxf(THROTTLE + (int)(rollPID * 10), 0), 1800);
+      M2 = fminf(fmaxf(THROTTLE - (int)(rollPID * 10), 0), 1800);
 
       /* The Code continues here... */
-      motorLeftPWM.write();
-      motorRightPWM.write();
+      M1 = map(M1, 0, 1800, 0, 180);
+      M2 = map(M2, 0, 1800, 0, 180);
+
+      motorLeftPWM.write(M1);
+      motorRightPWM.write(M2);
 
       // Print the euler angles to the serial monitor
       Serial.print("Angle:");
