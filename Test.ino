@@ -50,7 +50,7 @@ Servo motorRightPWM; // Right Motors PWM signal object
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
-#define THROTTLE                        600                        // The throttle of the motors (Between 0 and 1800)
+#define THROTTLE                        400                        // The throttle of the motors (Between 0 and 1800)
 #define SETPOINT                          0.00000000000000000000f  // The setpoint for the PID Controller
 #define MTR_LEFT_PIN                      9                        // Motor left pin from the PDB standpoint
 #define MTR_RIGHT_PIN                    10                        // Motor right pin from the PDB standpoint
