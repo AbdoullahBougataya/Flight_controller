@@ -82,7 +82,7 @@ void setup() {
   /*========================================*/
   /*        Controller coefficients         */
   /**/pid.Kp = 1.0f;                        //
-  /**/pid.Ki = 0.6f;                        //
+  /**/pid.Ki = 0.0f;                        //
   /**/pid.Kd = 0.0f;                        //
   /*----------------------------------------*/
   /*Derivative low-pass filter time constant*/
