@@ -27,6 +27,7 @@
 #include "./include/RCFilter.h"
 #include "./include/PID.h"
 #include <math.h>
+#include <Servo.h>
 
 // Section 1: Constants & Global variables declarations.
 
@@ -46,15 +47,18 @@ PIDController pid; // Declaring the PID object
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
-
-
-float PID_output = 0.0f;
+#define THROTTLE                        600                        // The throttle of the motors (Between 0 and 1800)
+#define SETPOINT                          0.00000000000000000000f  // The setpoint for the PID Controller
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
 
 uint8_t rslt = 0; // Define the result of the data extraction from the imu
+
+int M1 = 0, M2 = 0; // Motor throttle variables (to be later determined to the real motors)
+
+float rollPID = 0.0f;
 
 float gyroRateOffset[3] = { 0.0 }; // Gyro rates offsets
 
@@ -79,16 +83,16 @@ void setup() {
   /*        Controller coefficients         */
   /**/pid.Kp = 1.0f;                        //
   /**/pid.Ki = 0.6f;                        //
-  /**/pid.Kd = 0.0f;                        //
+  /**/pid.Kd = 0.4f;                        //
   /*----------------------------------------*/
   /*Derivative low-pass filter time constant*/
-  /**/pid.tau = 1.0f;                       //
+  /**/pid.tau = 1.5f;                       //
   /*----------------------------------------*/
   /*               Clampings                */
-  /**/pid.limMin = -1.0f;                   //
-  /**/pid.limMax =  1.0f;                   //
+  /**/pid.limMin =    0.0f;                 //
+  /**/pid.limMax =  180.0f;                 //
   /*========================================*/
-  // initialize serial communication at 115200 bits per second:
+  // Initialize serial communication at 115200 bits per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
 
@@ -165,10 +169,16 @@ void loop() {
     memset(accelGyro, 0, sizeof(accelGyro));
     memset(accelGyroData, 0, sizeof(accelGyroData));
 
+    // Zeroing the motor throttles
+    M1 = 0;
+    M2 = 0;
+
+    // Reseting the PID
+    rollPID = 0.0f;
+
     // Get both accel and gyro data from the BMI160
     // Parameter accelGyro is the pointer to store the data
     rslt = imu.getAccelGyroData(accelGyro);
-
 
     // if the data is succesfully extracted
     if (rslt == 0) {
@@ -191,13 +201,19 @@ void loop() {
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
-      // Update the PID controller
-      PID_output = PIDController_Update(&pid, 0.0f, phiHat_rad);
+      // Update the PID Controller
+      rollPID = PIDController_Update(&pid, SETPOINT, phiHat_rad * RAD2DEG);
+
+      // Set the motor throttle from the MMA (Motor Mixing Algorithm)
+      M1 = THROTTLE + (int)(rollPID * 10);
+      M2 = THROTTLE - (int)(rollPID * 10);
+
+      /* The Code continues here... */
 
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
       Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.print(PID_output * RAD2DEG);Serial.print("\t");
+      Serial.print(rollPID);Serial.print("\t");
       Serial.println();
     }
     else
@@ -232,10 +248,10 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   // Bound the values of the pitch and roll
   phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
   thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
-  if (abs(phiHat_rad) < 1) {
+  if (abs(phiHat_rad * RAD2DEG) < 1) {
     phiHat_rad = 0;
   }
-  if (abs(thetaHat_rad) < 1) {
+  if (abs(thetaHat_rad * RAD2DEG) < 1) {
     thetaHat_rad = 0;
   }
 }
