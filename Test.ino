@@ -236,9 +236,11 @@ void loop() {
       // Print the euler angles to the serial monitor
       Serial.print("Angle:");
       Serial.print(phiHat_rad * RAD2DEG);
-      Serial.print("\tMotor 1 Throttle: ");
+      Serial.print("\t PID: ");
+      Serial.print(rollPID);
+      Serial.print("\t Motor 1 Throttle: ");
       Serial.print(M1);
-      Serial.print("\tMotor 2 Throttle: ");
+      Serial.print("\t Motor 2 Throttle: ");
       Serial.print(M2);
       Serial.println();
     }
