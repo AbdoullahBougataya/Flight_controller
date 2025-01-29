@@ -218,9 +218,12 @@ void loop() {
       M2 = fminf(fmaxf(THROTTLE - (int)(rollPID * 10), 0), 1800);
 
       /* The Code continues here... */
+
+      // Map motor Throttle to 0 to 180
       M1 = map(M1, 0, 1800, 0, 180);
       M2 = map(M2, 0, 1800, 0, 180);
 
+      // Write the PWM to the pins
       motorLeftPWM.write(M1);
       motorRightPWM.write(M2);
 
