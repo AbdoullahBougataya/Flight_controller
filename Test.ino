@@ -94,7 +94,7 @@ void setup() {
   /**/pid.tau = 1.5f;                       //
   /*----------------------------------------*/
   /*               Clampings                */
-  /**/pid.limMin =    0.0f;                 //
+  /**/pid.limMin = -180.0f;                 //
   /**/pid.limMax =  180.0f;                 //
   /*========================================*/
   // Initialize serial communication at 115200 bits per second:
