@@ -214,8 +214,14 @@ void loop() {
       rollPID = PIDController_Update(&pid, SETPOINT, phiHat_rad * RAD2DEG);
 
       // Set the motor throttle from the MMA (Motor Mixing Algorithm)
-      M1 = fminf(fmaxf(THROTTLE + (int)(abs(rollPID * 10)), 0), 1800);
-      M2 = fminf(fmaxf(THROTTLE - (int)(abs(rollPID * 10)), 0), 1800);
+      if (rollPID >= 0) {
+        M1 = fminf(fmaxf(THROTTLE + (int)(rollPID * 10), 0), 1800);
+        M2 = fminf(fmaxf(THROTTLE - (int)(rollPID * 10), 0), 1800);
+      }
+      else {
+        M1 = fminf(fmaxf(THROTTLE - (int)(abs(rollPID) * 10), 0), 1800);
+        M2 = fminf(fmaxf(THROTTLE + (int)(abs(rollPID) * 10), 0), 1800);
+      }
 
       /* The Code continues here... */
 
