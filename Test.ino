@@ -218,6 +218,8 @@ void loop() {
       M2 = THROTTLE - (int)(rollPID * 10);
 
       /* The Code continues here... */
+      motorLeftPWM.write();
+      motorRightPWM.write();
 
       // Print the euler angles to the serial monitor
       Serial.print("Angle:");
