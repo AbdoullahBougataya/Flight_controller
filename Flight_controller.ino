@@ -206,10 +206,10 @@ void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &the
   thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
 
   // If the angle is absolutly less than 1, then it zeroes out
-  if (abs(phiHat_rad) < 1) {
+  if (abs(phiHat_rad * RAD2DEG) < 1) {
     phiHat_rad = 0;
   }
-  if (abs(thetaHat_rad) < 1) {
+  if (abs(thetaHat_rad * RAD2DEG) < 1) {
     thetaHat_rad = 0;
   }
 }
