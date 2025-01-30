@@ -40,5 +40,6 @@ void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
     float A[4] = { tt * (q * cp - r * sp), (r * cp + q * sp) * (tt * tt + 1.0f), -(r * cp + q * sp), 0.0f};
 
     /* Update the covariance matrix P(+) = P + T * (A*P + P*A' + Q) */
-    float Ptmp[4] = {T * (kal->Q[0] + 2.0f * A[0] * kal->P[0] + A[1] * kal->P[1] + A[1] * kal->P[2]), T * (A[0] * kal->)}
+    float Ptmp[4] = {T * (kal->Q[0] + 2.0f * A[0] * kal->P[0] + A[1] * kal->P[1] + A[1] * kal->P[2]), T * (A[0] * kal->P[1] + A[2] * kal->P[0] + A[1] * kal->P[3] + A[3] * kal->P[1]),
+                     T * (A[0] * kal->P[2] + A[2] * kal->P[0] + A[1] * kal->P[3] + A[3] * kal->P[2]), T * (kal->Q[1]        + A[2] * kal->P[1] + A[2] * kal->P[2] + 2.0f * A[3] * kal->P[3])};
 }
