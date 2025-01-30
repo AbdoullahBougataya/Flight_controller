@@ -47,4 +47,6 @@ void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
     kal->P[2] = kal->P[2] + Ptmp[2]; kal->P[3] = kal->P[3] + Ptmp[3];
 }
 
-
+void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
+    
+}
