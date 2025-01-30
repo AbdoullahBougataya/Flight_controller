@@ -7,6 +7,7 @@ typedef struct {
     float out;
 } extendedKalmanFilter;
 
-void PIDController_Init(extendedKalmanFilter *fltr, float dt);
+void PIDController_Init(extendedKalmanFilter *ekf, float dt);
+void PIDController_Init(extendedKalmanFilter *ekf);
 
 #endif
