@@ -23,7 +23,7 @@ typedef struct {
     float differentiator;
     float prevMeasurement;     // Differentiator
 
-    // out
+    // output
     float out;
 } PIDController;
 
