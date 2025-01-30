@@ -69,6 +69,8 @@ void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
                    G_MPS2 * sp * ct, G_MPS2 * cp * st };
 
     /* Kalman Gain K = P * C' /(C * P * C' + R) */
-    float G[9] = {kal->P[3] * C[1] * C[1]}
+    float G[9] = { kal->P[3] * C[1] * C[1] + kal->R[0],          C[1] * C[2] * kal->P[2] + C[1] * C[3] * kal->P[3],                                                       C[1] * C[4]
+                   C[1] * (C[2] * kal->P[1] + C[3] * kal->P[3]), kal->R[1] + C[2] * (C[2] * kal->P[0] + C[3] * kal->P[2]) + C[3] * (C[2] * kal->P[1] + C[3] * kal->P[3]), C[4] * (C[2])
+                   C[1] * (C[4] * kal->P[1] + C[5] * kal->P[3]), C[2] * (C[4] * kal->P[0] + C[5] * kal->P[2]) + C[3] * (C[4] * kal->P[1] + C[5] * kal->P[3]),             kal->R[2]}
 
 }
