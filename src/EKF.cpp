@@ -73,9 +73,10 @@ void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
                    C[1] * (C[2] * kal->P[1] + C[3] * kal->P[3]), kal->R[1] + C[2] * (C[2] * kal->P[0] + C[3] * kal->P[2]) + C[3] * (C[2] * kal->P[1] + C[3] * kal->P[3]), C[4] * (C[2] * kal->P[0] + C[3] * kal->P[2]) + C[5] * (C[2] * kal->P[1] + C[3] * kal->P[3]),
                    C[1] * (C[4] * kal->P[1] + C[5] * kal->P[3]), C[2] * (C[4] * kal->P[0] + C[5] * kal->P[2]) + C[3] * (C[4] * kal->P[1] + C[5] * kal->P[3]),             kal->R[2] + C[4] * (C[4] * kal->P[0] + C[5] * kal->P[2]) + C[5] * (C[4] * kal->P[1] + C[5] * kal->P[3]) };
 
-    float Gdetinv = 1.0f / (G[0] * G[4] * G[8] - G[0] * G[5] * G[7] - G[1] * G[3] * G[8] + G[1] * G[5] * G[6] + G[2] * G[3] * G[7] - G[2] * G[4] * G[6]);
+    float Gdetinv = 1.0f / (G[0] * G[4] * G[8] - G[0] * G[5] * G[7] - G[1] * G[3] * G[8] + G[1] * G[5] * G[6] + G[2] * G[3] * G[7] - G[2] * G[4] * G[6]); // The inverse of the determinant
 
     float Ginv[9] = {   Gdetinv * (G[4] * G[8] - G[5] * G[7]), - Gdetinv * (G[1] * G[8] - G[2] * G[7]),   Gdetinv * (G[1] * G[5] - G[2] * G[4]),
                       - Gdetinv * (G[3] * G[8] - G[5] * G[6]),   Gdetinv * (G[0] * G[8] - G[2] * G[6]), - Gdetinv * (G[0] * G[5] - G[2] * G[3]),
-                        Gdetinv * (G[3] * G[7] - G[4] * G[6]), - Gdetinv * (G[4] * G[8] - G[5] * G[7]),   Gdetinv * (G[4] * G[8] - G[5] * G[7]) };
+                        Gdetinv * (G[3] * G[7] - G[4] * G[6]), - Gdetinv * (G[0] * G[7] - G[1] * G[6]),   Gdetinv * (G[0] * G[4] - G[1] * G[3]) };
+    float K[6] = { }
 }
