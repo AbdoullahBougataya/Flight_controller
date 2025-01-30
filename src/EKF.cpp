@@ -65,5 +65,6 @@ void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
 
     // Jacobian of h(x, u)
     float C[6] = { 0.0f, G_MPS2 * ct,
-                  -G_MPS2 * cp * ct, G_MPS}
+                  -G_MPS2 * cp * ct, G_MPS2 * sp * st,
+                  G_MPS2 * sp }
 }
