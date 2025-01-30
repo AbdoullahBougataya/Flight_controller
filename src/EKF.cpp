@@ -78,5 +78,5 @@ void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
     float Ginv[9] = {   Gdetinv * (G[4] * G[8] - G[5] * G[7]), - Gdetinv * (G[1] * G[8] - G[2] * G[7]),   Gdetinv * (G[1] * G[5] - G[2] * G[4]),
                       - Gdetinv * (G[3] * G[8] - G[5] * G[6]),   Gdetinv * (G[0] * G[8] - G[2] * G[6]), - Gdetinv * (G[0] * G[5] - G[2] * G[3]),
                         Gdetinv * (G[3] * G[7] - G[4] * G[6]), - Gdetinv * (G[0] * G[7] - G[1] * G[6]),   Gdetinv * (G[0] * G[4] - G[1] * G[3]) };
-    float K[6] = { }
+    float K[6] = { Ginv[3] * }
 }
