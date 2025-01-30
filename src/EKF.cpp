@@ -58,5 +58,11 @@ void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
     float sp = sin(kal->phi_rad); float cp = cos(kal->phi_rad);
     float st = sin(kal->theta_rad); float ct = cos(kal->theta_rad);
 
-    // 
+    // Output function h(x, u)
+    float h[3] = { G_MPS2 * st,
+                  -G_MPS2 * ct * sp,
+                  -G_MPS2 * ct * cp };
+
+    // Jacobian of h(x, u)
+    float C[6] = { 0.0f, G_MPS2 * }
 }
