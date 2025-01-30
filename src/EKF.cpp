@@ -48,5 +48,10 @@ void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
 }
 
 void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
-    
+
+    /* Extract measurements */
+    float ax = -sensorData[3];
+    float ay = -sensorData[4];
+    float az = -sensorData[5];
+
 }
