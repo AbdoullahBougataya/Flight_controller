@@ -30,4 +30,11 @@ void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
     /* x(+) = x + T * f(x, u) */
     kal->phi_rad = kal->phi_rad + T * (p + tt * (q * sp + r * cp));
     kal->theta_rad = kal->theta_rad + T * (q * cp - r * sp);
+
+    // Update trigonometry
+          sp = sin(kal->phi_rad);         cp = cos(kal->phi_rad);
+    float st = sin(kal->theta_rad); float ct = cos(kal->theta_rad); tt = st / ct;
+
+    // Jacobian of the new state transistion function
+
 }
