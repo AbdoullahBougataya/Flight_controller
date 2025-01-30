@@ -7,12 +7,12 @@
            -------------------------------------------
   Tasks:
     To do 🎯:
-      1. Implement additional signal processing for PID control.
-      2. Implement the PID control algorithms.
-      3. Implement PWM signal generation algorithms.
-      4. Take instructions in real time from the RC controller.
+      1. Implement PWM signal generation algorithms.
+      2. Take instructions in real time from the RC controller.
     In progress ⏳:
-      1. Perform sensor fusion
+      1. Perform sensor fusion.
+      2. Implement additional signal processing for PID control.
+      3. Implement the PID control algorithms.
     Done ✅:
       1. Initialize the sensors.
       2. Calibrate the gyroscope.
