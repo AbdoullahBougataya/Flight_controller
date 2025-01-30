@@ -6,7 +6,7 @@ void KalmanRollPitch_Init(kalmanRollPitch *kal, float PInit, float *Q, float *R)
     kal->phi_rad = 0.0f; // Roll
     kal->theta_rad = 0.0f; // pitch
 
-    // Initialize the Error covariance matrix
+    // Initialize the covariance matrix
     kal->P[0] = Pinit; kal->P[1] = 0.0f;
     kal->P[2] = 0.0f;  kal->P[3] = Pinit;
 
@@ -18,9 +18,9 @@ void KalmanRollPitch_Init(kalmanRollPitch *kal, float PInit, float *Q, float *R)
 void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
 
     /* Extract measurements */
-    float p = sensorData[0];
-    float q = sensorData[1];
-    float r = sensorData[2];
+    float p = -sensorData[0];
+    float q = -sensorData[1];
+    float r = -sensorData[2];
 
     /* Predict */
     // Common trigonometry
@@ -36,6 +36,9 @@ void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
           sp = sin(kal->phi_rad);         cp = cos(kal->phi_rad);
     float st = sin(kal->theta_rad); float ct = cos(kal->theta_rad); tt = st / ct;
 
-    // Jacobian of the new state transistion function
-    
+    /* Jacobian of the new state transistion function */
+    float A[4] = { tt * (q * cp - r * sp), (r * cp + q * sp) * (tt * tt + 1.0f), -(r * cp + q * sp), 0.0f};
+
+    /* Update the covariance matrix P(+) = P + T * (A*P + P*A' + Q) */
+    float Ptmp[4] = {T * (kal->Q[0] + 2.0f * A[0] * kal->P[0] + A[1] * kal->P[1] + A[1] * kal->P[2])}
 }
