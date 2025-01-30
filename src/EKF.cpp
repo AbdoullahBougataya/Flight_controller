@@ -53,5 +53,7 @@ void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData) {
     float ax = -sensorData[3];
     float ay = -sensorData[4];
     float az = -sensorData[5];
-    /* Comp */
+    // Common trigonometry
+    float sp = sin(kal->phi_rad); float cp = cos(kal->phi_rad);
+    float st = sin(kal->theta_rad); float 
 }
