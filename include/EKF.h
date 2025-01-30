@@ -1,13 +1,16 @@
-#ifndef EXTENDED_KALMAN_FLTR_H
-#define EXTENDED_KALMAN_FLTR_H
+#ifndef KALMAN_ROLL_PITCH_H
+#define KALMAN_ROLL_PITCH_H
+
+#include <math.h>
+
+#define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
 
 typedef struct {
+    float phi_
+} kalmanRollPitch;
 
-    // out
-    float out;
-} extendedKalmanFilter;
-
-void PIDController_Init(extendedKalmanFilter *ekf, float dt);
-void PIDController_Init(extendedKalmanFilter *ekf);
+void KalmanRollPitch_Init(kalmanRollPitch *kal, float PInit, float *Q, float *R);
+void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T);
+void KalmanRollPitch_Update(kalmanRollPitch *kal, float *sensorData);
 
 #endif
