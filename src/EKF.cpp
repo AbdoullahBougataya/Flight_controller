@@ -15,5 +15,19 @@ void KalmanRollPitch_Init(kalmanRollPitch *kal, float PInit, float *Q, float *R)
 }
 
 void KalmanRollPitch_Predict(kalmanRollPitch *kal, float *sensorData, float T) {
-    float p = sensorData[]
+
+    /* Extract measurements */
+    float p = sensorData[0];
+    float q = sensorData[1];
+    float r = sensorData[2];
+
+    /* Predict */
+    // Common trigonometry
+    float sp = sin(kal->phi_rad);
+    float cp = cos(kal->phi_rad);
+    float tt = tan(kal->theta_rad);
+
+    /* x(+) = x + T * f(x, u) */
+    kal->phi_rad = kal->phi_rad + T * (p + tt * (q * sp + r * cp));
+    kal->theta_rad = kal->theta_rad + T * (q * cp - r * sp);
 }
