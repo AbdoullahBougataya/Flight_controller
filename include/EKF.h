@@ -6,7 +6,13 @@
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
 
 typedef struct {
-    float phi_
+    float phi_rad;
+    float theta_rad;
+
+    float P[4];
+    float Q[2];
+    float R[3];
+    
 } kalmanRollPitch;
 
 void KalmanRollPitch_Init(kalmanRollPitch *kal, float PInit, float *Q, float *R);
