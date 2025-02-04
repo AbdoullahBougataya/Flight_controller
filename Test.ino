@@ -50,10 +50,10 @@ Servo motorRightPWM; // Right Motors PWM signal object
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.03000000000000000000f  // Complimentary filter coefficient
-#define THROTTLE                        400                        // The throttle of the motors (Between 0 and 1800)
+#define THROTTLE                        110                        // The throttle of the motors (Between 0 and 1800)
 #define SETPOINT                          0.00000000000000000000f  // The setpoint for the PID Controller
 #define MTR_LEFT_PIN                      9                        // Motor left pin from the PDB standpoint
-#define MTR_RIGHT_PIN                    10                        // Motor right pin from the PDB standpoint
+#define MTR_RIGHT_PIN                    11                        // Motor right pin from the PDB standpoint
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
@@ -88,15 +88,16 @@ void setup() {
   /*        Controller coefficients         */
   /**/pid.Kp = 1.0f;                        //
   /**/pid.Ki = 0.0f;                        //
-  /**/pid.Kd = 0.0f;                        //
+  /**/pid.Kd = 0.01f;                       //
   /*----------------------------------------*/
   /*Derivative low-pass filter time constant*/
   /**/pid.tau = 1.5f;                       //
   /*----------------------------------------*/
   /*               Clampings                */
-  /**/pid.limMin = -90.0f;                 //
-  /**/pid.limMax =  90.0f;                 //
+  /**/pid.limMin = -90.0f;                  //
+  /**/pid.limMax =  90.0f;                  //
   /*========================================*/
+
   // Initialize serial communication at 115200 bits per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
@@ -135,7 +136,7 @@ void setup() {
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
   // For five seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
-  Serial.print("Calibrating...");
+  Serial.println("Calibrating...");
   for (int i = 0; i < GYRO_CALIBRATION_SAMPLES_200; i++) {
 
     // Initialize sensor data arrays
@@ -163,6 +164,16 @@ void setup() {
   // Calculate the average offset
   for (byte i = 0; i < 3; i++) {
     gyroRateOffset[i] = gyroRateCumulativeOffset[i] / GYRO_CALIBRATION_SAMPLES_200;
+  }
+
+  // Initialize the ESC
+  Serial.println("!!! Plug the battery in 10 seconds!!!");
+  delay(10000);
+  Serial.println("!!! Initializing ESCs !!!");
+  for (int i = 0; i < 10000; i++) {
+    motorLeftPWM.write(0);
+    motorRightPWM.write(0);
+    delay(1);
   }
 }
 
@@ -215,12 +226,12 @@ void loop() {
 
       // Set the motor throttle from the MMA (Motor Mixing Algorithm)
       if (rollPID >= 0) {
-        M1 = fminf(fmaxf(THROTTLE + (int)(rollPID * 10), 0), 1800);
-        M2 = fminf(fmaxf(THROTTLE - (int)(rollPID * 10), 0), 1800);
+        M1 = fminf(fmaxf(THROTTLE + (int)(rollPID * 10), 100), 300);
+        M2 = fminf(fmaxf(THROTTLE - (int)(rollPID * 10), 100), 300);
       }
       else {
-        M1 = fminf(fmaxf(THROTTLE - (int)(abs(rollPID) * 10), 0), 1800);
-        M2 = fminf(fmaxf(THROTTLE + (int)(abs(rollPID) * 10), 0), 1800);
+        M1 = fminf(fmaxf(THROTTLE - (int)(abs(rollPID) * 10), 100), 300);
+        M2 = fminf(fmaxf(THROTTLE + (int)(abs(rollPID) * 10), 100), 300);
       }
 
       /* The Code continues here... */
@@ -238,9 +249,9 @@ void loop() {
       Serial.print(phiHat_rad * RAD2DEG);
       Serial.print("\t PID: ");
       Serial.print(rollPID);
-      Serial.print("\t Motor 1 Throttle: ");
+      Serial.print("\t Motor left Throttle: ");
       Serial.print(M1);
-      Serial.print("\t Motor 2 Throttle: ");
+      Serial.print("\t Motor right Throttle: ");
       Serial.print(M2);
       Serial.println();
     }
