@@ -72,6 +72,15 @@ void setup() {
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
 
+  xTaskCreate(getSensorData, "Sensor Data Task", 128, NULL, 1, NULL);
+}
+
+// Section 3: Looping and realtime processing.
+
+void loop() {}
+
+// Get data from the sensor
+void getSensorData(void *pvParameters) {
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
     Serial.println("Reset error");
@@ -129,66 +138,56 @@ void setup() {
   for (byte i = 0; i < 3; i++) {
     gyroRateOffset[i] = gyroRateCumulativeOffset[i] / GYRO_CALIBRATION_SAMPLES_200;
   }
-}
 
-// Section 3: Looping and realtime processing.
-
-void loop() {
-
-// Checking if there is data ready in the sensor
-  if (dataReady)
-  {
-    dataReady = false; // Reseting the dataReady flag
-    // Initialize sensor data arrays
-    memset(accelGyro, 0, sizeof(accelGyro));
-    memset(accelGyroData, 0, sizeof(accelGyroData));
-
-    // Get both accel and gyro data from the BMI160
-    // Parameter accelGyro is the pointer to store the data
-    rslt = imu.getAccelGyroData(accelGyro);
-
-    // if the data is succesfully extracted
-    if (rslt == 0) {
-      // Format and offset the accelerometer data
-      offset(accelGyro, accelGyroData);
-
-      // Substract the offsets from the Gyro readings
-      for (byte i = 0; i < 3; i++) {
-        accelGyroData[i] -= gyroRateOffset[i];
-      }
-
-      for (int i = 0; i < 6; i++) {
-        accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
-      }
-
-      /*
-        A complimentary filter is a premitive technique of sensor fusion
-        to use both the accelerometer and the gyroscope to predict the
-        euler angles (phi: roll, theta: pitch)
-      */
-      complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
-
-      // Print the euler angles to the serial monitor
-      Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
-      Serial.println();
-    }
-    else
+  while(1) {
+    // Checking if there is data ready in the sensor
+    if (dataReady)
     {
-      Serial.print("!!! Data reading error !!!");
-      Serial.println();
+      dataReady = false; // Reseting the dataReady flag
+      // Initialize sensor data arrays
+      memset(accelGyro, 0, sizeof(accelGyro));
+      memset(accelGyroData, 0, sizeof(accelGyroData));
+
+      // Get both accel and gyro data from the BMI160
+      // Parameter accelGyro is the pointer to store the data
+      rslt = imu.getAccelGyroData(accelGyro);
+
+      // if the data is succesfully extracted
+      if (rslt == 0) {
+        // Format and offset the accelerometer data
+        offset(accelGyro, accelGyroData);
+
+        // Substract the offsets from the Gyro readings
+        for (byte i = 0; i < 3; i++) {
+          accelGyroData[i] -= gyroRateOffset[i];
+        }
+
+        for (int i = 0; i < 6; i++) {
+          accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+        }
+
+        /*
+          A complimentary filter is a premitive technique of sensor fusion
+          to use both the accelerometer and the gyroscope to predict the
+          euler angles (phi: roll, theta: pitch)
+        */
+        complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+
+        // Print the euler angles to the serial monitor
+        Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
+        Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
+        Serial.println();
+      }
+      else
+      {
+        Serial.print("!!! Data reading error !!!");
+        Serial.println();
+      }
     }
   }
 }
 
-// Section 4: Define tasks.
-
-// Get data from the sensor
-void getSensorData(void *pvParameters) {
-
-}
-
-// Section 5: Function declarations.
+// Section 4: Function declarations.
 
 // Accelerometer and Gyroscope interrupt service routine
 void AccelGyroISR() {
