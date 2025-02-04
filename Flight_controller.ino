@@ -25,6 +25,7 @@
 
 #include "./include/BMI160.h"
 #include "./include/RCFilter.h"
+#include <Arduino_FreeRTOS.h>
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
@@ -166,7 +167,7 @@ void loop() {
         euler angles (phi: roll, theta: pitch)
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
-      
+
       // Print the euler angles to the serial monitor
       Serial.print(phiHat_rad * RAD2DEG);Serial.print("\t");
       Serial.print(thetaHat_rad * RAD2DEG);Serial.print("\t");
@@ -180,7 +181,14 @@ void loop() {
   }
 }
 
-// Section 4: Function declarations.
+// Section 4: Define tasks.
+
+// Get data from the sensor
+void getSensorData(void *pvParameters) {
+
+}
+
+// Section 5: Function declarations.
 
 // Accelerometer and Gyroscope interrupt service routine
 void AccelGyroISR() {
