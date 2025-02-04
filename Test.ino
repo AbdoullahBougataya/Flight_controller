@@ -35,7 +35,8 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-PIDController pid; // Declaring the PID object
+PIDController ratePID; // Declaring the ratePID object
+PIDController anglePID; // Declaring the anglePID object
 
 Servo motorLeftPWM;  // Left Motors PWM signal object
 Servo motorRightPWM; // Right Motors PWM signal object
@@ -86,16 +87,16 @@ void setup() {
   /*     The PID controller settings        */
   /*========================================*/
   /*        Controller coefficients         */
-  /**/pid.Kp = 1.0f;                        //
-  /**/pid.Ki = 0.0f;                        //
-  /**/pid.Kd = 0.01f;                       //
+  /**/anglePID.Kp = 0.5f;                        //
+  /**/anglePID.Ki = 0.0f;                        //
+  /**/anglePID.Kd = 0.0f;                        //
   /*----------------------------------------*/
   /*Derivative low-pass filter time constant*/
-  /**/pid.tau = 1.5f;                       //
+  /**/anglePID.tau = 1.5f;                       //
   /*----------------------------------------*/
   /*               Clampings                */
-  /**/pid.limMin = -90.0f;                  //
-  /**/pid.limMax =  90.0f;                  //
+  /**/anglePID.limMin = -90.0f;                  //
+  /**/anglePID.limMax =  90.0f;                  //
   /*========================================*/
 
   // Initialize serial communication at 115200 bits per second:
@@ -131,7 +132,7 @@ void setup() {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_5HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
-  PIDController_Init(&pid, SAMPLING_PERIOD);
+  PIDController_Init(&anglePID, SAMPLING_PERIOD);
 
   float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
 
@@ -221,8 +222,8 @@ void loop() {
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
-      // Update the PID Controller
-      rollPID = PIDController_Update(&pid, SETPOINT, phiHat_rad * RAD2DEG);
+      // Update the anglePID Controller
+      rollPID = PIDController_Update(&anglePID, SETPOINT, phiHat_rad * RAD2DEG);
 
       // Set the motor throttle from the MMA (Motor Mixing Algorithm)
       if (rollPID >= 0) {
