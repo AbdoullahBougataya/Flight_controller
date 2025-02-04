@@ -78,6 +78,7 @@ void setup() {
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
 
+  // Creating tasks to run simultanously
   xTaskCreate(getSensorData, "sensorDataTask", 4096, NULL, 1, NULL);
   xTaskCreate(PIDUpdate, "initializeAndUpdatePID", 4096, NULL, 1, NULL);
   xTaskCreate(motorControl, "initializeAndUpdatePID", 4096, NULL, 1, NULL);
