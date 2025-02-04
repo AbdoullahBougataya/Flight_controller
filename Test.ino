@@ -221,6 +221,8 @@ void loop() {
       */
       complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
+      phiHat_rad = 
+
       // Update the PID Controller
       rollPID = PIDController_Update(&pid, SETPOINT, phiHat_rad * RAD2DEG);
 
