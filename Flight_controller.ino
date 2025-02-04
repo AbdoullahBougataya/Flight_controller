@@ -65,6 +65,8 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 // Functions
 void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt, float alpha);
 void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving data from the sensor
+
+// Tasks
 void getSensorData(void *pvParameters); // getSensorData task
 void PIDUpdate(void *pvParameters); // PIDUpdate task
 void motorControl(void *pvParameters); // motorControl task
