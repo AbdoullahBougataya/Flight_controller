@@ -132,7 +132,7 @@ void getSensorData(void *pvParameters) {
       Serial.print("!!! Data reading error !!!");
       Serial.println();
     }
-    delay(1);
+    vTaskDelay(1);
   }
   // Calculate the average offset
   for (byte i = 0; i < 3; i++) {
