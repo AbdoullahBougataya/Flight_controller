@@ -72,7 +72,7 @@ void setup() {
   Serial.begin(SERIAL_BANDWIDTH_115200);
   delay(STARTUP_DELAY);
 
-  xTaskCreate(getSensorData, "Sensor Data Task", 128, NULL, 1, NULL);
+  xTaskCreate(getSensorData, "sensorDataTask", 4096, NULL, 1, NULL);
 }
 
 // Section 3: Looping and realtime processing.
