@@ -114,7 +114,7 @@ void app_main(void)
         {
             ESP_LOGE(TAG, "!!! Data reading error !!!\n");
         }
-        vTaskDelay(1);
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
     // Calculate the average offset
     for (uint8_t i = 0; i < 3; i++)
