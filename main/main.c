@@ -30,7 +30,7 @@ const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
 
-static const char *TAG = "Flight_controller";
+char *TAG = "Flight_controller";
 
 uint8_t rslt = 0; // Define the result of the data extraction from the imu
 
@@ -51,6 +51,7 @@ static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service 
 void app_main(void)
 {
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
+    *TAG = ""
     imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
     imu->id = addr;
     // Reset the BMI160 to erased any preprogrammed instructions
