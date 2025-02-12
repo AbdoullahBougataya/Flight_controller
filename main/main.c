@@ -51,7 +51,7 @@ static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service 
 void app_main(void)
 {
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
-    *TAG = ""
+    TAG = "IMU_Sensor";
     imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
     imu->id = addr;
     // Reset the BMI160 to erased any preprogrammed instructions
