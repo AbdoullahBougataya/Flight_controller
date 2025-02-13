@@ -4,6 +4,7 @@
 #include "inttypes.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/idf_additions.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "../include/BMI160.h"
@@ -54,6 +55,7 @@ static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service 
 void app_main(void)
 {
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
+    
     TAG = "IMU_Sensor";
     imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
     imu->id = addr;
