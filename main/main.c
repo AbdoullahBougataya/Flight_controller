@@ -51,6 +51,7 @@ void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *the
 static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service Routine for retrieving data from the sensor
 void standby(void); // A function that waits and does nothing
 void IMUStartUpSequence(BMI160 *imu); // A function that starts up the IMU
+void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge); // Attaches the interrupt to an MCU pin
 
 // Section 2: Initialization & setup section.
 
@@ -63,7 +64,7 @@ void app_main(void)
     IMUStartUpSequence(&imu); // Start up and setup the IMU
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
-
+    attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, );
 
     for (uint8_t i = 0; i < 6; i++)
     {
@@ -241,7 +242,7 @@ void IMUStartUpSequence(BMI160 *imu)
 }
 
 // Attaches the interrupt to an MCU pin
-void attachInterrupt(uint8_t intr_pin, )
+void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge)
 {
     if (gpio_reset_pin(intr_pin) != ESP_OK)
     {
@@ -258,7 +259,7 @@ void attachInterrupt(uint8_t intr_pin, )
         ESP_LOGE(TAG, "Pull mode parameter error\n");
         standby();
     }
-    if (gpio_set_intr_type(intr_pin, GPIO_INTR_POSEDGE) == ESP_ERR_INVALID_ARG)
+    if (gpio_set_intr_type(intr_pin, edge) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Interrupt type parameter error\n");
         standby();
@@ -268,7 +269,7 @@ void attachInterrupt(uint8_t intr_pin, )
         ESP_LOGE(TAG, "ISR installation error\n");
         standby();
     }
-    if (gpio_isr_handler_add(intr_pin, AccelGyroISR, NULL) != ESP_OK)
+    if (gpio_isr_handler_add(intr_pin, ISR, NULL) != ESP_OK)
     {
         ESP_LOGE(TAG, "ISR handling error\n");
         standby();
