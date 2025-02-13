@@ -64,7 +64,7 @@ void app_main(void)
     IMUStartUpSequence(&imu); // Start up and setup the IMU
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
-    attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, );
+    attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, GPIO_INTR_POSEDGE);
 
     for (uint8_t i = 0; i < 6; i++)
     {
