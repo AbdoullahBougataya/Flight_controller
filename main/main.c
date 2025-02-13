@@ -49,6 +49,7 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 // Functions
 void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *thetaHat_rad, float dt, float alpha);
 static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service Routine for retrieving data from the sensor
+void cleanup(void); // Cleanup function to free allocated memory
 
 // Section 2: Initialization & setup section.
 
@@ -57,25 +58,37 @@ void app_main(void)
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
     TAG = "IMU_Sensor";
     imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
+    if (imu == NULL) {
+        ESP_LOGE(TAG, "Failed to allocate memory for imu object\n");
+        while (1) {
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+        }
+    }
     imu->id = addr;
     // Reset the BMI160 to erased any preprogrammed instructions
     if (BMI160_softReset(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Reset error\n");
-        while (1);
+        while (1) {
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+        }
     }
     // Initialize the BMI160 on I²C
     if (BMI160_Init(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Init error\n");
-        while (1);
+        while (1) {
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+        }
     }
 
     // Initialize the BMI160 interrupt 1
     if (BMI160_setInt(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Interrupt error\n");
-        while (1);
+        while (1) {
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+        }
     }
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
@@ -216,5 +229,14 @@ void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *the
     if (fabs(*thetaHat_rad * RAD2DEG) < 1)
     {
         *thetaHat_rad = 0;
+    }
+}
+
+// Cleanup function to free allocated memory
+void cleanup(void)
+{
+    if (imu != NULL) {
+        free(imu);
+        imu = NULL;
     }
 }
