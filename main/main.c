@@ -50,6 +50,7 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *thetaHat_rad, float dt, float alpha);
 static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service Routine for retrieving data from the sensor
 void cleanup(void); // Cleanup function to free allocated memory
+void standby(void); // A function that waits and does nothing
 
 // Section 2: Initialization & setup section.
 
@@ -60,9 +61,7 @@ void app_main(void)
     imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
     if (imu == NULL) {
         ESP_LOGE(TAG, "Failed to allocate memory for imu object\n");
-        while (1) {
-            vTaskDelay(1 / portTICK_PERIOD_MS);
-        }
+        standby();
     }
     imu->id = addr;
     // Reset the BMI160 to erased any preprogrammed instructions
@@ -70,18 +69,14 @@ void app_main(void)
     {
         ESP_LOGE(TAG, "Reset error\n");
         cleanup();
-        while (1) {
-            vTaskDelay(1 / portTICK_PERIOD_MS);
-        }
+        standby();
     }
     // Initialize the BMI160 on I²C
     if (BMI160_Init(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Init error\n");
         cleanup();
-        while (1) {
-            vTaskDelay(1 / portTICK_PERIOD_MS);
-        }
+        standby();
     }
 
     // Initialize the BMI160 interrupt 1
@@ -89,9 +84,7 @@ void app_main(void)
     {
         ESP_LOGE(TAG, "Interrupt error\n");
         cleanup();
-        while (1) {
-            vTaskDelay(1 / portTICK_PERIOD_MS);
-        }
+        standby();
     }
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
@@ -241,5 +234,13 @@ void cleanup(void)
     if (imu != NULL) {
         free(imu);
         imu = NULL;
+    }
+}
+
+// A function that waits and does nothing
+void standby(void)
+{
+    while (1) {
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }
