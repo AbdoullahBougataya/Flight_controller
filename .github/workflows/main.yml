@@ -9,9 +9,6 @@ on:
     paths:
       - "main/**"
 
-  workflow_dispatch:
-  repository_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +21,6 @@ jobs:
     - name: esp-idf build
       uses: espressif/esp-idf-ci-action@v1
       with:
-        esp_idf_version: v4.4
+        esp_idf_version: latest
         target: esp32s3
         path: '.'

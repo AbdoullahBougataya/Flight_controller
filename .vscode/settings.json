@@ -10,7 +10,8 @@
         "inttypes.h": "c",
         "esp_log.h": "c",
         "cstddef": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "idf_additions.h": "c"
     },
     "idf.flashType": "JTAG"
 }
