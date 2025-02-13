@@ -3,8 +3,6 @@
 #include <math.h>
 #include "inttypes.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/idf_additions.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "../include/BMI160.h"
