@@ -69,6 +69,7 @@ void app_main(void)
     if (BMI160_softReset(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Reset error\n");
+        cleanup();
         while (1) {
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
@@ -77,6 +78,7 @@ void app_main(void)
     if (BMI160_Init(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Init error\n");
+        cleanup();
         while (1) {
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
@@ -86,6 +88,7 @@ void app_main(void)
     if (BMI160_setInt(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Interrupt error\n");
+        cleanup();
         while (1) {
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
