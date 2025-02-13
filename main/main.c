@@ -102,13 +102,13 @@ void app_main(void)
     }
     if (gpio_set_pull_mode(INTERRUPT_1_MCU_PIN, GPIO_PULLUP_ONLY) == ESP_ERR_INVALID_ARG)
     {
-        ESP_LOGE(TAG, "Parameter error\n");
+        ESP_LOGE(TAG, "Pull mode parameter error\n");
         cleanup();
         standby();
     }
     if (gpio_set_intr_type(INTERRUPT_1_MCU_PIN, GPIO_INTR_POSEDGE) == ESP_ERR_INVALID_ARG)
     {
-        ESP_LOGE(TAG, "Parameter error\n");
+        ESP_LOGE(TAG, "Interrupt type parameter error\n");
         cleanup();
         standby();
     }
@@ -126,7 +126,7 @@ void app_main(void)
     }
     if (gpio_intr_enable(INTERRUPT_1_MCU_PIN) == ESP_ERR_INVALID_ARG)
     {
-        ESP_LOGE(TAG, "Parameter error\n");
+        ESP_LOGE(TAG, "Interrupt enabling parameter error\n");
         cleanup();
         standby();
     }
