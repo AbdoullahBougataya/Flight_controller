@@ -88,8 +88,18 @@ void app_main(void)
     }
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
-    gpio_reset_pin(INTERRUPT_1_MCU_PIN);
-    gpio_set_direction(INTERRUPT_1_MCU_PIN, GPIO_MODE_INPUT);
+    if (gpio_reset_pin(INTERRUPT_1_MCU_PIN) != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Master pin error\n");
+        cleanup();
+        standby();
+    }
+    if (gpio_set_direction(INTERRUPT_1_MCU_PIN, GPIO_MODE_INPUT) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "GPIO error\n");
+        cleanup();
+        standby();
+    }
     gpio_set_pull_mode(INTERRUPT_1_MCU_PIN, GPIO_PULLUP_ONLY);
     gpio_set_intr_type(INTERRUPT_1_MCU_PIN, GPIO_INTR_POSEDGE);
     gpio_install_isr_service(0);
