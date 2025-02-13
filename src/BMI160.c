@@ -494,7 +494,7 @@ int8_t BMI160_offset(int16_t* accelGyro, float* rawAccelGyro) {
   rawAccelGyro[3] = (accelGyro[3] / 8192.0) * G_MPS2;
   rawAccelGyro[4] = ((accelGyro[4] / 8192.0) + BMI160_ACC_Y_OFFSET) * G_MPS2; // Offset added
   rawAccelGyro[5] = (accelGyro[5] / 8192.0) * G_MPS2;
-  return BMI160_OK;
+  return rslt;
 }
 
 int8_t BMI160_getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)
