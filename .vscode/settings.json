@@ -10,5 +10,6 @@
         "inttypes.h": "c",
         "esp_log.h": "c",
         "cstddef": "c"
-    }
+    },
+    "idf.flashType": "JTAG"
 }

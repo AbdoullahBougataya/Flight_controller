@@ -17,16 +17,16 @@ BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
-#define RAD2DEG 57.29577951308232087680f                      // Radians to degrees (per second)
-#define G_MPS2 9.81000000000000000000f                        // Gravitational acceleration (g)
-#define PI 3.14159265358979323846f                            // Pi
-#define SAMPLING_PERIOD 0.01000000000000000000f               // Sampling period of the sensor in seconds
-#define STARTUP_DELAY 100                                     // 100 ms for the microcontroller to start
-#define INTERRUPT_1_MCU_PIN 2                                 // The pin that receives the interrupt 1 signal from the IMU
-#define RC_LOW_PASS_FLTR_CUTOFF_5HZ 5.00000000000000000000f   // The cutoff frequency for the RC low pass filter
-#define RC_LOW_PASS_FLTR_CUTOFF_10HZ 10.00000000000000000000f // The cutoff frequency for the RC low pass filter
-#define GYRO_CALIBRATION_SAMPLES_200 200                      // It takes 200 samples to calibrate the gyroscope
-#define COMP_FLTR_ALPHA 0.03000000000000000000f               // Complimentary filter coefficient
+#define RAD2DEG                         57.29577951308232087680f   // Radians to degrees (per second)
+#define G_MPS2                           9.81000000000000000000f   // Gravitational acceleration (g)
+#define PI                               3.14159265358979323846f   // Pi
+#define SAMPLING_PERIOD                  0.01000000000000000000f   // Sampling period of the sensor in seconds
+#define STARTUP_DELAY                  100                         // 100 ms for the microcontroller to start
+#define INTERRUPT_1_MCU_PIN              2                         // The pin that receives the interrupt 1 signal from the IMU
+#define RC_LOW_PASS_FLTR_CUTOFF_5HZ      5.00000000000000000000f   // The cutoff frequency for the RC low pass filter
+#define RC_LOW_PASS_FLTR_CUTOFF_10HZ    10.00000000000000000000f   // The cutoff frequency for the RC low pass filter
+#define GYRO_CALIBRATION_SAMPLES_200   200                         // It takes 200 samples to calibrate the gyroscope
+#define COMP_FLTR_ALPHA                  0.03000000000000000000f   // Complimentary filter coefficient
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
