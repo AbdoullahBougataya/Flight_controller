@@ -56,11 +56,6 @@ void app_main(void)
 {
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
     TAG = "IMU_Sensor";
-    if (xTaskCreatePinnedToCore() != pdPASS)
-    {
-        ESP_LOGE(TAG, "IMU task creation error\n");
-        while (1);
-    }
     imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
     imu->id = addr;
     // Reset the BMI160 to erased any preprogrammed instructions
