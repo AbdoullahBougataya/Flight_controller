@@ -100,9 +100,19 @@ void app_main(void)
         cleanup();
         standby();
     }
-    gpio_set_pull_mode(INTERRUPT_1_MCU_PIN, GPIO_PULLUP_ONLY);
-    gpio_set_intr_type(INTERRUPT_1_MCU_PIN, GPIO_INTR_POSEDGE);
-    gpio_install_isr_service(0);
+    if (gpio_set_pull_mode(INTERRUPT_1_MCU_PIN, GPIO_PULLUP_ONLY) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "Parameter error\n");
+        cleanup();
+        standby();
+    }
+    if (gpio_set_intr_type(INTERRUPT_1_MCU_PIN, GPIO_INTR_POSEDGE) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "Parameter error\n");
+        cleanup();
+        standby();
+    }
+    gpio_install_isr_service(0)
     gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL);
     gpio_intr_enable(INTERRUPT_1_MCU_PIN);
 
