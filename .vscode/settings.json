@@ -9,7 +9,8 @@
         "gpio.h": "c",
         "inttypes.h": "c",
         "esp_log.h": "c",
-        "cstddef": "c"
+        "cstddef": "c",
+        "freertos.h": "c"
     },
     "idf.flashType": "JTAG"
 }

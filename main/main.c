@@ -32,9 +32,9 @@ const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
 
-char *TAG = "Flight_controller";
+const char *TAG = "Flight_controller";
 
-uint8_t rslt = 0; // Define the result of the data extraction from the imu
+uint8_t rslt = BMI160_OK; // Define the result of the data extraction from the imu
 
 float gyroRateOffset[3] = {0.0}; // Gyro rates offsets
 
@@ -57,14 +57,14 @@ void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge); //
 
 void app_main(void)
 {
-    vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
+    (void)vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
     TAG = "IMU_Sensor";
     imu.id = addr; // Initializing the address of the imu object
 
-    IMUStartUpSequence(&imu); // Start up and setup the IMU
+    (void)IMUStartUpSequence(&imu); // Start up and setup the IMU
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
-    attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, GPIO_INTR_POSEDGE);
+    (void)attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, GPIO_INTR_POSEDGE);
 
     for (uint8_t i = 0; i < 6; i++)
     {
@@ -72,7 +72,7 @@ void app_main(void)
         if (RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD) != RCFilter_OK)
         {
             ESP_LOGE(TAG, "RC filter init error\n");
-            standby();
+            (void)standby();
         }
     }
 
@@ -84,8 +84,8 @@ void app_main(void)
     {
 
         // Initialize sensor data arrays
-        memset(accelGyro, 0, sizeof(accelGyro));
-        memset(accelGyroData, 0, sizeof(accelGyroData));
+        (void)memset(accelGyro, 0, sizeof(accelGyro));
+        (void)memset(accelGyroData, 0, sizeof(accelGyroData));
 
         // Get both accel and gyro data from the BMI160
         // Parameter accelGyro is the pointer to store the data
@@ -106,7 +106,7 @@ void app_main(void)
         {
             ESP_LOGE(TAG, "!!! Data reading error !!!\n");
         }
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+        (void)vTaskDelay(1 / portTICK_PERIOD_MS);
     }
     // Calculate the average offset
     for (uint8_t i = 0; i < 3; i++)
@@ -124,8 +124,8 @@ void app_main(void)
             dataReady = false; // Reseting the dataReady flag
 
             // Initialize sensor data arrays
-            memset(accelGyro, 0, sizeof(accelGyro));
-            memset(accelGyroData, 0, sizeof(accelGyroData));
+            (void)memset(accelGyro, 0, sizeof(accelGyro));
+            (void)memset(accelGyroData, 0, sizeof(accelGyroData));
 
             // Get both accel and gyro data from the BMI160
             // Parameter accelGyro is the pointer to store the data
@@ -156,11 +156,11 @@ void app_main(void)
                     to use both the accelerometer and the gyroscope to predict the
                     euler angles (phi: roll, theta: pitch)
                 */
-                complementaryFilter(accelGyroData, &phiHat_rad, &thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+                (void)complementaryFilter(accelGyroData, &phiHat_rad, &thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
                 // Print the euler angles to the serial monitor
-                printf("%f", phiHat_rad * RAD2DEG);
-                printf("%f\n", thetaHat_rad * RAD2DEG);
+                (void)printf("%f", phiHat_rad * RAD2DEG);
+                (void)printf("%f\n", thetaHat_rad * RAD2DEG);
             }
             else
             {
@@ -176,8 +176,16 @@ void app_main(void)
 static void AccelGyroISR(void *arg)
 {
     dataReady = true;
-    gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL);
-    gpio_intr_enable(INTERRUPT_1_MCU_PIN);
+    if (gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL) != ESP_OK)
+    {
+        ESP_LOGE(TAG, "ISR handling error\n");
+        (void)standby();
+    }
+    if (gpio_intr_enable(INTERRUPT_1_MCU_PIN) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "Interrupt enabling parameter error\n");
+        (void)standby();
+    }
 }
 
 // Complementary filter (Check Phil's Lab video for more details)
@@ -214,7 +222,7 @@ void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *the
 void standby(void)
 {
     while (1) {
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+        (void)vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }
 
@@ -225,20 +233,20 @@ void IMUStartUpSequence(BMI160 *imu)
     if (BMI160_softReset(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Reset error\n");
-        standby();
+        (void)standby();
     }
     // Initialize the BMI160 on I²C
     if (BMI160_Init(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Init error\n");
-        standby();
+        (void)standby();
     }
 
     // Initialize the BMI160 interrupt 1
     if (BMI160_setInt(imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Interrupt error\n");
-        standby();
+        (void)standby();
     }
 }
 
@@ -248,36 +256,36 @@ void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge)
     if (gpio_reset_pin(intr_pin) != ESP_OK)
     {
         ESP_LOGE(TAG, "Master pin error\n");
-        standby();
+        (void)standby();
     }
     if (gpio_set_direction(intr_pin, GPIO_MODE_INPUT) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "GPIO error\n");
-        standby();
+        (void)standby();
     }
     if (gpio_set_pull_mode(intr_pin, GPIO_PULLUP_ONLY) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Pull mode parameter error\n");
-        standby();
+        (void)standby();
     }
     if (gpio_set_intr_type(intr_pin, edge) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Interrupt type parameter error\n");
-        standby();
+        (void)standby();
     }
     if (gpio_install_isr_service(0) != ESP_OK)
     {
         ESP_LOGE(TAG, "ISR installation error\n");
-        standby();
+        (void)standby();
     }
     if (gpio_isr_handler_add(intr_pin, ISR, NULL) != ESP_OK)
     {
         ESP_LOGE(TAG, "ISR handling error\n");
-        standby();
+        (void)standby();
     }
     if (gpio_intr_enable(intr_pin) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Interrupt enabling parameter error\n");
-        standby();
+        (void)standby();
     }
 }
