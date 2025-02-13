@@ -133,7 +133,13 @@ void app_main(void)
 
     for (uint8_t i = 0; i < 6; i++)
     {
-        RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
+        // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
+        if (RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD) != RCFilter_OK)
+        {
+            ESP_LOGE(TAG, "RC filter init error\n");
+            cleanup();
+            standby();
+        }
     }
 
     float gyroRateCumulativeOffset[3] = {0.0}; // Define a temporary variable to sum the offsets
@@ -153,7 +159,10 @@ void app_main(void)
         if (rslt == 0)
         {
             // Formatting the data
-            BMI160_offset(accelGyro, accelGyroData);
+            if (BMI160_offset(accelGyro, accelGyroData) != BMI160_OK)
+            {
+                ESP_LOGE(TAG, "Offset error\n");
+            }
             for (uint8_t j = 0; j < 3; j++)
             {
                 gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
@@ -191,7 +200,10 @@ void app_main(void)
             if (rslt == 0)
             {
                 // Format and offset the accelerometer data
-                BMI160_offset(accelGyro, accelGyroData);
+                if (BMI160_offset(accelGyro, accelGyroData) != BMI160_OK)
+                {
+                    ESP_LOGE(TAG, "Offset error\n");
+                }
 
                 // Substract the offsets from the Gyro readings
                 for (uint8_t i = 0; i < 3; i++)

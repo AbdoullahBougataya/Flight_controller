@@ -486,13 +486,15 @@ int8_t BMI160_setInt(struct bmi160Dev *dev)
 }
 
 // Offsets of the sensor data
-void BMI160_offset(int16_t* accelGyro, float* rawAccelGyro) {
+int8_t BMI160_offset(int16_t* accelGyro, float* rawAccelGyro) {
+  int8_t rslt = BMI160_OK;
   rawAccelGyro[0] = (accelGyro[0] / 16.4) * DPS2RPS;
   rawAccelGyro[1] = (accelGyro[1] / 16.4) * DPS2RPS;
   rawAccelGyro[2] = (accelGyro[2] / 16.4) * DPS2RPS;
   rawAccelGyro[3] = (accelGyro[3] / 8192.0) * G_MPS2;
   rawAccelGyro[4] = ((accelGyro[4] / 8192.0) + BMI160_ACC_Y_OFFSET) * G_MPS2; // Offset added
   rawAccelGyro[5] = (accelGyro[5] / 8192.0) * G_MPS2;
+  return BMI160_OK;
 }
 
 int8_t BMI160_getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev)

@@ -292,7 +292,8 @@ int8_t BMI160_setInt(struct bmi160Dev *dev);
   * @brief Apply offset to the sensor output
   * @param accelGyro Data from the sensor
   * @param rawAccelGyro Offseted data
+  * @return BMI160_OK(0) means success
   */
-void BMI160_offset(int16_t* accelGyro, float* rawAccelGyro);
+int8_t BMI160_offset(int16_t* accelGyro, float* rawAccelGyro);
 
 #endif

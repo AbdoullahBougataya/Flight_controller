@@ -18,9 +18,9 @@ typedef struct {
   * @param filt The filter object
   * @param cutoffFreqHz The cutoff frequency in [Hz]
   * @param sampleTime The sampling period in [s]
-  * @return RCFilter_OK(1) if success
+  * @return RCFilter_OK(0) means success
   */
-uint8_t RCFilter_Init(RCFilter * filt, float cutoffFreqHz, float sampleTime);
+int8_t RCFilter_Init(RCFilter * filt, float cutoffFreqHz, float sampleTime);
 
 /**
   * @fn RCFilter_Update
