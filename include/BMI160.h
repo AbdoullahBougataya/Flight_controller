@@ -211,7 +211,7 @@ struct bmi160Cfg {
 typedef int8_t (*bmi160ComFptrT)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len);
 typedef void (*bmi160DelayFptrT)(uint32_t period);
 
-struct bmi160Dev {
+typedef struct {
   uint8_t chipId;   /**< Chip Id */
   uint8_t id;       /**< Device Id */
   struct bmi160Cfg accelCfg;                               /**< Structure to configure Accel sensor */
@@ -222,7 +222,7 @@ struct bmi160Dev {
   bmi160ComFptrT read;          /**< Read function pointer */
   bmi160ComFptrT write;         /**< Write function pointer */
   bmi160DelayFptrT delayMs;     /**<  Delay function pointer */
-};
+} BMI160;
 
 /**
  * @fn BMI160_Init
@@ -232,7 +232,7 @@ struct bmi160Dev {
  * @n     0x69: connect SDIO pin of the BMI160 to VCC
  * @return BMI160_OK(0) means success
  */
-int8_t BMI160_Init(struct bmi160Dev *dev);
+int8_t BMI160_Init(BMI160 *dev);
 
 /**
  * @fn BMI160_softReset
@@ -240,29 +240,29 @@ int8_t BMI160_Init(struct bmi160Dev *dev);
  * @param dev bmi160 object
  * @return BMI160_OK(0) means success
  */
-int8_t BMI160_softReset(struct bmi160Dev *dev);
+int8_t BMI160_softReset(BMI160 *dev);
 
-void BMI160_defaultParamSettg(struct bmi160Dev *dev);
-int8_t BMI160_setSensConf(struct bmi160Dev *dev);
+void BMI160_defaultParamSettg(BMI160 *dev);
+int8_t BMI160_setSensConf(BMI160 *dev);
 
-int8_t BMI160_setAccelConf(struct bmi160Dev *dev);
-int8_t BMI160_checkAccelConfig(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_processAccelOdr(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_processAccelBw(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_processAccelRange(uint8_t *data, struct bmi160Dev *dev);
+int8_t BMI160_setAccelConf(BMI160 *dev);
+int8_t BMI160_checkAccelConfig(uint8_t *data, BMI160 *dev);
+int8_t BMI160_processAccelOdr(uint8_t *data, BMI160 *dev);
+int8_t BMI160_processAccelBw(uint8_t *data, BMI160 *dev);
+int8_t BMI160_processAccelRange(uint8_t *data, BMI160 *dev);
 
-int8_t BMI160_setGyroConf(struct bmi160Dev *dev);
-int8_t BMI160_checkGyroConfig(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_processGyroOdr(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_processGyroBw(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_processGyroRange(uint8_t *data, struct bmi160Dev *dev);
+int8_t BMI160_setGyroConf(BMI160 *dev);
+int8_t BMI160_checkGyroConfig(uint8_t *data, BMI160 *dev);
+int8_t BMI160_processGyroOdr(uint8_t *data, BMI160 *dev);
+int8_t BMI160_processGyroBw(uint8_t *data, BMI160 *dev);
+int8_t BMI160_processGyroRange(uint8_t *data, BMI160 *dev);
 
-int8_t BMI160_setPowerMode(struct bmi160Dev *dev);
-int8_t BMI160_setAccelPwr(struct bmi160Dev *dev);
-int8_t BMI160_processUnderSampling(uint8_t *data, struct bmi160Dev *dev);
-int8_t BMI160_setGyroPwr(struct bmi160Dev *dev);
+int8_t BMI160_setPowerMode(BMI160 *dev);
+int8_t BMI160_setAccelPwr(BMI160 *dev);
+int8_t BMI160_processUnderSampling(uint8_t *data, BMI160 *dev);
+int8_t BMI160_setGyroPwr(BMI160 *dev);
 
-int8_t BMI160_checkInvalidSettg(struct bmi160Dev *dev);
+int8_t BMI160_checkInvalidSettg(BMI160 *dev);
 
 /**
  * @fn BMI160_getAccelGyroData
@@ -271,13 +271,13 @@ int8_t BMI160_checkInvalidSettg(struct bmi160Dev *dev);
  * @param data pointer to store the accel and gyro data
  * @return BMI160_OK(0) means succse
  */
-int8_t BMI160_getAccelGyroData(struct bmi160Dev *dev, int16_t *data);
+int8_t BMI160_getAccelGyroData(BMI160 *dev, int16_t *data);
 
-int8_t BMI160_getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev);
-int8_t BMI160_setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, struct bmi160Dev *dev);
+int8_t BMI160_getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, BMI160 *dev);
+int8_t BMI160_setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, BMI160 *dev);
 
-int8_t BMI160_I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
-int8_t BMI160_I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
+int8_t BMI160_I2cGetRegs(BMI160 *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
+int8_t BMI160_I2cSetRegs(BMI160 *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
 
 /**
  * @fn BMI160_setInt
@@ -285,7 +285,7 @@ int8_t BMI160_I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data,
  * @param dev bmi160 object
  * @return BMI160_OK(0) means success
  */
-int8_t BMI160_setInt(struct bmi160Dev *dev);
+int8_t BMI160_setInt(BMI160 *dev);
 
 /**
   * @fn BMI160_offset

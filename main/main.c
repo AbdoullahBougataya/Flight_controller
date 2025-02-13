@@ -13,7 +13,7 @@
 
 // Section 1: Constants & Global variables declarations.
 
-struct bmi160Dev *imu; // Declaring the imu object
+BMI160 imu; // Declaring the imu object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
@@ -49,7 +49,6 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 // Functions
 void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *thetaHat_rad, float dt, float alpha);
 static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service Routine for retrieving data from the sensor
-void cleanup(void); // Cleanup function to free allocated memory
 void standby(void); // A function that waits and does nothing
 
 // Section 2: Initialization & setup section.
@@ -58,32 +57,24 @@ void app_main(void)
 {
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
     TAG = "IMU_Sensor";
-    imu = (struct bmi160Dev *)malloc(sizeof(struct bmi160Dev));
-    if (imu == NULL) {
-        ESP_LOGE(TAG, "Failed to allocate memory for imu object\n");
-        standby();
-    }
-    imu->id = addr;
+    imu.id = addr; // Initializing the address of the imu object
     // Reset the BMI160 to erased any preprogrammed instructions
-    if (BMI160_softReset(imu) != BMI160_OK)
+    if (BMI160_softReset(&imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Reset error\n");
-        cleanup();
         standby();
     }
     // Initialize the BMI160 on I²C
-    if (BMI160_Init(imu) != BMI160_OK)
+    if (BMI160_Init(&imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Init error\n");
-        cleanup();
         standby();
     }
 
     // Initialize the BMI160 interrupt 1
-    if (BMI160_setInt(imu) != BMI160_OK)
+    if (BMI160_setInt(&imu) != BMI160_OK)
     {
         ESP_LOGE(TAG, "Interrupt error\n");
-        cleanup();
         standby();
     }
 
@@ -91,43 +82,36 @@ void app_main(void)
     if (gpio_reset_pin(INTERRUPT_1_MCU_PIN) != ESP_OK)
     {
         ESP_LOGE(TAG, "Master pin error\n");
-        cleanup();
         standby();
     }
     if (gpio_set_direction(INTERRUPT_1_MCU_PIN, GPIO_MODE_INPUT) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "GPIO error\n");
-        cleanup();
         standby();
     }
     if (gpio_set_pull_mode(INTERRUPT_1_MCU_PIN, GPIO_PULLUP_ONLY) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Pull mode parameter error\n");
-        cleanup();
         standby();
     }
     if (gpio_set_intr_type(INTERRUPT_1_MCU_PIN, GPIO_INTR_POSEDGE) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Interrupt type parameter error\n");
-        cleanup();
         standby();
     }
     if (gpio_install_isr_service(0) != ESP_OK)
     {
         ESP_LOGE(TAG, "ISR installation error\n");
-        cleanup();
         standby();
     }
     if (gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL) != ESP_OK)
     {
         ESP_LOGE(TAG, "ISR handling error\n");
-        cleanup();
         standby();
     }
     if (gpio_intr_enable(INTERRUPT_1_MCU_PIN) == ESP_ERR_INVALID_ARG)
     {
         ESP_LOGE(TAG, "Interrupt enabling parameter error\n");
-        cleanup();
         standby();
     }
 
@@ -137,7 +121,6 @@ void app_main(void)
         if (RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD) != RCFilter_OK)
         {
             ESP_LOGE(TAG, "RC filter init error\n");
-            cleanup();
             standby();
         }
     }
@@ -155,7 +138,7 @@ void app_main(void)
 
         // Get both accel and gyro data from the BMI160
         // Parameter accelGyro is the pointer to store the data
-        rslt = BMI160_getAccelGyroData(imu, accelGyro);
+        rslt = BMI160_getAccelGyroData(&imu, accelGyro);
         if (rslt == 0)
         {
             // Formatting the data
@@ -194,7 +177,7 @@ void app_main(void)
 
             // Get both accel and gyro data from the BMI160
             // Parameter accelGyro is the pointer to store the data
-            rslt = BMI160_getAccelGyroData(imu, accelGyro);
+            rslt = BMI160_getAccelGyroData(&imu, accelGyro);
 
             // if the data is succesfully extracted
             if (rslt == 0)
@@ -272,15 +255,6 @@ void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *the
     if (fabs(*thetaHat_rad * RAD2DEG) < 1)
     {
         *thetaHat_rad = 0;
-    }
-}
-
-// Cleanup function to free allocated memory
-void cleanup(void)
-{
-    if (imu != NULL) {
-        free(imu);
-        imu = NULL;
     }
 }
 
