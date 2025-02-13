@@ -112,9 +112,24 @@ void app_main(void)
         cleanup();
         standby();
     }
-    gpio_install_isr_service(0)
-    gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL);
-    gpio_intr_enable(INTERRUPT_1_MCU_PIN);
+    if (gpio_install_isr_service(0) != ESP_OK)
+    {
+        ESP_LOGE(TAG, "ISR installation error\n");
+        cleanup();
+        standby();
+    }
+    if (gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL) != ESP_OK)
+    {
+        ESP_LOGE(TAG, "ISR handling error\n");
+        cleanup();
+        standby();
+    }
+    if (gpio_intr_enable(INTERRUPT_1_MCU_PIN) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "Parameter error\n");
+        cleanup();
+        standby();
+    }
 
     for (uint8_t i = 0; i < 6; i++)
     {
