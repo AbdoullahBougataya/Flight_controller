@@ -48,6 +48,8 @@ float thetaHat_rad = 0.0f; // Euler Pitch
 void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *thetaHat_rad, float dt, float alpha);
 static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service Routine for retrieving data from the sensor
 
+// Section 2: Initialization & setup section.
+
 void app_main(void)
 {
     vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
@@ -122,6 +124,8 @@ void app_main(void)
     {
         gyroRateOffset[i] = gyroRateCumulativeOffset[i] / GYRO_CALIBRATION_SAMPLES_200;
     }
+
+    // Section 3: Looping and realtime processing.
 
     while (1)
     {
