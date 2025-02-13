@@ -52,6 +52,8 @@ static void IRAM_ATTR AccelGyroISR(void *arg); // This is the Interrupt Service 
 void standby(void); // A function that waits and does nothing
 void IMUStartUpSequence(BMI160 *imu); // A function that starts up the IMU
 void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge); // Attaches the interrupt to an MCU pin
+void calibrateGyroscope(int num); // Calibrates the gyroscope
+void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTime); // Initialize a 6D RC Low pass filter
 
 // Section 2: Initialization & setup section.
 
@@ -59,60 +61,19 @@ void app_main(void)
 {
     (void)vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
     TAG = "IMU_Sensor";
-    imu.id = addr; // Initializing the address of the imu object
 
-    (void)IMUStartUpSequence(&imu); // Start up and setup the IMU
+    // Start up and setup the IMU
+    imu.id = addr; // Initializing the address of the imu object
+    (void)IMUStartUpSequence(&imu);
 
     // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
     (void)attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, GPIO_INTR_POSEDGE);
 
-    for (uint8_t i = 0; i < 6; i++)
-    {
-        // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
-        if (RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD) != RCFilter_OK)
-        {
-            ESP_LOGE(TAG, "RC filter init error\n");
-            (void)standby();
-        }
-    }
+    // Initialize the RC Low pass filter for the sensor data
+    (void)dataRCLowPassFilterInit(lpFRC, RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD);
 
-    float gyroRateCumulativeOffset[3] = {0.0}; // Define a temporary variable to sum the offsets
-
-    // For five seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
-    ESP_LOGI(TAG, "Calibrating...\n");
-    for (int i = 0; i < GYRO_CALIBRATION_SAMPLES_200; i++)
-    {
-
-        // Initialize sensor data arrays
-        (void)memset(accelGyro, 0, sizeof(accelGyro));
-        (void)memset(accelGyroData, 0, sizeof(accelGyroData));
-
-        // Get both accel and gyro data from the BMI160
-        // Parameter accelGyro is the pointer to store the data
-        rslt = BMI160_getAccelGyroData(&imu, accelGyro);
-        if (rslt == 0)
-        {
-            // Formatting the data
-            if (BMI160_offset(accelGyro, accelGyroData) != BMI160_OK)
-            {
-                ESP_LOGE(TAG, "Offset error\n");
-            }
-            for (uint8_t j = 0; j < 3; j++)
-            {
-                gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
-            }
-        }
-        else
-        {
-            ESP_LOGE(TAG, "!!! Data reading error !!!\n");
-        }
-        (void)vTaskDelay(1 / portTICK_PERIOD_MS);
-    }
-    // Calculate the average offset
-    for (uint8_t i = 0; i < 3; i++)
-    {
-        gyroRateOffset[i] = gyroRateCumulativeOffset[i] / GYRO_CALIBRATION_SAMPLES_200;
-    }
+    // Calibrate the gyroscope
+    (void)calibrateGyroscope(GYRO_CALIBRATION_SAMPLES_200);
 
     // Section 3: Looping and realtime processing.
 
@@ -287,5 +248,61 @@ void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge)
     {
         ESP_LOGE(TAG, "Interrupt enabling parameter error\n");
         (void)standby();
+    }
+}
+
+// Calibrates the gyroscope
+void calibrateGyroscope(int num)
+{
+    float gyroRateCumulativeOffset[3] = {0.0}; // Define a temporary variable to sum the offsets
+
+    // For x seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
+    ESP_LOGI(TAG, "Calibrating...\n");
+    for (int i = 0; i < num; i++)
+    {
+
+        // Initialize sensor data arrays
+        (void)memset(accelGyro, 0, sizeof(accelGyro));
+        (void)memset(accelGyroData, 0, sizeof(accelGyroData));
+
+        // Get both accel and gyro data from the BMI160
+        // Parameter accelGyro is the pointer to store the data
+        rslt = BMI160_getAccelGyroData(&imu, accelGyro);
+        if (rslt == 0)
+        {
+            // Formatting the data
+            if (BMI160_offset(accelGyro, accelGyroData) != BMI160_OK)
+            {
+                ESP_LOGE(TAG, "Offset error\n");
+            }
+            for (uint8_t j = 0; j < 3; j++)
+            {
+                gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
+            }
+        }
+        else
+        {
+            ESP_LOGE(TAG, "!!! Data reading error !!!\n");
+        }
+        (void)vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+    // Calculate the average offset
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        gyroRateOffset[i] = gyroRateCumulativeOffset[i] / num;
+    }
+}
+
+// Initialize a 6D RC Low pass filter
+void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTime)
+{
+    for (uint8_t i = 0; i < 6; i++)
+    {
+        // Initialize the RCFilter
+        if (RCFilter_Init(&filt[i], cutoffFreqHz, sampleTime) != RCFilter_OK)
+        {
+            ESP_LOGE(TAG, "RC filter init error\n");
+            (void)standby();
+        }
     }
 }
