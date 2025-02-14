@@ -173,18 +173,16 @@ void getSensorsData(void *arg)
 // Controller Task
 void controller(void *arg) {
     /* Controller Code here... */
-    const char *TAG = "Controller";
     while(1) {
-
+        (void)standby();
     }
 }
 
 // Motors Command Task
 void motorsCommand(void *arg) {
     /* Motor Command Code here... */
-    const char *TAG = "PWM";
     while(1) {
-
+        (void)standby();
     }
 }
 
