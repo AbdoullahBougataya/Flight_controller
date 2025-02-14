@@ -27,24 +27,26 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ    10.00000000000000000000f   // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200   200                         // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                  0.03000000000000000000f   // Complimentary filter coefficient
+#define SENSORS_OUTPUTS                  8                         // The number of output variables the sensors have
+#define MOTORS_NMBR                      4                         // The quadcopter has 4 motors to throttle
 
-const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
-
-volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
-
-const char *TAG = "Flight_controller";
-
-uint8_t rslt = BMI160_OK; // Define the result of the data extraction from the imu
+volatile bool IMUDataReady = false; // IMU Data Ready ? yes:true | no:false
 
 float gyroRateOffset[3] = {0.0}; // Gyro rates offsets
 
-// Define sensor data arrays
-int16_t accelGyro[6] = {0};   // Raw data from the sensor
-float accelGyroData[6] = {0}; // Data that is going to be processed
+// Tasks
+void getSensorsData(void *arg); // Gets the Sensors data
+void controller(void *arg); // Operates the controller
+void motorsCommand(void *arg); // Commands the motors
 
-// Declare sensor fusion variables
-float phiHat_rad = 0.0f;   // Euler Roll
-float thetaHat_rad = 0.0f; // Euler Pitch
+// Tasks handles
+TaskHandle_t getSensorsDataTaskHandle;
+TaskHandle_t controllerTaskHandle;
+TaskHandle_t motorsCommandTaskHandle;
+
+// Queue handles
+QueueHandle_t sensorsToController;
+QueueHandle_t controllerToMotorsCommand;
 
 // Functions
 void complementaryFilter(float *filteredAccelGyro, float *phiHat_rad, float *thetaHat_rad, float dt, float alpha);
@@ -54,15 +56,66 @@ void IMUStartUpSequence(BMI160 *imu); // A function that starts up the IMU
 void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge); // Attaches the interrupt to an MCU pin
 void calibrateGyroscope(int num); // Calibrates the gyroscope
 void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTime); // Initialize a 6D RC Low pass filter
+void offset(int16_t* accelGyro, float* accelGyroDataRPS); // Adds the offset to the gyroscope
+void dataRCLowPassFilterUpdate(RCFilter *filt, float *accelGyroDataRPS); // Update the 6D RC Low pass filter
+void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, float *thetaHat_rad);
 
-// Section 2: Initialization & setup section.
+// Section 2: Tasks initialization & setup section.
 
 void app_main(void)
 {
     (void)vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
-    TAG = "IMU_Sensor";
+
+    /* Queues Initialization */
+    // Sensors to Controller Queue
+    sensorsToController = xQueueCreate(SENSORS_OUTPUTS, sizeof(float)); // 8 Float variables to be sent from the sensor to the Controller
+
+    // Controller to motor Command Queue
+    controllerToMotorsCommand = xQueueCreate(MOTORS_NMBR, sizeof(int)); // Throttle of the 4 motors in int
+
+    /* Tasks Initialization */
+    // Sensors Task
+    if (xTaskCreatePinnedToCore(getSensorsData, "getSensorsData", 2048, NULL, 0, &getSensorsDataTaskHandle, 1) != pdPASS)
+    {
+        ESP_LOGE("Flight_controller", "Sensors task creation error\n");
+        (void)standby();
+    }
+
+    // Controller Task
+    if (xTaskCreatePinnedToCore(controller, "controller", 2048, NULL, 0, &controllerTaskHandle, 1) != pdPASS)
+    {
+        ESP_LOGE("Flight_controller", "Controller task creation error\n");
+        (void)standby();
+    }
+
+    // Motors Command Task
+    if (xTaskCreatePinnedToCore(motorsCommand, "motorsCommand", 2048, NULL, 0, &motorsCommandTaskHandle, 1) != pdPASS)
+    {
+        ESP_LOGE("Flight_controller", "Motors command task creation error\n");
+        (void)standby();
+    }
+
+    while (1) {(void)vTaskDelete(NULL);}
+}
+
+// Section 3: Tasks.
+
+// Sensors Task
+void getSensorsData(void *arg)
+{
+    const char *TAG = "Sensor";
 
     // Start up and setup the IMU
+    const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
+
+    // Define sensor data arrays
+    int16_t accelGyro[6] = {0};   // Raw data from the sensor
+    float accelGyroDataRPS[6] = {0}; // Data that is going to be processed
+
+    // Declare sensor fusion variables
+    float phiHat_rad = 0.0f;   // Euler Roll
+    float thetaHat_rad = 0.0f; // Euler Pitch
+
     imu.id = addr; // Initializing the address of the imu object
     (void)IMUStartUpSequence(&imu);
 
@@ -75,53 +128,39 @@ void app_main(void)
     // Calibrate the gyroscope
     (void)calibrateGyroscope(GYRO_CALIBRATION_SAMPLES_200);
 
-    // Section 3: Looping and realtime processing.
-
     while (1)
     {
         // Checking if there is data ready in the sensor
-        if (dataReady)
+        if (IMUDataReady)
         {
-            dataReady = false; // Reseting the dataReady flag
+            IMUDataReady = false; // Reseting the dataReady flag
 
             // Initialize sensor data arrays
             (void)memset(accelGyro, 0, sizeof(accelGyro));
-            (void)memset(accelGyroData, 0, sizeof(accelGyroData));
+            (void)memset(accelGyroDataRPS, 0, sizeof(accelGyroDataRPS));
 
             // Get both accel and gyro data from the BMI160
             // Parameter accelGyro is the pointer to store the data
-            rslt = BMI160_getAccelGyroData(&imu, accelGyro);
-
             // if the data is succesfully extracted
-            if (rslt == 0)
+            if (BMI160_getAccelGyroData(&imu, accelGyro) == BMI160_OK)
             {
-                // Format and offset the accelerometer data
-                if (BMI160_offset(accelGyro, accelGyroData) != BMI160_OK)
-                {
-                    ESP_LOGE(TAG, "Offset error\n");
-                }
+                (void)offset(accelGyro, accelGyroDataRPS); // Adds the offset to the gyroscope
 
-                // Substract the offsets from the Gyro readings
-                for (uint8_t i = 0; i < 3; i++)
-                {
-                    accelGyroData[i] -= gyroRateOffset[i];
-                }
-
-                for (uint8_t i = 0; i < 6; i++)
-                {
-                    accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
-                }
+                (void)dataRCLowPassFilterUpdate(lpFRC, accelGyroDataRPS); // Update the 6D RC Low pass filter
 
                 /*
                     A complimentary filter is a premitive technique of sensor fusion
                     to use both the accelerometer and the gyroscope to predict the
                     euler angles (phi: roll, theta: pitch)
                 */
-                (void)complementaryFilter(accelGyroData, &phiHat_rad, &thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+                (void)complementaryFilter(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
                 // Print the euler angles to the serial monitor
                 (void)printf("%f", phiHat_rad * RAD2DEG);
                 (void)printf("%f\n", thetaHat_rad * RAD2DEG);
+
+                // Send the output variables to the Controller
+                (void)sensorsToControllerTransfer(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad);
             }
             else
             {
@@ -131,20 +170,38 @@ void app_main(void)
     }
 }
 
-// Section 4: Function declarations.
+// Controller Task
+void controller(void *arg) {
+    /* Controller Code here... */
+    const char *TAG = "Controller";
+    while(1) {
+
+    }
+}
+
+// Motors Command Task
+void motorsCommand(void *arg) {
+    /* Motor Command Code here... */
+    const char *TAG = "PWM";
+    while(1) {
+
+    }
+}
+
+// Section 5: Function declarations.
 
 // Accelerometer and Gyroscope interrupt service routine
 static void AccelGyroISR(void *arg)
 {
-    dataReady = true;
+    IMUDataReady = true;
     if (gpio_isr_handler_add(INTERRUPT_1_MCU_PIN, AccelGyroISR, NULL) != ESP_OK)
     {
-        ESP_LOGE(TAG, "ISR handling error\n");
+        ESP_LOGE("AccelGyroISR", "ISR handling error\n");
         (void)standby();
     }
     if (gpio_intr_enable(INTERRUPT_1_MCU_PIN) == ESP_ERR_INVALID_ARG)
     {
-        ESP_LOGE(TAG, "Interrupt enabling parameter error\n");
+        ESP_LOGE("AccelGyroISR", "Interrupt enabling parameter error\n");
         (void)standby();
     }
 }
@@ -190,6 +247,8 @@ void standby(void)
 // A function that starts up the IMU
 void IMUStartUpSequence(BMI160 *imu)
 {
+    const char *TAG = "IMUStartUpSequence";
+
     // Reset the BMI160 to erased any preprogrammed instructions
     if (BMI160_softReset(imu) != BMI160_OK)
     {
@@ -214,6 +273,8 @@ void IMUStartUpSequence(BMI160 *imu)
 // Attaches the interrupt to an MCU pin
 void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge)
 {
+    const char *TAG = "attachInterrupt";
+
     if (gpio_reset_pin(intr_pin) != ESP_OK)
     {
         ESP_LOGE(TAG, "Master pin error\n");
@@ -254,6 +315,10 @@ void attachInterrupt(uint8_t intr_pin, gpio_isr_t ISR, gpio_int_type_t edge)
 // Calibrates the gyroscope
 void calibrateGyroscope(int num)
 {
+    const char *TAG = "calibrateGyroscope";
+    // Define sensor data arrays
+    int16_t accelGyro[6] = {0};   // Raw data from the sensor
+    float accelGyroDataRPS[6] = {0}; // Data that is going to be processed
     float gyroRateCumulativeOffset[3] = {0.0}; // Define a temporary variable to sum the offsets
 
     // For x seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
@@ -263,21 +328,20 @@ void calibrateGyroscope(int num)
 
         // Initialize sensor data arrays
         (void)memset(accelGyro, 0, sizeof(accelGyro));
-        (void)memset(accelGyroData, 0, sizeof(accelGyroData));
+        (void)memset(accelGyroDataRPS, 0, sizeof(accelGyroDataRPS));
 
         // Get both accel and gyro data from the BMI160
         // Parameter accelGyro is the pointer to store the data
-        rslt = BMI160_getAccelGyroData(&imu, accelGyro);
-        if (rslt == 0)
+        if (BMI160_getAccelGyroData(&imu, accelGyro) == BMI160_OK)
         {
             // Formatting the data
-            if (BMI160_offset(accelGyro, accelGyroData) != BMI160_OK)
+            if (BMI160_offset(accelGyro, accelGyroDataRPS) != BMI160_OK)
             {
                 ESP_LOGE(TAG, "Offset error\n");
             }
             for (uint8_t j = 0; j < 3; j++)
             {
-                gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
+                gyroRateCumulativeOffset[j] += accelGyroDataRPS[j]; // Accumulating the gyroscope error
             }
         }
         else
@@ -296,6 +360,7 @@ void calibrateGyroscope(int num)
 // Initialize a 6D RC Low pass filter
 void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTime)
 {
+    const char *TAG = "IMURCLowPassFilter";
     for (uint8_t i = 0; i < 6; i++)
     {
         // Initialize the RCFilter
@@ -304,5 +369,52 @@ void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTim
             ESP_LOGE(TAG, "RC filter init error\n");
             (void)standby();
         }
+    }
+}
+
+// Adds the offset to the gyroscope
+void offset(int16_t *accelGyro, float *accelGyroDataRPS)
+{
+    const char *TAG = "offset";
+    // Format and offset the accelerometer data
+    if (BMI160_offset(accelGyro, accelGyroDataRPS) != BMI160_OK)
+    {
+        ESP_LOGE(TAG, "Offset error\n");
+    }
+
+    // Substract the offsets from the Gyro readings
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        accelGyroDataRPS[i] -= gyroRateOffset[i];
+    }
+}
+
+// Update the 6D RC Low pass filter
+void dataRCLowPassFilterUpdate(RCFilter *filt, float *accelGyroDataRPS)
+{
+    for (uint8_t i = 0; i < 6; i++)
+    {
+        accelGyroDataRPS[i] = RCFilter_Update(&filt[i], accelGyroDataRPS[i]); // Update the RCFilter
+    }
+}
+
+// Transfers data from the sensor to the controller
+void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, float *thetaHat_rad)
+{
+    // Send the output variables to the Controller
+    for (int i = 0; i < 6; i++)
+    {
+        if (xQueueSend(sensorsToController, &accelGyroDataRPS[i], portMAX_DELAY) != pdTRUE)
+        {
+            ESP_LOGE("Sensors", "Queue send Error\n");
+        }
+    }
+    if (xQueueSend(sensorsToController, &phiHat_rad, portMAX_DELAY) != pdTRUE)
+    {
+        ESP_LOGE("Sensors", "Queue send Error\n");
+    }
+    if (xQueueSend(sensorsToController, &thetaHat_rad, portMAX_DELAY) != pdTRUE)
+    {
+        ESP_LOGE("Sensors", "Queue send Error\n");
     }
 }
