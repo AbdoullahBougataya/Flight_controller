@@ -11,7 +11,8 @@
         "esp_log.h": "c",
         "cstddef": "c",
         "freertos.h": "c",
-        "idf_additions.h": "c"
+        "idf_additions.h": "c",
+        "bmi160.h": "c"
     },
     "idf.flashType": "JTAG"
 }

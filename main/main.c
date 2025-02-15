@@ -7,6 +7,7 @@
 #include "freertos/idf_additions.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "../include/BMI160.h"
 #include "../include/PID.h"
 #include "../include/RCFilter.h"
@@ -20,15 +21,19 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define RAD2DEG                         57.29577951308232087680f   // Radians to degrees (per second)
 #define G_MPS2                           9.81000000000000000000f   // Gravitational acceleration (g)
 #define PI                               3.14159265358979323846f   // Pi
-#define SAMPLING_PERIOD                  0.01000000000000000000f   // Sampling period of the sensor in seconds
+#define IMU_SAMPLING_PERIOD              0.01000000000000000000f   // Sampling period of the sensor in seconds
+#define CONTROLLER_SAMPLING_PERIOD       0.01000000000000000000f   // Sampling period of the controller in seconds
 #define STARTUP_DELAY                  100                         // 100 ms for the microcontroller to start
-#define INTERRUPT_1_MCU_PIN              2                         // The pin that receives the interrupt 1 signal from the IMU
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ      5.00000000000000000000f   // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ    10.00000000000000000000f   // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200   200                         // It takes 200 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                  0.03000000000000000000f   // Complimentary filter coefficient
 #define SENSORS_OUTPUTS                  8                         // The number of output variables the sensors have
 #define MOTORS_NMBR                      4                         // The quadcopter has 4 motors to throttle
+#define CORE_1                           1                         // Core 1 of the ESP
+#define CORE_0                           0                         // Core 1 of the ESP
+#define INTERRUPT_1_MCU_PIN             17                         // The pin that receives the interrupt 1 signal from the IMU
+#define ON_OFF_MCU_PIN                  21                         // The pin that on/off signal from the switch
 
 volatile bool IMUDataReady = false; // IMU Data Ready ? yes:true | no:false
 
@@ -59,6 +64,7 @@ void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTim
 void offset(int16_t* accelGyro, float* accelGyroDataRPS); // Adds the offset to the gyroscope
 void dataRCLowPassFilterUpdate(RCFilter *filt, float *accelGyroDataRPS); // Update the 6D RC Low pass filter
 void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, float *thetaHat_rad);
+void sensorsToControllerReceive(float *accelGyroDataRad); // Recieves data from the sensor
 
 // Section 2: Tasks initialization & setup section.
 
@@ -75,21 +81,21 @@ void app_main(void)
 
     /* Tasks Initialization */
     // Sensors Task
-    if (xTaskCreatePinnedToCore(getSensorsData, "getSensorsData", 2048, NULL, 0, &getSensorsDataTaskHandle, 1) != pdPASS)
+    if (xTaskCreatePinnedToCore(getSensorsData, "getSensorsData", 2048, NULL, 0, &getSensorsDataTaskHandle, CORE_1) != pdPASS)
     {
         ESP_LOGE("Flight_controller", "Sensors task creation error\n");
         (void)standby();
     }
 
     // Controller Task
-    if (xTaskCreatePinnedToCore(controller, "controller", 2048, NULL, 0, &controllerTaskHandle, 1) != pdPASS)
+    if (xTaskCreatePinnedToCore(controller, "controller", 2048, NULL, 0, &controllerTaskHandle, CORE_1) != pdPASS)
     {
         ESP_LOGE("Flight_controller", "Controller task creation error\n");
         (void)standby();
     }
 
     // Motors Command Task
-    if (xTaskCreatePinnedToCore(motorsCommand, "motorsCommand", 2048, NULL, 0, &motorsCommandTaskHandle, 1) != pdPASS)
+    if (xTaskCreatePinnedToCore(motorsCommand, "motorsCommand", 2048, NULL, 0, &motorsCommandTaskHandle, CORE_1) != pdPASS)
     {
         ESP_LOGE("Flight_controller", "Motors command task creation error\n");
         (void)standby();
@@ -123,7 +129,7 @@ void getSensorsData(void *arg)
     (void)attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, GPIO_INTR_POSEDGE);
 
     // Initialize the RC Low pass filter for the sensor data
-    (void)dataRCLowPassFilterInit(lpFRC, RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD);
+    (void)dataRCLowPassFilterInit(lpFRC, RC_LOW_PASS_FLTR_CUTOFF_10HZ, IMU_SAMPLING_PERIOD);
 
     // Calibrate the gyroscope
     (void)calibrateGyroscope(GYRO_CALIBRATION_SAMPLES_200);
@@ -153,7 +159,7 @@ void getSensorsData(void *arg)
                     to use both the accelerometer and the gyroscope to predict the
                     euler angles (phi: roll, theta: pitch)
                 */
-                (void)complementaryFilter(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+                (void)complementaryFilter(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad, IMU_SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
                 // Print the euler angles to the serial monitor
                 (void)printf("%f", phiHat_rad * RAD2DEG);
@@ -173,7 +179,17 @@ void getSensorsData(void *arg)
 // Controller Task
 void controller(void *arg) {
     /* Controller Code here... */
-    while(1) {
+
+    int64_t timer = 0; // Sampling timer
+
+    float accelGyroDataRad[8] = { 0.0 }; // Data that is going to be processed
+
+    while(1) {                            // µs to s
+        if ((esp_timer_get_time() - timer) / 1000000 >= CONTROLLER_SAMPLING_PERIOD)
+        {
+            (void)sensorsToControllerReceive(accelGyroDataRad);
+            timer = esp_timer_get_time();
+        }
         (void)standby();
     }
 }
@@ -402,17 +418,18 @@ void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, flo
     // Send the output variables to the Controller
     for (int i = 0; i < 6; i++)
     {
-        if (xQueueSend(sensorsToController, &accelGyroDataRPS[i], portMAX_DELAY) != pdTRUE)
-        {
-            ESP_LOGE("Sensors", "Queue send Error\n");
-        }
+        (void)xQueueSend(sensorsToController, &accelGyroDataRPS[i], portMAX_DELAY);
     }
-    if (xQueueSend(sensorsToController, &phiHat_rad, portMAX_DELAY) != pdTRUE)
+    (void)xQueueSend(sensorsToController, &phiHat_rad, portMAX_DELAY);
+    (void)xQueueSend(sensorsToController, &thetaHat_rad, portMAX_DELAY);
+}
+
+// Recieves data from the sensor
+void sensorsToControllerReceive(float *accelGyroDataRad)
+{
+    // Recieve the output sensor output in the Controller
+    for (int i = 0; i < 8; i++)
     {
-        ESP_LOGE("Sensors", "Queue send Error\n");
-    }
-    if (xQueueSend(sensorsToController, &thetaHat_rad, portMAX_DELAY) != pdTRUE)
-    {
-        ESP_LOGE("Sensors", "Queue send Error\n");
+        (void)xQueueReceive(sensorsToController, &accelGyroDataRad[i], 0);
     }
 }
