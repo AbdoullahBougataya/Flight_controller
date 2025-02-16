@@ -21,8 +21,7 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define RAD2DEG                         57.29577951308232087680f   // Radians to degrees (per second)
 #define G_MPS2                           9.81000000000000000000f   // Gravitational acceleration (g)
 #define PI                               3.14159265358979323846f   // Pi
-#define IMU_SAMPLING_PERIOD              0.01000000000000000000f   // Sampling period of the sensor in seconds
-#define CONTROLLER_SAMPLING_PERIOD       0.01000000000000000000f   // Sampling period of the controller in seconds
+#define IMU_SAMPLING_PERIOD              0.00250000000000000000f   // Sampling period of the sensor in seconds
 #define STARTUP_DELAY                  100                         // 100 ms for the microcontroller to start
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ      5.00000000000000000000f   // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ    10.00000000000000000000f   // The cutoff frequency for the RC low pass filter
@@ -40,17 +39,14 @@ volatile bool IMUDataReady = false; // IMU Data Ready ? yes:true | no:false
 float gyroRateOffset[3] = {0.0}; // Gyro rates offsets
 
 // Tasks
-void getSensorsData(void *arg); // Gets the Sensors data
 void controller(void *arg); // Operates the controller
 void motorsCommand(void *arg); // Commands the motors
 
 // Tasks handles
-TaskHandle_t getSensorsDataTaskHandle;
 TaskHandle_t controllerTaskHandle;
 TaskHandle_t motorsCommandTaskHandle;
 
 // Queue handles
-QueueHandle_t sensorsToController;
 QueueHandle_t controllerToMotorsCommand;
 
 // Functions
@@ -65,6 +61,7 @@ void offset(int16_t* accelGyro, float* accelGyroDataRPS); // Adds the offset to 
 void dataRCLowPassFilterUpdate(RCFilter *filt, float *accelGyroDataRPS); // Update the 6D RC Low pass filter
 void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, float *thetaHat_rad);
 void sensorsToControllerReceive(float *accelGyroDataRad); // Recieves data from the sensor
+void onOffSWInit(uint8_t onoff_pin); // Initialize an On Off Switch
 
 // Section 2: Tasks initialization & setup section.
 
@@ -73,20 +70,10 @@ void app_main(void)
     (void)vTaskDelay(STARTUP_DELAY / portTICK_PERIOD_MS);
 
     /* Queues Initialization */
-    // Sensors to Controller Queue
-    sensorsToController = xQueueCreate(SENSORS_OUTPUTS, sizeof(float)); // 8 Float variables to be sent from the sensor to the Controller
-
     // Controller to motor Command Queue
     controllerToMotorsCommand = xQueueCreate(MOTORS_NMBR, sizeof(int)); // Throttle of the 4 motors in int
 
     /* Tasks Initialization */
-    // Sensors Task
-    if (xTaskCreatePinnedToCore(getSensorsData, "getSensorsData", 2048, NULL, 0, &getSensorsDataTaskHandle, CORE_1) != pdPASS)
-    {
-        ESP_LOGE("Flight_controller", "Sensors task creation error\n");
-        (void)standby();
-    }
-
     // Controller Task
     if (xTaskCreatePinnedToCore(controller, "controller", 2048, NULL, 0, &controllerTaskHandle, CORE_1) != pdPASS)
     {
@@ -106,10 +93,9 @@ void app_main(void)
 
 // Section 3: Tasks.
 
-// Sensors Task
-void getSensorsData(void *arg)
-{
-    const char *TAG = "Sensor";
+// Controller Task
+void controller(void *arg) {
+    const char *TAG = "Controller";
 
     // Start up and setup the IMU
     const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
@@ -131,13 +117,16 @@ void getSensorsData(void *arg)
     // Initialize the RC Low pass filter for the sensor data
     (void)dataRCLowPassFilterInit(lpFRC, RC_LOW_PASS_FLTR_CUTOFF_10HZ, IMU_SAMPLING_PERIOD);
 
+    // Initialize the on off switch pin
+    (void)onOffSWInit(ON_OFF_MCU_PIN);
+
     // Calibrate the gyroscope
     (void)calibrateGyroscope(GYRO_CALIBRATION_SAMPLES_200);
 
     while (1)
     {
         // Checking if there is data ready in the sensor
-        if (IMUDataReady)
+        if (IMUDataReady && gpio_get_level(ON_OFF_MCU_PIN))
         {
             IMUDataReady = false; // Reseting the dataReady flag
 
@@ -164,33 +153,15 @@ void getSensorsData(void *arg)
                 // Print the euler angles to the serial monitor
                 (void)printf("%f", phiHat_rad * RAD2DEG);
                 (void)printf("%f\n", thetaHat_rad * RAD2DEG);
-
-                // Send the output variables to the Controller
-                (void)sensorsToControllerTransfer(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad);
             }
             else
             {
                 ESP_LOGE(TAG, "!!! Data reading error !!!\n");
             }
         }
-    }
-}
-
-// Controller Task
-void controller(void *arg) {
-    /* Controller Code here... */
-
-    int64_t timer = 0; // Sampling timer
-
-    float accelGyroDataRad[8] = { 0.0 }; // Data that is going to be processed
-
-    while(1) {                            // µs to s
-        if ((esp_timer_get_time() - timer) / 1000000 >= CONTROLLER_SAMPLING_PERIOD)
-        {
-            (void)sensorsToControllerReceive(accelGyroDataRad);
-            timer = esp_timer_get_time();
+        else {
+            (void)vTaskDelay(1 / portTICK_PERIOD_MS);
         }
-        (void)standby();
     }
 }
 
@@ -412,24 +383,26 @@ void dataRCLowPassFilterUpdate(RCFilter *filt, float *accelGyroDataRPS)
     }
 }
 
-// Transfers data from the sensor to the controller
-void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, float *thetaHat_rad)
+// Initialize an On Off Switch
+void onOffSWInit(uint8_t onoff_pin)
 {
-    // Send the output variables to the Controller
-    for (int i = 0; i < 6; i++)
-    {
-        (void)xQueueSend(sensorsToController, &accelGyroDataRPS[i], portMAX_DELAY);
-    }
-    (void)xQueueSend(sensorsToController, &phiHat_rad, portMAX_DELAY);
-    (void)xQueueSend(sensorsToController, &thetaHat_rad, portMAX_DELAY);
-}
+    const char *TAG = "onOffSwitch";
 
-// Recieves data from the sensor
-void sensorsToControllerReceive(float *accelGyroDataRad)
-{
-    // Recieve the output sensor output in the Controller
-    for (int i = 0; i < 8; i++)
+    if (gpio_reset_pin(onoff_pin) != ESP_OK)
     {
-        (void)xQueueReceive(sensorsToController, &accelGyroDataRad[i], 0);
+        ESP_LOGE(TAG, "Master pin error\n");
+        (void)standby();
+    }
+
+    if (gpio_set_direction(onoff_pin, GPIO_MODE_OUTPUT) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "GPIO error\n");
+        (void)standby();
+    }
+
+    if (gpio_input_enable(onoff_pin) == ESP_ERR_INVALID_ARG)
+    {
+        ESP_LOGE(TAG, "Input enable error\n");
+        (void)standby();
     }
 }

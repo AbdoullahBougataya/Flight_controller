@@ -10,8 +10,8 @@
 #define I2C_SLAVE_SCL_IO     18    /*!<gpio number for i2c slave clock  */
 #define I2C_SLAVE_SDA_IO     19    /*!<gpio number for i2c slave data */
 
-#define I2C_MASTER_SCL_IO    22     /*!< gpio number for I2C master clock */
-#define I2C_MASTER_SDA_IO    21     /*!< gpio number for I2C master data  */
+#define I2C_MASTER_SCL_IO     9     /*!< gpio number for I2C master clock */
+#define I2C_MASTER_SDA_IO     8     /*!< gpio number for I2C master data  */
 #else
 #define I2C_SLAVE_SCL_IO     4    /*!<gpio number for i2c slave clock  */
 #define I2C_SLAVE_SDA_IO     2    /*!<gpio number for i2c slave data */
