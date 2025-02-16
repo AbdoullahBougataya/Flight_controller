@@ -14,6 +14,9 @@ This repository is the software part of a DIY flight controller. It's for people
 ## Project structure
 ``` sh
 /Flight_controller
+├── /Datasheet
+│     └── Sensors
+│          └── BMI160 Datasheet.pdf
 ├── /include
 │     ├── BMI160.h
 │     ├── RCFilter.h
@@ -22,14 +25,11 @@ This repository is the software part of a DIY flight controller. It's for people
 │     ├── PID.c
 │     ├── BMI160.c
 │     └── RCFilter.c
-├── /Datasheet
-│     └── Sensors
-│          └── BMI160 Datasheet.pdf
-├── Flight_controller.ino
+├── /src
+│     ├── CMakeLists.txt
+│     └── main.c
 ├── LICENSE
-├── README.md --> You are in this file
-├── /lib
-└── /test
+└── README.md --> You are in this file
 ```
 
 ## Features
