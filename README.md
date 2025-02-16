@@ -2,7 +2,7 @@
 
 # Flight Controller
 
-[![Build Status](https://img.shields.io/badge/build-passing-cyan?style=flat-square&logo=arduino&logoColor=cyan)](https://github.com/AbdoullahBougataya/Flight_controller/.github/workflows/main.yml)
+[![ESP IDF Build](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml/badge.svg)](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml)
 
 > [!TIP]
 > This codebase is only compatible with dual core ESP32s
