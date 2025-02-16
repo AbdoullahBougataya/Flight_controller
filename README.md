@@ -25,10 +25,11 @@ This repository is the software part of a DIY flight controller. It's for people
 │     ├── PID.c
 │     ├── BMI160.c
 │     └── RCFilter.c
-├── /src
+├── /main
 │     ├── CMakeLists.txt
 │     └── main.c
 ├── LICENSE
+├── CMakeLists.txt
 └── README.md --> You are in this file
 ```
 
