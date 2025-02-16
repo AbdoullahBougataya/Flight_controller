@@ -21,7 +21,7 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define RAD2DEG                         57.29577951308232087680f   // Radians to degrees (per second)
 #define G_MPS2                           9.81000000000000000000f   // Gravitational acceleration (g)
 #define PI                               3.14159265358979323846f   // Pi
-#define IMU_SAMPLING_PERIOD              0.00250000000000000000f   // Sampling period of the sensor in seconds
+#define CONTROLLER_SAMPLING_PERIOD_S     0.00250000000000000000f   // Sampling period of the sensor and controller in seconds
 #define STARTUP_DELAY                  100                         // 100 ms for the microcontroller to start
 #define RC_LOW_PASS_FLTR_CUTOFF_5HZ      5.00000000000000000000f   // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ    10.00000000000000000000f   // The cutoff frequency for the RC low pass filter
@@ -59,8 +59,6 @@ void calibrateGyroscope(int num); // Calibrates the gyroscope
 void dataRCLowPassFilterInit(RCFilter *filt, float cutoffFreqHz, float sampleTime); // Initialize a 6D RC Low pass filter
 void offset(int16_t* accelGyro, float* accelGyroDataRPS); // Adds the offset to the gyroscope
 void dataRCLowPassFilterUpdate(RCFilter *filt, float *accelGyroDataRPS); // Update the 6D RC Low pass filter
-void sensorsToControllerTransfer(float *accelGyroDataRPS, float *phiHat_rad, float *thetaHat_rad);
-void sensorsToControllerReceive(float *accelGyroDataRad); // Recieves data from the sensor
 void onOffSWInit(uint8_t onoff_pin); // Initialize an On Off Switch
 
 // Section 2: Tasks initialization & setup section.
@@ -115,7 +113,7 @@ void controller(void *arg) {
     (void)attachInterrupt(INTERRUPT_1_MCU_PIN, AccelGyroISR, GPIO_INTR_POSEDGE);
 
     // Initialize the RC Low pass filter for the sensor data
-    (void)dataRCLowPassFilterInit(lpFRC, RC_LOW_PASS_FLTR_CUTOFF_10HZ, IMU_SAMPLING_PERIOD);
+    (void)dataRCLowPassFilterInit(lpFRC, RC_LOW_PASS_FLTR_CUTOFF_10HZ, CONTROLLER_SAMPLING_PERIOD_S);
 
     // Initialize the on off switch pin
     (void)onOffSWInit(ON_OFF_MCU_PIN);
@@ -148,11 +146,13 @@ void controller(void *arg) {
                     to use both the accelerometer and the gyroscope to predict the
                     euler angles (phi: roll, theta: pitch)
                 */
-                (void)complementaryFilter(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad, IMU_SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+                (void)complementaryFilter(accelGyroDataRPS, &phiHat_rad, &thetaHat_rad, CONTROLLER_SAMPLING_PERIOD_S, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
                 // Print the euler angles to the serial monitor
                 (void)printf("%f", phiHat_rad * RAD2DEG);
                 (void)printf("%f\n", thetaHat_rad * RAD2DEG);
+
+                // Controller code continues here...
             }
             else
             {
