@@ -91,3 +91,5 @@ This project is licensed under the **GPL v2.0 License**. See the [LICENSE](LICEN
 
 - **Carbon aeronautics** series on making a Quadcopter using Teensy (Arduino compatible).
 - **Phil's Lab** series on DSP using STM32.
+- **void loop Robotech & Automation** videos on ESP IDF programming.
+- **DroneBot Workshop** videos on PWM communication.
