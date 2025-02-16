@@ -21,9 +21,12 @@ This repository is the software part of a DIY flight controller. It's for people
 ├── /src
 │     ├── BMI160.cpp
 │     └── RCFilter.cpp
+├── /Datasheet
+│     ├── Sensors
+│          └── BMI160 Datasheet.pdf
 ├── Flight_controller.ino
 ├── LICENSE
-├── README.md
+├── README.md --> You are in this file
 ├── /lib
 └── /test
 ```
