@@ -5,11 +5,11 @@
 [![Build Status](https://img.shields.io/badge/build-passing-cyan?style=flat-square&logo=arduino&logoColor=cyan)](https://github.com/AbdoullahBougataya/Flight_controller/.github/workflows/main.yml)
 
 > [!TIP]
-> This codebase is compatible with all Arduino compatible boards
+> This codebase is only compatible with dual core ESP32s
 
 ## Overview
 
-This repository is the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. **The software has features for flight stabilization, sensor integration, PID control, and signal processing**. Compatible with quadcopter drones.
+This repository is the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. **The software has features for flight stabilization, sensor integration, PID control, and signal processing**. Compatible with ESP32 based quadcopter drones.
 
 ## Project structure
 ``` sh
@@ -32,11 +32,9 @@ This repository is the software part of a DIY flight controller. It's for people
 
 - Real-time flight stabilization using **PID control**.
 - Supports the **BMI160 IMU** (**I**nertial **M**easurement **U**nit) sensor.
-- Supports the **BMP280 Barometric sensor** (Altimeter).
+- Supports the **BMP390 Barometric sensor** (Altimeter).
 - Communication via **standard RC protocols** (PPM/PWM).
 - Simple sensor communications **using I²C**.
-- Integration with **GPS** (**G**eo**p**ositioning **S**ervice) modules for navigation.
-- Cross-platform compatibility with **Arduino language** compatible boards (UNO, MEGA, ESP32, Teensy...).
 
 ## Getting Started
 
