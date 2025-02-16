@@ -47,7 +47,7 @@ Follow these steps to set up and run the Flight Controller software.
 
 ### Prerequisites
 
-- [Arduino IDE](https://www.arduino.cc/en/software)
+- [ESP IDF](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
 - Required hardware:
   - Microcontroller (e.g., [Arduino UNO](https://store.arduino.cc/products/arduino-uno-rev3), [ESP32-S3](https://www.espressif.com/en/products/socs/esp32-s3)...)
   - [BMI160](https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi160/) IMU
@@ -57,12 +57,13 @@ Follow these steps to set up and run the Flight Controller software.
 
 ### Installation
 
-1. Clone this repository:
+1. Install **ESP IDF** following the [installation guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html#installation).
+2. Clone this repository:
    ```bash
    git clone https://github.com/AbdoullahBougataya/Flight_controller.git
    ```
-2. Open the project in your preferred IDE.
-3. Compile and upload the code to your microcontroller.
+3. Open the project in your preferred IDE.
+4. Build and flash the code to your microcontroller.
 
 ## Hardware Configuration
 
@@ -71,7 +72,7 @@ _Waiting for the image_
 ## Usage
 
 1. Connect the hardware components as per the [Hardware Configuration](#Hardware-Configuration).
-2. Power on the flight controller and **wait 5 seconds** for the sensors to calibrate.
+2. Power on the flight controller and **wait 8 seconds** for the sensors and the ESCs to calibrate.
 3. Use your RC transmitter to control the drone.
 
 ## Contributing
@@ -90,4 +91,3 @@ This project is licensed under the **GPL v2.0 License**. See the [LICENSE](LICEN
 
 - **Carbon aeronautics** series on making a Quadcopter using Teensy (Arduino compatible).
 - **Phil's Lab** series on DSP using STM32.
-
