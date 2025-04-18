@@ -48,9 +48,9 @@ float PIDController_Update(PIDController *pid, float setpoint, float measurement
     }
 
     // Derivative
-    pid->differentiator = (2.0f * pid->Kd * (pid->prevMeasurement - measurement)
-                        + (2.0f * pid->tau - pid->T) * pid->differentiator)
-                        / (2.0f * pid->tau + pid->T);
+    pid->differentiator = - (2.0f * pid->Kd * (measurement - pid->prevMeasurement)
+                          + (2.0f * pid->tau - pid->T) * pid->differentiator)
+                          / (2.0f * pid->tau + pid->T);
 
     // Computing the output and applying the limits
     pid->out = proportional + pid->integrator + pid->differentiator;

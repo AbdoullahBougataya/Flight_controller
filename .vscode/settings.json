@@ -1,18 +1,48 @@
 {
-    "C_Cpp.intelliSenseEngine": "default",
-    "idf.espIdfPathWin": "C:\\Users\\HP\\esp\\v5.4\\esp-idf",
-    "idf.openOcdConfigs": [
-        "board/esp32s3-builtin.cfg"
-    ],
-    "idf.toolsPathWin": "c:\\Espressif\\tools",
-    "files.associations": {
-        "gpio.h": "c",
-        "inttypes.h": "c",
-        "esp_log.h": "c",
-        "cstddef": "c",
-        "freertos.h": "c",
-        "idf_additions.h": "c",
-        "bmi160.h": "c"
+    "code-runner.executorMapByFileExtension": {
+        ".ino": "cd $dir && arduino-cli compile --no-color --quiet --fqbn arduino:avr:uno $fileName && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
+        ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
+        ".vbs": "cscript //Nologo",
+        ".scala": "scala",
+        ".jl": "julia",
+        ".cr": "crystal",
+        ".ml": "ocaml",
+        ".zig": "zig run",
+        ".exs": "elixir",
+        ".hx": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+        ".rkt": "racket",
+        ".scm": "csi -script",
+        ".ahk": "autohotkey",
+        ".au3": "autoit3",
+        ".kt": "cd $dir && kotlinc $fileName -include-runtime -d $fileNameWithoutExt.jar && java -jar $fileNameWithoutExt.jar",
+        ".kts": "kotlinc -script",
+        ".dart": "dart",
+        ".pas": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+        ".pp": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+        ".d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+        ".hs": "runhaskell",
+        ".nim": "nim compile --verbosity:0 --hints:off --run",
+        ".csproj": "dotnet run --project",
+        ".fsproj": "dotnet run --project",
+        ".lisp": "sbcl --script",
+        ".kit": "kitc --run",
+        ".v": "v run",
+        ".vsh": "v run",
+        ".sass": "sass --style expanded",
+        ".cu": "cd $dir && nvcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        ".ring": "ring",
+        ".sml": "cd $dir && sml $fileName",
+        ".mojo": "mojo run",
+        ".erl": "escript",
+        ".spwn": "spwn build",
+        ".pkl": "cd $dir && pkl eval -f yaml $fileName -o $fileNameWithoutExt.yaml",
+        ".gleam": "gleam run -m $fileNameWithoutExt"
     },
-    "idf.flashType": "JTAG"
+    "code-runner.executorMapByGlob": {
+        "*.ino": "cd $dir && arduino-cli compile --no-color --quiet --fqbn arduino:avr:uno --log-level info $fileName && arduino-cli upload -p COM6 --quiet --fqbn arduino:avr:uno $fileName > NUL 2>&1",
+        "pom.xml": "cd $dir && mvn clean package"
+    },
+    "files.associations": {
+        "cmath": "cpp"
+    }
 }

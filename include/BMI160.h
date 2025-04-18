@@ -1,37 +1,5 @@
-#ifndef BMI160_H
-#define BMI160_H
-
-#include <stdlib.h>
-#include "freertos/FreeRTOS.h"
-#include "driver/i2c_master.h"
-#include "sdkconfig.h"
-
-#if CONFIG_IDF_TARGET_ESP32
-#define I2C_SLAVE_SCL_IO     18    /*!<gpio number for i2c slave clock  */
-#define I2C_SLAVE_SDA_IO     19    /*!<gpio number for i2c slave data */
-
-#define I2C_MASTER_SCL_IO     9     /*!< gpio number for I2C master clock */
-#define I2C_MASTER_SDA_IO     8     /*!< gpio number for I2C master data  */
-#else
-#define I2C_SLAVE_SCL_IO     4    /*!<gpio number for i2c slave clock  */
-#define I2C_SLAVE_SDA_IO     2    /*!<gpio number for i2c slave data */
-
-#define I2C_MASTER_SCL_IO    4     /*!< gpio number for I2C master clock */
-#define I2C_MASTER_SDA_IO    2     /*!< gpio number for I2C master data  */
-#endif
-
-#if SOC_LP_I2C_SUPPORTED
-#if CONFIG_IDF_TARGET_ESP32P4
-#define LP_I2C_SCL_IO   4
-#define LP_I2C_SDA_IO   5
-#else
-#define LP_I2C_SCL_IO   7
-#define LP_I2C_SDA_IO   6
-#endif
-#endif
-
-#define TEST_I2C_PORT     0
-#define DATA_LENGTH     100
+#include <Arduino.h>
+#include <Wire.h>
 
 /** Mask definitions */
 #define BMI160_ACCEL_BW_MASK                    UINT8_C(0x70)
@@ -197,6 +165,16 @@
 #define BMI160_I2C_ADDR                 UINT8_C(0x68)
 
 /**
+ * @enum eBmi160AnySigMotionActiveInterruptState
+ * @brief bmi160 active state of any & sig motion interrupt.
+ */
+enum eBmi160AnySigMotionActiveInterruptState {
+  eBmi160BothAnySigMotionDisabled = -1, /**< Both any & sig motion are disabled */
+  eBmi160AnyMotionEnabled,              /**< Any-motion selected */
+  eBmi160SigMotionEnabled               /**< Sig-motion selected */
+};
+
+/**
  * @struct bmi160Cfg
  * @brief bmi160 sensor configuration structure
  */
@@ -207,93 +185,152 @@ struct bmi160Cfg {
   uint8_t bw;     /**< bandwidth */
 };
 
+/**
+ * @brief Aux sensor configuration structure
+ */
+struct bmi160AuxCfg {
+  uint8_t auxSensorEnable : 1;  /**< Aux sensor, 1 - enable 0 - disable */
+  uint8_t manualEnable : 1;     /**< Aux manual/auto mode status */
+  uint8_t auxRdBurstLen : 2;    /**< Aux read burst length */
+  uint8_t auxOdr :4;            /**< output data rate */
+  uint8_t auxI2cAddr;           /**< i2c addr of auxiliary sensor */
+};
+
 /* type definitions */
 typedef int8_t (*bmi160ComFptrT)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t len);
 typedef void (*bmi160DelayFptrT)(uint32_t period);
 
-typedef struct {
+struct bmi160Dev {
   uint8_t chipId;   /**< Chip Id */
   uint8_t id;       /**< Device Id */
+  enum eBmi160AnySigMotionActiveInterruptState any_sig_sel;/**< Hold active interrupts status for any and sig motion 0 - Any-motion enable, 1 - Sig-motion enable,  -1 neither any-motion nor sig-motion selected */
   struct bmi160Cfg accelCfg;                               /**< Structure to configure Accel sensor */
   struct bmi160Cfg prevAccelCfg;/**< Structure to hold previous/old accel config parameters.This is used at driver level to prevent overwriting of samedata, hence user does not change it in the code */
   struct bmi160Cfg gyroCfg;     /**< Structure to configure Gyro sensor */
   struct bmi160Cfg prevGyroCfg; /**< Structure to hold previous/old gyro config parameters.This is used at driver level to prevent overwriting of same data, hence user does not change it in the code */
+  struct bmi160AuxCfg auxCfg;   /**< Structure to configure the auxiliary sensor */
+  struct bmi160AuxCfg prevAuxCfg;/**< Structure to hold previous/old aux config parameters.This is used at driver level to prevent overwriting of samedata, hence user does not change it in the code */
   struct bmi160FifoFrame *fifo; /**< FIFO related configurations */
   bmi160ComFptrT read;          /**< Read function pointer */
   bmi160ComFptrT write;         /**< Write function pointer */
   bmi160DelayFptrT delayMs;     /**<  Delay function pointer */
-} BMI160;
+};
 
 /**
- * @fn BMI160_Init
- * @brief set the i2c addr and init the i2c.
- * @param dev bmi160 object
- * @n     0x68: connect SDIO pin of the BMI160 to GND which means the default I2C address
- * @n     0x69: connect SDIO pin of the BMI160 to VCC
- * @return BMI160_OK(0) means success
+ * @brief bmi160 sensor data structure which comprises of accel data
  */
-int8_t BMI160_Init(BMI160 *dev);
+struct bmi160SensorData {
+  int16_t x;           /**< X-axis sensor data */
+  int16_t y;           /**< Y-axis sensor data */
+  int16_t z;           /**< Z-axis sensor data */
+  uint32_t sensortime; /**< sensor time */
+};
+
+class BMI160{
+public:
+  BMI160();
+
+  /**
+   * @fn Init
+   * @brief set the i2c addr and init the i2c.
+   * @param i2c_addr  bmi160 i2c addr
+   * @n     0x68: connect SDIO pin of the BMI160 to GND which means the default I2C address
+   * @n     0x69: set I2C address by parameter
+   * @return BMI160_OK(0) means success
+   */
+  int8_t Init(int8_t i2c_addr = BMI160_I2C_ADDR);
+
+  /**
+   * @fn getSensorData
+   * @brief select mode and save returned data to parameter data.
+   * @param type  three type
+   * @n     onlyAccel    :   only get the accel data
+   * @n     onlyGyro     :   only get the gyro data
+   * @n     bothAccelGyro:   get boath accel and gyro data
+   * @param data  save returned data to parameter data
+   * @return BMI160_OK(0) means succse
+   */
+  int8_t getSensorData(uint8_t type,int16_t* data);
+
+  /**
+   * @fn getAccelGyroData
+   * @brief get the accel and gyro data
+   * @param data pointer to store the accel and gyro data
+   * @return BMI160_OK(0) means succse
+   */
+  int8_t getAccelGyroData(int16_t* data);
+
+  /**
+   * @fn getAccelGyroData
+   * @brief get the accel and gyro data
+   * @param data pointer to store the accel and gyro data
+   * @param timestamp pointer to store the timestamp for accel and gyro
+   * @return BMI160_OK(0) means succse
+   */
+  int8_t getAccelGyroData(int16_t* data, uint32_t* timestamp);
+
+  /**
+   * @fn softReset
+   * @brief reset bmi160 hardware
+   * @return BMI160_OK(0) means success
+   */
+  int8_t softReset();
+
+  /**
+   * @fn setInt
+   * @brief setup the bmi160 interrupt 1
+   * @return BMI160_OK(0) means success
+   */
+  int8_t setInt();
+
+  private:
+    int8_t Init(struct bmi160Dev *dev);
+
+    int8_t softReset(struct bmi160Dev *dev);
+    void   defaultParamSettg(struct bmi160Dev *dev);
+
+    int8_t setSensConf();
+    int8_t setSensConf(struct bmi160Dev *dev);
+
+    int8_t setAccelConf(struct bmi160Dev *dev);
+    int8_t checkAccelConfig(uint8_t *data, struct bmi160Dev *dev);
+    int8_t processAccelOdr(uint8_t *data, struct bmi160Dev *dev);
+    int8_t processAccelBw(uint8_t *data, struct bmi160Dev *dev);
+    int8_t processAccelRange(uint8_t *data, struct bmi160Dev *dev);
+
+    int8_t setGyroConf(struct bmi160Dev *dev);
+    int8_t checkGyroConfig(uint8_t *data, struct bmi160Dev *dev);
+    int8_t processGyroOdr(uint8_t *data, struct bmi160Dev *dev);
+    int8_t processGyroBw(uint8_t *data, struct bmi160Dev *dev);
+    int8_t processGyroRange(uint8_t *data, struct bmi160Dev *dev);
+
+    int8_t setPowerMode(struct bmi160Dev *dev);
+    int8_t setAccelPwr(struct bmi160Dev *dev);
+    int8_t processUnderSampling(uint8_t *data, struct bmi160Dev *dev);
+    int8_t setGyroPwr(struct bmi160Dev *dev);
+
+    int8_t checkInvalidSettg( struct bmi160Dev *dev);
+
+    int8_t getSensorData(uint8_t select_sensor, struct bmi160SensorData *accel, struct bmi160SensorData *gyro,struct bmi160Dev *dev);
+    int8_t getAccelGyroData(uint8_t len, struct bmi160SensorData *accel, struct bmi160SensorData *gyro, struct bmi160Dev *dev);
+
+    int8_t getRegs(uint8_t reg_addr, uint8_t * data, uint16_t len, struct bmi160Dev *dev);
+    int8_t setRegs(uint8_t reg_addr, uint8_t * data, uint16_t len, struct bmi160Dev *dev);
+
+    int8_t I2cGetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
+    int8_t I2cSetRegs(struct bmi160Dev *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
+
+    int8_t setInt(struct bmi160Dev *dev);
+
+    struct bmi160Dev* Obmi160;
+    struct bmi160SensorData* Oaccel;
+    struct bmi160SensorData* Ogyro;
+};
 
 /**
- * @fn BMI160_softReset
- * @brief reset bmi160 hardware
- * @param dev bmi160 object
- * @return BMI160_OK(0) means success
- */
-int8_t BMI160_softReset(BMI160 *dev);
-
-void BMI160_defaultParamSettg(BMI160 *dev);
-int8_t BMI160_setSensConf(BMI160 *dev);
-
-int8_t BMI160_setAccelConf(BMI160 *dev);
-int8_t BMI160_checkAccelConfig(uint8_t *data, BMI160 *dev);
-int8_t BMI160_processAccelOdr(uint8_t *data, BMI160 *dev);
-int8_t BMI160_processAccelBw(uint8_t *data, BMI160 *dev);
-int8_t BMI160_processAccelRange(uint8_t *data, BMI160 *dev);
-
-int8_t BMI160_setGyroConf(BMI160 *dev);
-int8_t BMI160_checkGyroConfig(uint8_t *data, BMI160 *dev);
-int8_t BMI160_processGyroOdr(uint8_t *data, BMI160 *dev);
-int8_t BMI160_processGyroBw(uint8_t *data, BMI160 *dev);
-int8_t BMI160_processGyroRange(uint8_t *data, BMI160 *dev);
-
-int8_t BMI160_setPowerMode(BMI160 *dev);
-int8_t BMI160_setAccelPwr(BMI160 *dev);
-int8_t BMI160_processUnderSampling(uint8_t *data, BMI160 *dev);
-int8_t BMI160_setGyroPwr(BMI160 *dev);
-
-int8_t BMI160_checkInvalidSettg(BMI160 *dev);
-
-/**
- * @fn BMI160_getAccelGyroData
- * @brief get the accel and gyro data
- * @param dev bmi160 object
- * @param data pointer to store the accel and gyro data
- * @return BMI160_OK(0) means succse
- */
-int8_t BMI160_getAccelGyroData(BMI160 *dev, int16_t *data);
-
-int8_t BMI160_getRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, BMI160 *dev);
-int8_t BMI160_setRegs(uint8_t reg_addr, uint8_t *data, uint16_t len, BMI160 *dev);
-
-int8_t BMI160_I2cGetRegs(BMI160 *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
-int8_t BMI160_I2cSetRegs(BMI160 *dev, uint8_t reg_addr, uint8_t *data, uint16_t len);
-
-/**
- * @fn BMI160_setInt
- * @brief setup the bmi160 interrupt 1
- * @param dev bmi160 object
- * @return BMI160_OK(0) means success
- */
-int8_t BMI160_setInt(BMI160 *dev);
-
-/**
-  * @fn BMI160_offset
+  * @fn offset
   * @brief Apply offset to the sensor output
   * @param accelGyro Data from the sensor
   * @param rawAccelGyro Offseted data
-  * @return BMI160_OK(0) means success
   */
-int8_t BMI160_offset(int16_t* accelGyro, float* rawAccelGyro);
-
-#endif
+void offset(int16_t* accelGyro, float* rawAccelGyro);
