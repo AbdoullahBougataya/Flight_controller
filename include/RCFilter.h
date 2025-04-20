@@ -7,6 +7,7 @@
 #define PI          3.14159265358979323846f  // Pi
 
 typedef struct {
+    float RC;
     float coeff[2];
     float out[2];
 } RCFilter;
@@ -16,17 +17,17 @@ typedef struct {
   * @brief Initalize the RC Filter
   * @param filt The filter object
   * @param cutoffFreqHz The cutoff frequency in [Hz]
-  * @param sampleTime The sampling period in [s]
   */
-void RCFilter_Init(RCFilter * filt, float cutoffFreqHz, float sampleTime);
+void RCFilter_Init(RCFilter * filt, float cutoffFreqHz);
 
 /**
   * @fn RCFilter_Update
-  * @brief Update the filter on every ittiration
+  * @brief Update the filter on every iteration
   * @param filt The filter object
   * @param inp The input signal
+  * @param sampleTime The sampling period in [s]
   * @return The filtered signal
   */
-float RCFilter_Update(RCFilter * filt, float inp);
+float RCFilter_Update(RCFilter * filt, float inp, float sampleTime);
 
 #endif

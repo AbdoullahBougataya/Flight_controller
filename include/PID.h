@@ -27,7 +27,21 @@ typedef struct {
     float out;
 } PIDController;
 
-void PIDController_Init(PIDController *pid, float dt);
-float PIDController_Update(PIDController *pid, float setpoint, float measurement);
+/**
+  * @fn PIDController_Init
+  * @brief Initalize the PID controller
+  * @param pid The PID object
+  */
+void PIDController_Init(PIDController *pid);
+
+/**
+  * @fn RCFilter_Init
+  * @brief Update the controller on every iteration
+  * @param pid The PID object
+  * @param setpoint The setpoint of the PID controller
+  * @param measurement The measurement from the sensor
+  * @param dt The sampling period in [s]
+  */
+float PIDController_Update(PIDController *pid, float setpoint, float measurement, float dt);
 
 #endif

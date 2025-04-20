@@ -1,3 +1,11 @@
+/*!
+ * @file  flight-controller.ino
+ * @brief  Runs the flight control code for our ESP32 based quadcopter
+ * @author  [Abdellah Bougataya](sience.story@gmail.com)
+ * @version  V1.0
+ * @date  2024-12-20
+ * @url  https://github.com/AbdoullahBougataya/Flight_controller
+ */
 /*
   This code is partitioned into four sections:
     * Constants & Global variables declarations. 📝
@@ -23,13 +31,19 @@
     * Phil's Lab series on DSP using STM32 (Included more advanced topics like the Filtering, EKF, Compilmentary...).
  */
 
-#include "./include/BMI160.h"
+
 #include "./include/RCFilter.h"
+#include "./include/BMP390.h"
+#include "./include/ComplementaryFilter.h"
+#include "./include/2D_ComplementaryFilter.h"
+#include "./include/Calibrations.h"
 #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
 
 BMI160 imu; // Declaring the imu object
+
+ComplementaryFilter CF; // Declaring the Complementary filter object
 
 RCFilter lpFRC[6]; // Declaring the RC filter object
 
@@ -50,20 +64,21 @@ const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
 volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
 
-uint8_t rslt = 0; // Define the result of the data extraction from the imu
+uint8_t rslt; // Define the result of the data extraction from the imu
 
-float gyroRateOffset[3] = { 0.0 }; // Gyro rates offsets
+unsigned long ST = 0;
+float T;
+
+float *gyroRateOffset; // Gyro rates offsets
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
 
 // Declare sensor fusion variables
-float phiHat_rad = 0.0f; // Euler Roll
-float thetaHat_rad = 0.0f; // Euler Pitch
+float *eulerAngles; // Euler angles φ, θ and ψ
 
 // Functions
-void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt, float alpha);
 void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving data from the sensor
 
 // Section 2: Initialization & setup section.
@@ -94,47 +109,20 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), AccelGyroISR, RISING);
 
   for (int i = 0; i < 6; i++) {
-    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
+    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ); // Initialize the RCFilter fc = 5 Hz
   }
 
-  float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
+  ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
-  // For ten seconds the gyroscope will be calibrating (make sure you put it on a flat surface)
-  Serial.println("Calibrating...");
-  for (int i = 0; i < GYRO_CALIBRATION_SAMPLES_400; i++) {
+  gyroRateOffset = CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400);
 
-    // Initialize sensor data arrays
-    memset(accelGyro, 0, sizeof(accelGyro));
-    memset(accelGyroData, 0, sizeof(accelGyroData));
-
-    // Get both accel and gyro data from the BMI160
-    // Parameter accelGyro is the pointer to store the data
-    rslt = imu.getAccelGyroData(accelGyro);
-    if (rslt == 0)
-    {
-      // Formatting the data
-      offset(accelGyro, accelGyroData);
-      for (byte j = 0; j < 3; j++) {
-        gyroRateCumulativeOffset[j] += accelGyroData[j]; // Accumulating the gyroscope error
-      }
-    }
-    else
-    {
-      Serial.print("!!! Data reading error !!!");
-      Serial.println();
-    }
-    delay(1);
-  }
-
-  // Calculate the average offset
-  for (byte i = 0; i < 3; i++) {
-    gyroRateOffset[i] = gyroRateCumulativeOffset[i] / GYRO_CALIBRATION_SAMPLES_400;
-  }
 }
 
 // Section 3: Looping and realtime processing.
 
 void loop() {
+  T = (millis() - ST) / 1000;
+  ST = millis();
   // Checking if there is data ready in the sensor
   if (dataReady)
   {
@@ -158,21 +146,21 @@ void loop() {
     }
 
     for (int i = 0; i < 6; i++) {
-      accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+      accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i], T); // Update the RCFilter ; Ts = 0.01 s
     }
 
     /*
       A complimentary filter is a premitive technique of sensor fusion
       to use both the accelerometer and the gyroscope to predict the
-      euler angles (phi: roll, theta: pitch)
+      euler angles (phi: roll, theta: pitch, psi: yaw)
     */
-    complementaryFilter(accelGyroData, phiHat_rad, thetaHat_rad, SAMPLING_PERIOD, COMP_FLTR_ALPHA); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+    eulerAngles = ComplementaryFilter_Update(&CF, accelGyroData, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     Serial.print(accelGyroData[0]);Serial.print(", \t");
     Serial.print(accelGyroData[1]);Serial.print(", \t");
     Serial.print(accelGyroData[2]);Serial.print(", \t");
-    Serial.print(phiHat_rad * RAD2DEG);Serial.print(", \t");
-    Serial.print(thetaHat_rad * RAD2DEG);Serial.print(", \t");
+    Serial.print(eulerAngles[0] * RAD2DEG);Serial.print(", \t");
+    Serial.print(eulerAngles[1] * RAD2DEG);Serial.print(", \t");
     Serial.println();
   }
   else
@@ -186,25 +174,8 @@ void loop() {
 
 // Accelerometer and Gyroscope interrupt service routine
 void AccelGyroISR() {
-  dataReady = true;
-}
-
-// Complementary filter (Check Phil's Lab video for more details)
-void complementaryFilter(float* filteredAccelGyro, float &phiHat_rad, float &thetaHat_rad, float dt, float alpha) {
-  // Using gravity to estimate the Euler angles
-  float phiHat_acc_rad = atanf(filteredAccelGyro[4] / filteredAccelGyro[5]);                 // Roll estimate
-  float thetaHat_acc_rad = asinf(fminf(fmaxf(filteredAccelGyro[3] / G_MPS2, -1.0f), 1.0f));  // Pitch estimate
-
-  // Using gyroscope to estimate the euler rates (Transforming body rates to euler rates)
-  filteredAccelGyro[0] = (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]) * tanf(thetaHat_rad) + filteredAccelGyro[0];  // Roll rate (rad/s)
-  filteredAccelGyro[1] =  cosf(phiHat_rad) * filteredAccelGyro[1] - sinf(phiHat_rad) * filteredAccelGyro[2];                                               // Pitch rate (rad/s)
-  filteredAccelGyro[2] = (sinf(phiHat_rad) * filteredAccelGyro[1] + cosf(phiHat_rad) * filteredAccelGyro[2]) * (1 / cosf(thetaHat_rad));                   // Yaw rate (rad/s)
-
-  // Complementary filter implementation [Just like mixing the data from the gyroscope and the accelerometer with alpha proportions](alpha should be between 0 and 1)
-  phiHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * phiHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (phiHat_rad + dt * filteredAccelGyro[0]);        // Roll estimate
-  thetaHat_rad = fminf(fmaxf(alpha, 0.0f), 1.0f) * thetaHat_acc_rad + (1.0f - fminf(fmaxf(alpha, 0.0f), 1.0f)) * (thetaHat_rad + dt * filteredAccelGyro[1]);  // Pitch estimate
-
-  // Bound the values of the pitch and roll
-  phiHat_rad = fminf(fmaxf(phiHat_rad, -PI), PI);
-  thetaHat_rad = fminf(fmaxf(thetaHat_rad, -PI), PI);
+  if(dataReady == false)
+  {
+    dataReady = true;
+  }
 }
