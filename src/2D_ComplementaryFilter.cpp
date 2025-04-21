@@ -22,7 +22,7 @@ float ComplementaryFilter2D_Update(ComplementaryFilter2D* cf2, float* accel, flo
     cf2->T = dt;
 
     // Derivate the altitude and save the current altitude
-    cf2->velocities[0] = (alt - cf2->alt)/cf2->T;
+    cf2->velocities[0] = (alt - cf2->alt) / cf2->T;
     cf2->alt = alt;
 
     //Perform the trigonometry and integrate the acceleration
