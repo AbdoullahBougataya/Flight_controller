@@ -31,10 +31,11 @@ typedef struct {
   * @fn ComplementaryFilter_Update
   * @brief Update the Complementary Filter
   * @param cf The complementary filter object
-  * @param inp The sensor data in [rad]
+  * @param inp The sensor data in [rad/s]
+  * @param euler The euler array in [rad]
   * @param dt The sampling period in [s]
   * @return Pointer to the euler angles array
   */
- float *ComplementaryFilter_Update(ComplementaryFilter* cf, float* inp, float dt);
+ void ComplementaryFilter_Update(ComplementaryFilter* cf, float* inp, float* euler, float dt);
 
 #endif

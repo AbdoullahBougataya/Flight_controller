@@ -1,13 +1,24 @@
 #include "../include/Calibrations.h"
 
-float *CalibrateGyroscope(int SC)
+void CalibrateGyroscope(int SC, float *GyroOffset)
 {
     BMI160 imu; // Declaring the imu object
     uint8_t rslt = 0; // Define the result of the data extraction from the imu
+    const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
     int16_t accelGyro[6] = { 0 }; // Raw data from the sensor
     float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
-    float gyroRateOffset[3] = { 0.0 }; // Gyro rate offset
     float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
+    // Reset the BMI160 to erased any preprogrammed instructions
+    if (imu.softReset() != BMI160_OK) {
+      Serial.println("Reset error");
+      while (1);
+    }
+
+    // Initialize the BMI160 on I²C
+    if (imu.Init(addr) != BMI160_OK) {
+      Serial.println("Init error");
+      while (1);
+    }
     for (int i = 0; i < SC; i++) {
 
         // Initialize sensor data arrays
@@ -32,7 +43,6 @@ float *CalibrateGyroscope(int SC)
         }
       }
       for (byte i = 0; i < 3; i++) {
-        gyroRateOffset[i] = gyroRateCumulativeOffset[i] / SC;
+        GyroOffset[i] = gyroRateCumulativeOffset[i] / SC;
       }
-      return gyroRateOffset;
 }

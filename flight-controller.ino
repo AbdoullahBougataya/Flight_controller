@@ -32,20 +32,24 @@
  */
 
 
-#include "./include/RCFilter.h"
-#include "./include/BMP390.h"
-#include "./include/ComplementaryFilter.h"
-#include "./include/2D_ComplementaryFilter.h"
-#include "./include/Calibrations.h"
-#include <math.h>
+ #include "./include/RCFilter.h"
+ #include "./include/BMP390.h"
+ #include "./include/ComplementaryFilter.h"
+ #include "./include/2D_ComplementaryFilter.h"
+ #include "./include/Calibrations.h"
+ #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
 
 BMI160 imu; // Declaring the imu object
 
+BMP390_BAROMETER barometer(&Wire, barometer.eSDOVDD);
+
 ComplementaryFilter CF; // Declaring the Complementary filter object
 
-RCFilter lpFRC[6]; // Declaring the RC filter object
+ComplementaryFilter2D CF2; // Declaring the 2D Complementary filter object
+
+RCFilter lpFRC[7]; // Declaring the RC filter object
 
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
@@ -53,33 +57,43 @@ RCFilter lpFRC[6]; // Declaring the RC filter object
 #define SAMPLING_PERIOD                   0.01000000000000000000f  // Sampling period of the sensor in seconds
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
-#define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the IMU
-#define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
+#define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the Barometer
+#define RC_LOW_PASS_FLTR_CUTOFF_4HZ       4.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ     10.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.50000000000000000000f  // Complimentary filter coefficient
+#define COMP_FLTR_2D_ALPHA                0.03000000000000000000f  // 2D Complimentary filter coefficient
+
+volatile uint8_t barometerFlag = 0;
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
 
-volatile bool dataReady = false; // Sensor Data Ready ? yes:true | no:false
+uint8_t IMUrslt; // Define the result of the data extraction from the imu
 
-uint8_t rslt; // Define the result of the data extraction from the imu
+uint8_t Barslt; // Define the result of the data extraction from the barometer
 
 unsigned long ST = 0;
 float T;
 
-float *gyroRateOffset; // Gyro rates offsets
+float gyroRateOffset[3] = { 0.0 };
 
 // Define sensor data arrays
 int16_t accelGyro[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
+float altitude = 0.0; // Altitude from the barometer
 
 // Declare sensor fusion variables
-float *eulerAngles; // Euler angles φ, θ and ψ
+float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
+float verticalVelocity = 0.0; // The vertical velocity of the
 
-// Functions
-void AccelGyroISR(); // This is the Interrupt Service Routine for retrieving data from the sensor
+/* External interrupt flag */
+void barometerInterrupt()
+{
+  if(barometerFlag ==0){
+    barometerFlag = 1;
+  }
+}
 
 // Section 2: Initialization & setup section.
 
@@ -87,56 +101,90 @@ void setup() {
   // Initialize serial communication at 115200 bytes per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
 
+  // Begin the communication with the barometer
+  while( ERR_OK != (Barslt = barometer.begin()) ){
+    if(ERR_DATA_BUS == Barslt){
+      Serial.println("BMP390: Data bus error");
+    }else if(ERR_IC_VERSION == Barslt){
+      Serial.println("BMP390: Chip versions do not match");
+    }
+    delay(3000);
+  }
+  Serial.println("BMP390: Begin ok");
+  /**
+   * Interrupt configuration
+   * mode The interrupt mode needs to set. The following modes add up to mode:
+   *      Interrupt pin output mode: eINTPinPP: Push pull, eINTPinOD: Open drain
+   *      Interrupt pin active level: eINTPinActiveLevelLow: Active low, eINTPinActiveLevelHigh: Active high
+   *      Register interrupt latch: eINTLatchDIS: Disable, eINTLatchEN: Enable
+   *      FIFO water level reached interrupt: eIntFWtmDis: Disable, eIntFWtmEn: Enable
+   *      FIFO full interrupt: eINTFFullDIS: Disable, eINTFFullEN: Enable
+   *      Interrupt pin initial (invalid, non-interrupt) level: eINTInitialLevelLOW: Low, eINTInitialLevelHIGH: High
+   *      Temperature/pressure data ready interrupt: eINTDataDrdyDIS: Disable, eINTDataDrdyEN: Enable
+   * Notice: In non-latching mode (eINTLatchDIS), interrupt signal is 2.5 ms pulse signal
+   * Note: When using eINTPinActiveLevelLow (Active low interrupt pin), you need to use eINTInitialLevelHIGH (Initial
+   *       level of interrupt pin is high). Please use “FALLING” to trigger the following interrupt.
+   *       When using eINTPinActiveLevelHigh (Active low interrupt pin), you need to use eINTInitialLevelLOW (Initial
+   *       level of interrupt pin is high). Please use “RISING” to trigger the following interrupt.
+   */
+  barometer.setINTMode(barometer.eINTPinPP |
+    barometer.eINTPinActiveLevelHigh |
+    barometer.eINTLatchDIS |
+    barometer.eINTInitialLevelLOW |
+    barometer.eINTDataDrdyEN);
+
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
-    Serial.println("Reset error");
+    Serial.println("BMI160: Reset error");
     while (1);
   }
 
   // Initialize the BMI160 on I²C
   if (imu.Init(addr) != BMI160_OK) {
-    Serial.println("Init error");
+    Serial.println("BMI160: Init error");
     while (1);
   }
-
-  // Initialize the BMI160 interrupt 1
-  if (imu.setInt() != BMI160_OK) {
-    Serial.println("Interrupt error");
-    while (1);
-  }
-
-  // Everytime a pulse is received from the sensor, the AccelGyroISR() will set the dataReady to true, which will enable the code to be ran in the loop
-  attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), AccelGyroISR, RISING);
 
   for (int i = 0; i < 6; i++) {
-    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ); // Initialize the RCFilter fc = 5 Hz
+    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
+
+  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD);
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
-  gyroRateOffset = CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400);
+  ComplementaryFilter2D_Init(&CF2, COMP_FLTR_ALPHA);
 
+  if(barometer.calibratedAbsoluteDifference(70.0)){
+    Serial.println("BMP390: Absolute difference base value set successfully");
+  }
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), barometerInterrupt, CHANGE);
+  Serial.println("BMI160: Calibrating");
+  CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
 }
 
 // Section 3: Looping and realtime processing.
 
 void loop() {
-  T = (millis() - ST) / 1000;
-  ST = millis();
-  // Checking if there is data ready in the sensor
-  if (dataReady)
-  {
-    dataReady = false; // Reseting the dataReady flag
-    // Initialize sensor data arrays
-    memset(accelGyro, 0, sizeof(accelGyro));
-    memset(accelGyroData, 0, sizeof(accelGyroData));
+  T = (micros() - ST) / 1000000.0;
+  ST = micros();
+  // Read altitude from the Barometer
+  if(barometerFlag == 1){
+    barometerFlag = 0;
+    /* When data is ready and the interrupt is triggered, read altitude, unit: m */
+    altitude = barometer.readAltitudeM();
+    altitude = RCFilter_Update(&lpFRC[6], altitude); // Update the RCFilter
 
-    // Get both accel and gyro data from the BMI160
-    // Parameter accelGyro is the pointer to store the data
-    rslt = imu.getAccelGyroData(accelGyro);
   }
+  // Initialize sensor data arrays
+  memset(accelGyro, 0, sizeof(accelGyro));
+  memset(accelGyroData, 0, sizeof(accelGyroData));
+  // Get both accel and gyro data from the BMI160
+  // Parameter accelGyro is the pointer to store the data
+  IMUrslt = imu.getAccelGyroData(accelGyro);
   // if the data is succesfully extracted
-  if (rslt == 0) {
+  if (IMUrslt == 0) {
+    IMUrslt = 1;
     // Format and offset the accelerometer data
     offset(accelGyro, accelGyroData);
 
@@ -146,7 +194,7 @@ void loop() {
     }
 
     for (int i = 0; i < 6; i++) {
-      accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i], T); // Update the RCFilter ; Ts = 0.01 s
+      accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
     }
 
     /*
@@ -154,28 +202,22 @@ void loop() {
       to use both the accelerometer and the gyroscope to predict the
       euler angles (phi: roll, theta: pitch, psi: yaw)
     */
-    eulerAngles = ComplementaryFilter_Update(&CF, accelGyroData, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
-
-    Serial.print(accelGyroData[0]);Serial.print(", \t");
-    Serial.print(accelGyroData[1]);Serial.print(", \t");
-    Serial.print(accelGyroData[2]);Serial.print(", \t");
-    Serial.print(eulerAngles[0] * RAD2DEG);Serial.print(", \t");
-    Serial.print(eulerAngles[1] * RAD2DEG);Serial.print(", \t");
-    Serial.println();
+    ComplementaryFilter_Update(&CF, accelGyroData, eulerAngles, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
   }
   else
   {
-    Serial.print("!!! Data reading error !!!");
+    Serial.print("BMI160: Data reading error");
     Serial.println();
   }
-}
-
-// Section 4: Function declarations.
-
-// Accelerometer and Gyroscope interrupt service routine
-void AccelGyroISR() {
-  if(dataReady == false)
-  {
-    dataReady = true;
-  }
+  verticalVelocity = ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T);
+  Serial.print(accelGyroData[3]);Serial.print(", \t");
+  Serial.print(accelGyroData[4]);Serial.print(", \t");
+  Serial.print(accelGyroData[5]);Serial.print(", \t");
+  Serial.print(eulerAngles[0] * RAD2DEG);Serial.print(", \t");
+  Serial.print(eulerAngles[1] * RAD2DEG);Serial.print(", \t");
+  Serial.print(eulerAngles[2] * RAD2DEG);Serial.print(", \t");
+  Serial.print(T);Serial.print(", \t");
+  Serial.print(altitude);Serial.print(", \t");
+  Serial.print(verticalVelocity);Serial.println();
+  delay(50);
 }

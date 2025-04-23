@@ -17,6 +17,9 @@ typedef struct {
     // Altitude from the barometer
     float alt;
 
+    // vertical acceleration from the accelerometer
+    float accel[2];
+
     // Velocity from the accelerometer and from the barometer (in meters per seconds)
     float velocities[2];
 

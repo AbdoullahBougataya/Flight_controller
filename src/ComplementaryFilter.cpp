@@ -11,7 +11,7 @@ void ComplementaryFilter_Init(ComplementaryFilter* cf, float alpha)
     cf->eulerAngles[2] = 0.0f;
 }
 
-float *ComplementaryFilter_Update(ComplementaryFilter* cf, float* inp, float dt)
+void ComplementaryFilter_Update(ComplementaryFilter* cf, float* inp, float* euler, float dt)
 {
   // Set the sampling period
   cf->T = dt;
@@ -29,7 +29,9 @@ float *ComplementaryFilter_Update(ComplementaryFilter* cf, float* inp, float dt)
   cf->eulerAngles[0] = fminf(fmaxf(cf->alpha * phiHat_acc_rad + (1.0f - cf->alpha) * (cf->eulerAngles[0] + cf->T * inp[0]), -PI), PI);    // Roll estimate
   cf->eulerAngles[1] = fminf(fmaxf(cf->alpha * thetaHat_acc_rad + (1.0f - cf->alpha) * (cf->eulerAngles[1] + cf->T * inp[1]), -PI), PI);  // Pitch estimate
   cf->eulerAngles[2] = fminf(fmaxf(cf->eulerAngles[2] + cf->T * inp[2], -PI), PI);                                                        // Yaw estimate
-
-  return cf->eulerAngles;
+  for (int i = 0; i < 3; i++)
+  {
+    euler[i] = cf->eulerAngles[i];
+  }
 }
 

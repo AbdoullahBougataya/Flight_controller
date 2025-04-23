@@ -5,6 +5,6 @@
 #include <stdint.h>
 #include "BMI160.h"
 
-float *CalibrateGyroscope(int SC);
+void CalibrateGyroscope(int SC, float *offset);
 
 #endif

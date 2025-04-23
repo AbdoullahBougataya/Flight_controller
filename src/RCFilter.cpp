@@ -1,24 +1,18 @@
 #include "../include/RCFilter.h"
 
-void RCFilter_Init(RCFilter * filt, float cutoffFreqHz) {
-
+void RCFilter_Init(RCFilter *filt, float cutoffFreqHz, float sampleTime) {
     /* Compute equivalent 'RC' constant from cut-off frequency */
-    filt->RC = 1.0f / (2 * PI * cutoffFreqHz);
+    float RC = 1.0f / (2 * PI * cutoffFreqHz);
+    /* Pre-compute filter coefficients for first-order low-pass filter */
+    filt->coeff[0] = sampleTime / (sampleTime + RC);
+    filt->coeff[1] = RC / (sampleTime + RC);
 
-    /* Clear the outputs and coefficients */
+    /* Clear the outputs */
     filt->out[0] = 0.0f;
     filt->out[1] = 0.0f;
-    filt->coeff[0] = 0.0f;
-    filt->coeff[1] = 0.0f;
-
 }
 
-float RCFilter_Update(RCFilter * filt, float inp, float sampleTime) {
-
-    /* Compute filter coefficients for first-order low-pass filter */
-    filt->coeff[0] = sampleTime / (sampleTime + filt->RC);
-    filt->coeff[1] = filt->RC / (sampleTime + filt->RC);
-
+float RCFilter_Update(RCFilter * filt, float inp) {
     /* Shift output samples */
     filt->out[1] = filt->out[0];
 

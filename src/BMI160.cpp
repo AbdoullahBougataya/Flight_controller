@@ -684,6 +684,6 @@ void offset(int16_t* accelGyro, float* rawAccelGyro) {
   rawAccelGyro[1] = (accelGyro[1] / 16.4) * DPS2RPS;
   rawAccelGyro[2] = (accelGyro[2] / 16.4) * DPS2RPS;
   rawAccelGyro[3] = (accelGyro[3] / 16384.0) * G_MPS2;
-  rawAccelGyro[4] = ((accelGyro[4] / 16384.0) + BMI160_ACC_Y_OFFSET) * G_MPS2; // Offset added
+  rawAccelGyro[4] = (accelGyro[4] / 16384.0) * G_MPS2;
   rawAccelGyro[5] = (accelGyro[5] / 16384.0) * G_MPS2;
 }
