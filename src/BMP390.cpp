@@ -57,6 +57,30 @@ void BMP390::setPWRMode(uint8_t mode)
   }
 }
 
+void BMP390::setOSRMode(uint8_t mode)
+{
+  writeReg(BMP390_OSR, &mode, sizeof(mode));
+}
+
+bool BMP390::setODRMode(uint8_t mode)
+{
+  bool ret = true;
+
+  writeReg(BMP390_ODR, &mode, sizeof(mode));
+  uint32_t samplingPeriodus = getSamplingPeriodUS();   // Judge whether the ODR setting is resonable
+  if(0 == samplingPeriodus){
+    DBG("ODRSetting error!!!");
+    ret = false;
+  }
+
+  return ret;
+}
+
+void BMP390::setIIRMode(uint8_t mode)
+{
+  writeReg(BMP390_IIR_CONFIG, &mode, sizeof(mode));
+}
+
 /***************** Get and process data registers ******************************/
 
 uint32_t BMP390::getSamplingPeriodUS(void)

@@ -546,6 +546,53 @@ public:
    */
   void setPWRMode(uint8_t mode);
 
+  /**
+   * @fn setOSRMode
+   * @brief oversampling configuration of pressure and temperature measurement (OSR:over-sampling register)
+   * @param mode oversampling mode of pressure & temperature measurement to be set, the following patterns constitute mode:
+   * @n       6 pressure oversampling modes:
+   * @n         ePressOSRMode1,  pressure sampling×1, 16 bit / 2.64 Pa(recommended temperature oversampling×1)
+   * @n         ePressOSRMode2,  pressure sampling×2, 16 bit / 2.64 Pa(recommended temperature oversampling×1)
+   * @n         ePressOSRMode4,  pressure sampling×4, 18 bit / 0.66 Pa(recommended temperature oversampling×1)
+   * @n         ePressOSRMode8,  pressure sampling×8, 19 bit / 0.33 Pa(recommended temperature oversampling×2)
+   * @n         ePressOSRMode16,  pressure sampling×16, 20 bit / 0.17 Pa(recommended temperature oversampling×2)
+   * @n         ePressOSRMode32,  pressure sampling×32, 21 bit / 0.085 Pa(recommended temperature oversampling×2)
+   * @n       6 temperature oversampling modes
+   * @n         eTempOSRMode1,  temperature sampling×1, 16 bit / 0.0050 °C
+   * @n         eTempOSRMode2,  temperature sampling×2, 16 bit / 0.0025 °C
+   * @n         eTempOSRMode4,  temperature sampling×4, 18 bit / 0.0012 °C
+   * @n         eTempOSRMode8,  temperature sampling×8, 19 bit / 0.0006 °C
+   * @n         eTempOSRMode16,  temperature sampling×16, 20 bit / 0.0003 °C
+   * @n         eTempOSRMode32,  temperature sampling×32, 21 bit / 0.00015 °C
+   * @return None
+   */
+  void setOSRMode(uint8_t mode);
+
+  /**
+   * @fn setODRMode
+   * @brief set output data rate configuration in subdivision/sub-sampling mode (ODR:output data rates)
+   * @param mode output data rate to be set, configurable modes:
+   * @n       BMP390_ODR_200_HZ, BMP390_ODR_100_HZ, BMP390_ODR_50_HZ, BMP390_ODR_25_HZ, BMP390_ODR_12P5_HZ,
+   * @n       BMP390_ODR_6P25_HZ, BMP390_ODR_3P1_HZ, BMP390_ODR_1P5_HZ, BMP390_ODR_0P78_HZ, BMP390_ODR_0P39_HZ,
+   * @n       BMP390_ODR_0P2_HZ, BMP390_ODR_0P1_HZ, BMP390_ODR_0P05_HZ, BMP390_ODR_0P02_HZ, BMP390_ODR_0P01_HZ,
+   * @n       BMP390_ODR_0P006_HZ, BMP390_ODR_0P003_HZ, BMP390_ODR_0P0015_HZ
+   * @return boolean, indicates configuration results
+   * @retval True indicates configuration succeeds, successfully update the configuration
+   * @retval False indicates configuration fails and remains its original state
+   */
+  bool setODRMode(uint8_t mode);
+
+  /**
+   * @fn setIIRMode
+   * @brief IIR filter coefficient configuration (IIR filtering)
+   * @param mode IIR filter coefficient setting, configurable modes:
+   * @n       BMP390_IIR_CONFIG_COEF_0, BMP390_IIR_CONFIG_COEF_1, BMP390_IIR_CONFIG_COEF_3,
+   * @n       BMP390_IIR_CONFIG_COEF_7, BMP390_IIR_CONFIG_COEF_15, BMP390_IIR_CONFIG_COEF_31,
+   * @n       BMP390_IIR_CONFIG_COEF_63, BMP390_IIR_CONFIG_COEF_127
+   * @return None
+   */
+  void setIIRMode(uint8_t mode);
+
 /***************** data register acquisition and processing ******************************/
 
   /**
