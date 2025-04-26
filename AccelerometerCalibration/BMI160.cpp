@@ -1,4 +1,4 @@
-#include"../include/BMI160.h"
+#include"./BMI160.h"
 
 BMI160::BMI160()
 {

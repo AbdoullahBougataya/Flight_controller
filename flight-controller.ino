@@ -62,7 +62,7 @@ RCFilter lpFRC[7]; // Declaring the RC filter object
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ     10.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
-#define COMP_FLTR_ALPHA                   0.50000000000000000000f  // Complimentary filter coefficient
+#define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
 #define COMP_FLTR_2D_ALPHA                0.03000000000000000000f  // 2D Complimentary filter coefficient
 
 volatile uint8_t barometerFlag = 0;
@@ -210,6 +210,9 @@ void loop() {
     Serial.println();
   }
   verticalVelocity = ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T);
+  Serial.print(accelGyroData[0]);Serial.print(", \t");
+  Serial.print(accelGyroData[1]);Serial.print(", \t");
+  Serial.print(accelGyroData[2]);Serial.print(", \t");
   Serial.print(accelGyroData[3]);Serial.print(", \t");
   Serial.print(accelGyroData[4]);Serial.print(", \t");
   Serial.print(accelGyroData[5]);Serial.print(", \t");
@@ -219,5 +222,4 @@ void loop() {
   Serial.print(T);Serial.print(", \t");
   Serial.print(altitude);Serial.print(", \t");
   Serial.print(verticalVelocity);Serial.println();
-  delay(50);
 }
