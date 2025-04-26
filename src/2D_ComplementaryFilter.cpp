@@ -45,5 +45,5 @@ float ComplementaryFilter2D_Update(ComplementaryFilter2D* cf2, float* accel, flo
     //Perform sensor fusion
     cf2->velocity = cf2->alpha * cf2->velocities[1] + (1 - cf2->alpha) * cf2->velocities[0];
 
-    return cf2->accel[0];
+    return cf2->velocity;
 }
