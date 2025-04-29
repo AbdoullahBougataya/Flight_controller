@@ -64,6 +64,7 @@ RCFilter lpFRC[7]; // Declaring the RC filter object
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
 #define COMP_FLTR_2D_ALPHA                0.01000000000000000000f  // 2D Complimentary filter coefficient
+#define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
 
 volatile uint8_t barometerFlag = 0;
 
