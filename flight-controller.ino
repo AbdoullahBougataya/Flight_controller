@@ -165,7 +165,7 @@ void setup() {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
-  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_3HZ, SAMPLING_PERIOD);
+  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_3HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 3 Hz ; Ts = 0.01 s
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
