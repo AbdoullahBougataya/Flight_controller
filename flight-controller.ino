@@ -58,12 +58,12 @@ RCFilter lpFRC[7]; // Declaring the RC filter object
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
 #define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the Barometer
-#define RC_LOW_PASS_FLTR_CUTOFF_4HZ       4.00000000000000000000f  // The cutoff frequency for the RC low pass filter
+#define RC_LOW_PASS_FLTR_CUTOFF_3HZ       3.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ     10.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
-#define COMP_FLTR_2D_ALPHA                0.03000000000000000000f  // 2D Complimentary filter coefficient
+#define COMP_FLTR_2D_ALPHA                0.01000000000000000000f  // 2D Complimentary filter coefficient
 
 volatile uint8_t barometerFlag = 0;
 
@@ -111,6 +111,21 @@ void setup() {
     delay(3000);
   }
   Serial.println("BMP390: Begin ok");
+
+    /**
+   * 6 commonly used sampling modes that allows users to configure easily, mode:
+   *      eUltraLowPrecision, Ultra-low precision, suitable for monitoring weather (lowest power consumption), the power is mandatory mode.
+   *      eLowPrecision, Low precision, suitable for random detection, power is normal mode
+   *      eNormalPrecision1, Normal precision 1, suitable for dynamic detection on handheld devices (e.g on mobile phones), power is normal mode.
+   *      eNormalPrecision2, Normal precision 2, suitable for drones, power is normal mode.
+   *      eHighPrecision, High precision, suitable for low-power handled devices (e.g mobile phones), power is in normal mode.
+   *      eUltraPrecision, Ultra-high precision, suitable for indoor navigation, its acquisition rate will be extremely low, and the acquisition cycle is 1000 ms.
+   */
+  while (!barometer.setSamplingMode(barometer.eNormalPrecision2)) {
+    Serial.println("BMP390: Set sampling mode fail, retrying....");
+    delay(3000);
+  }
+
   /**
    * Interrupt configuration
    * mode The interrupt mode needs to set. The following modes add up to mode:
@@ -149,7 +164,7 @@ void setup() {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
-  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD);
+  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_3HZ, SAMPLING_PERIOD);
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
@@ -210,12 +225,6 @@ void loop() {
     Serial.println();
   }
   verticalVelocity = ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T);
-  Serial.print(accelGyroData[0]);Serial.print(", \t");
-  Serial.print(accelGyroData[1]);Serial.print(", \t");
-  Serial.print(accelGyroData[2]);Serial.print(", \t");
-  Serial.print(accelGyroData[3]);Serial.print(", \t");
-  Serial.print(accelGyroData[4]);Serial.print(", \t");
-  Serial.print(accelGyroData[5]);Serial.print(", \t");
   Serial.print(eulerAngles[0] * RAD2DEG);Serial.print(", \t");
   Serial.print(eulerAngles[1] * RAD2DEG);Serial.print(", \t");
   Serial.print(eulerAngles[2] * RAD2DEG);Serial.print(", \t");
