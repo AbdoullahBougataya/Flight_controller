@@ -593,6 +593,22 @@ public:
    */
   void setIIRMode(uint8_t mode);
 
+    /**
+   * @fn setSamplingMode
+   * @brief common sampling modes for users easy to configure
+   * @param mode:
+   * @n       eUltraLowPrecision, ultra-low precision, suitable for weather monitoring (minimum power consumption), power mode is enforcing mode
+   * @n       eLowPrecision, low precision, suitable for random detection, power mode is normal mode
+   * @n       eNormalPrecision1, normal accuracy 1, suitable for dynamic detection on handheld devices (such as mobile phones), power mode is normal mode
+   * @n       eNormalPrecision2, normal accuracy 2, suitable for drones, power mode is normal mode
+   * @n       eHighPrecision, high precision, suitable for low-power handheld devices (such as mobile phones), power mode is normal mode
+   * @n       eUltraPrecision, ultra high precision, suitable for indoor guide, the collection rate is very low and the collection period is 1000ms, power mode is normal mode
+   * @return boolean, indicates configuration results
+   * @retval True indicates configuration succeeds, successfully update the configuration
+   * @retval False indicates configuration fails and remains its original state
+   */
+  bool setSamplingMode(ePrecisionMode_t mode);
+
 /***************** data register acquisition and processing ******************************/
 
   /**

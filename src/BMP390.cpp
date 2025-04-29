@@ -81,6 +81,31 @@ void BMP390::setIIRMode(uint8_t mode)
   writeReg(BMP390_IIR_CONFIG, &mode, sizeof(mode));
 }
 
+#define CASE_SAMPLING_MODE(MODE, PWR, OSR, ODR, IIR)   case MODE:\
+                                                       setPWRMode(PWR);\
+                                                       setOSRMode(OSR);\
+                                                       setODRMode(ODR);\
+                                                       setIIRMode(IIR);\
+                                                       break;   // Simplify common mode configuration written macros
+bool BMP390::setSamplingMode(ePrecisionMode_t mode)
+{
+  bool ret = true;
+  switch (mode)
+  {
+    CASE_SAMPLING_MODE(eUltraLowPrecision, ePressEN | eTempEN | eForcedMode, ePressOSRMode1 | eTempOSRMode1, BMP390_ODR_0P01_HZ, BMP390_IIR_CONFIG_COEF_0)
+    CASE_SAMPLING_MODE(eLowPrecision, ePressEN | eTempEN | eNormalMode, ePressOSRMode2 | eTempOSRMode1, BMP390_ODR_100_HZ, BMP390_IIR_CONFIG_COEF_0)
+    CASE_SAMPLING_MODE(eNormalPrecision1, ePressEN | eTempEN | eNormalMode, ePressOSRMode4 | eTempOSRMode1, BMP390_ODR_50_HZ, BMP390_IIR_CONFIG_COEF_3)
+    CASE_SAMPLING_MODE(eNormalPrecision2, ePressEN | eTempEN | eNormalMode, ePressOSRMode8 | eTempOSRMode1, BMP390_ODR_50_HZ, BMP390_IIR_CONFIG_COEF_1)
+    CASE_SAMPLING_MODE(eHighPrecision, ePressEN | eTempEN | eNormalMode, ePressOSRMode8 | eTempOSRMode1, BMP390_ODR_12P5_HZ, BMP390_IIR_CONFIG_COEF_1)
+    CASE_SAMPLING_MODE(eUltraPrecision, ePressEN | eTempEN | eNormalMode, ePressOSRMode16 | eTempOSRMode2, BMP390_ODR_25_HZ, BMP390_IIR_CONFIG_COEF_3)
+    default:
+      DBG("samping mode error!");
+      ret = false;
+  }
+  delay(10);
+  return ret;
+}
+
 /***************** Get and process data registers ******************************/
 
 uint32_t BMP390::getSamplingPeriodUS(void)
