@@ -171,7 +171,7 @@ void setup() {
 
   ComplementaryFilter2D_Init(&CF2, COMP_FLTR_2D_ALPHA);
 
-  if (barometer.calibratedAbsoluteDifference(70.0)) {
+  if (barometer.calibratedAbsoluteDifference(ALTITUDE)) {
     Serial.println("BMP390: Absolute difference base value set successfully");
   }
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), barometerInterrupt, CHANGE); // Execute the ISR on interrupt level change
