@@ -49,7 +49,7 @@ ComplementaryFilter CF; // Declaring the Complementary filter object
 
 ComplementaryFilter2D CF2; // Declaring the 2D Complementary filter object
 
-RCFilter lpFRC[7]; // Declaring the RC filter object
+RCFilter lpFRC[7]; // Declaring the RC filter object (IMU + Barometer)
 
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
@@ -65,34 +65,32 @@ RCFilter lpFRC[7]; // Declaring the RC filter object
 #define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
 #define COMP_FLTR_2D_ALPHA                0.03000000000000000000f  // 2D Complimentary filter coefficient
 
-volatile uint8_t barometerFlag = 0;
+volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
-const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground
+const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
 
 uint8_t IMUrslt; // Define the result of the data extraction from the imu
 
 uint8_t Barslt; // Define the result of the data extraction from the barometer
 
-unsigned long ST = 0;
-float T;
+unsigned long ST = 0; // Start Time [us]
+float T;              // Measured Period [s]
 
-float gyroRateOffset[3] = { 0.0 };
+float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 
 // Define sensor data arrays
-int16_t accelGyro[6] = { 0 }; // Raw data from the sensor
+int16_t accelGyroData_int[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
 float altitude = 0.0; // Altitude from the barometer
 
 // Declare sensor fusion variables
 float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
-float verticalVelocity = 0.0; // The vertical velocity of the
+float verticalVelocity = 0.0; // The vertical velocity of the Quadcopter
 
 /* External interrupt flag */
 void barometerInterrupt()
 {
-  if(barometerFlag ==0){
-    barometerFlag = 1;
-  }
+  if(!barometerFlag) barometerFlag = 1;
 }
 
 // Section 2: Initialization & setup section.
@@ -102,12 +100,14 @@ void setup() {
   Serial.begin(SERIAL_BANDWIDTH_115200);
 
   // Begin the communication with the barometer
-  while( ERR_OK != (Barslt = barometer.begin()) ){
-    if(ERR_DATA_BUS == Barslt){
+  while ( ERR_OK != (Barslt = barometer.begin()) ){
+
+    if (ERR_DATA_BUS == Barslt) {
       Serial.println("BMP390: Data bus error");
-    }else if(ERR_IC_VERSION == Barslt){
+    } else if (ERR_IC_VERSION == Barslt) {
       Serial.println("BMP390: Chip versions do not match");
     }
+
     delay(3000);
   }
   Serial.println("BMP390: Begin ok");
@@ -149,16 +149,16 @@ void setup() {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
-  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD);
+  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 4 Hz ; Ts = 0.01 s
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
-  ComplementaryFilter2D_Init(&CF2, COMP_FLTR_ALPHA);
+  ComplementaryFilter2D_Init(&CF2, COMP_FLTR_2D_ALPHA);
 
-  if(barometer.calibratedAbsoluteDifference(70.0)){
+  if (barometer.calibratedAbsoluteDifference(70.0)) {
     Serial.println("BMP390: Absolute difference base value set successfully");
   }
-  attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), barometerInterrupt, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), barometerInterrupt, CHANGE); // Execute the ISR on interrupt level change
   Serial.println("BMI160: Calibrating");
   CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
 }
@@ -166,27 +166,31 @@ void setup() {
 // Section 3: Looping and realtime processing.
 
 void loop() {
+  // Dynamic Period
   T = (micros() - ST) / 1000000.0;
   ST = micros();
+
   // Read altitude from the Barometer
-  if(barometerFlag == 1){
-    barometerFlag = 0;
+  if (barometerFlag) {
+    barometerFlag = 0; // Clear the flag
     /* When data is ready and the interrupt is triggered, read altitude, unit: m */
     altitude = barometer.readAltitudeM();
     altitude = RCFilter_Update(&lpFRC[6], altitude); // Update the RCFilter
-
   }
+
   // Initialize sensor data arrays
-  memset(accelGyro, 0, sizeof(accelGyro));
+  memset(accelGyroData_int, 0, sizeof(accelGyroData_int));
   memset(accelGyroData, 0, sizeof(accelGyroData));
+
   // Get both accel and gyro data from the BMI160
   // Parameter accelGyro is the pointer to store the data
-  IMUrslt = imu.getAccelGyroData(accelGyro);
+  IMUrslt = imu.getAccelGyroData(accelGyroData_int);
+
   // if the data is succesfully extracted
   if (IMUrslt == 0) {
     IMUrslt = 1;
     // Format and offset the accelerometer data
-    offset(accelGyro, accelGyroData);
+    offset(accelGyroData_int, accelGyroData);
 
     // Substract the offsets from the Gyro readings
     for (byte i = 0; i < 3; i++) {
