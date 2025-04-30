@@ -58,7 +58,7 @@ RCFilter lpFRC[7]; // Declaring the RC filter object (IMU + Barometer)
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
 #define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the Barometer
-#define RC_LOW_PASS_FLTR_CUTOFF_3HZ       3.00000000000000000000f  // The cutoff frequency for the RC low pass filter
+#define RC_LOW_PASS_FLTR_CUTOFF_4HZ       4.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ     10.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
@@ -165,7 +165,7 @@ void setup() {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
-  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_3HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 3 Hz ; Ts = 0.01 s
+  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 4 Hz ; Ts = 0.01 s
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
