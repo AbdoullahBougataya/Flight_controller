@@ -49,7 +49,7 @@ ComplementaryFilter CF; // Declaring the Complementary filter object
 
 ComplementaryFilter2D CF2; // Declaring the 2D Complementary filter object
 
-RCFilter lpFRC[7]; // Declaring the RC filter object (IMU + Barometer)
+RCFilter lpFRC[8]; // Declaring the RC filter object (IMU + Barometer + Vertical velocity)
 
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
@@ -59,6 +59,7 @@ RCFilter lpFRC[7]; // Declaring the RC filter object (IMU + Barometer)
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
 #define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the Barometer
 #define RC_LOW_PASS_FLTR_CUTOFF_4HZ       4.00000000000000000000f  // The cutoff frequency for the RC low pass filter
+#define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define RC_LOW_PASS_FLTR_CUTOFF_10HZ     10.00000000000000000000f  // The cutoff frequency for the RC low pass filter
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
@@ -162,10 +163,11 @@ void setup() {
   }
 
   for (int i = 0; i < 6; i++) {
-    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_10HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
+    RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_5HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
 
   RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 4 Hz ; Ts = 0.01 s
+  RCFilter_Init(&lpFRC[7], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 4 Hz ; Ts = 0.01 s
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
@@ -230,10 +232,16 @@ void loop() {
     Serial.println();
   }
   verticalVelocity = ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T);
-  Serial.print(eulerAngles[0] * RAD2DEG);Serial.print(", \t");
-  Serial.print(eulerAngles[1] * RAD2DEG);Serial.print(", \t");
-  Serial.print(eulerAngles[2] * RAD2DEG);Serial.print(", \t");
+  verticalVelocity = RCFilter_Update(&lpFRC[7], verticalVelocity); // Update the RCFilter
+  Serial.print(accelGyroData[3] * RAD2DEG);Serial.print(", \t");
+  Serial.print(accelGyroData[4] * RAD2DEG);Serial.print(", \t");
+  Serial.print(accelGyroData[5] * RAD2DEG);Serial.print(", \t");
   Serial.print(T);Serial.print(", \t");
   Serial.print(altitude);Serial.print(", \t");
   Serial.print(verticalVelocity);Serial.println();
+
+  while ((micros() - ST) / 1000000.0 <= 0.01)
+  {
+    delay(1);
+  }
 }
