@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 * The ESP32 is a 32 bit processor that includes FP support; this code reflects that fact.
 */
 
-#include "../include/ESP32Servo.h"
+#include "ESP32Servo.h"
 #if defined(ARDUINO)
 	#include "Arduino.h"
 #endif
