@@ -89,7 +89,7 @@ int8_t BMI160::setSensConf()
 int8_t BMI160::setSensConf(struct bmi160Dev *dev)
 {
   int8_t rslt = BMI160_OK;
-  dev->accelCfg.odr = BMI160_ACCEL_ODR_100HZ;
+  dev->accelCfg.odr = BMI160_ACCEL_ODR_50HZ;
   dev->accelCfg.range = BMI160_ACCEL_RANGE_2G;
   dev->accelCfg.bw = BMI160_ACCEL_BW_OSR2_AVG2;
 

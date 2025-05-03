@@ -64,7 +64,7 @@ RCFilter lpFRC[8]; // Declaring the RC filter object (IMU + Barometer + Vertical
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
-#define COMP_FLTR_2D_ALPHA                0.01000000000000000000f  // 2D Complimentary filter coefficient
+#define COMP_FLTR_2D_ALPHA                0.50000000000000000000f  // 2D Complimentary filter coefficient
 #define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
 
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
@@ -123,10 +123,18 @@ void setup() {
    *      eHighPrecision, High precision, suitable for low-power handled devices (e.g mobile phones), power is in normal mode.
    *      eUltraPrecision, Ultra-high precision, suitable for indoor navigation, its acquisition rate will be extremely low, and the acquisition cycle is 1000 ms.
    */
-  while (!barometer.setSamplingMode(barometer.eNormalPrecision2)) {
+  while (!barometer.setSamplingMode(barometer.eHighPrecision)) {
     Serial.println("BMP390: Set sampling mode fail, retrying....");
     delay(3000);
   }
+
+  /* Set the internal IIR low pass filter:
+  * IIR filter coefficient configuration (IIR filtering) mode IIR filter coefficient setting, configurable modes:
+  *           BMP390_IIR_CONFIG_COEF_0, BMP390_IIR_CONFIG_COEF_1, BMP390_IIR_CONFIG_COEF_3,
+  *           BMP390_IIR_CONFIG_COEF_7, BMP390_IIR_CONFIG_COEF_15, BMP390_IIR_CONFIG_COEF_31,
+  *           BMP390_IIR_CONFIG_COEF_63, BMP390_IIR_CONFIG_COEF_127
+  */
+  barometer.setIIRMode(BMP390_IIR_CONFIG_COEF_31);
 
   /**
    * Interrupt configuration
@@ -162,20 +170,14 @@ void setup() {
     while (1);
   }
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 8; i++) {
     RCFilter_Init(&lpFRC[i], RC_LOW_PASS_FLTR_CUTOFF_5HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 5 Hz ; Ts = 0.01 s
   }
-
-  RCFilter_Init(&lpFRC[6], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 4 Hz ; Ts = 0.01 s
-  RCFilter_Init(&lpFRC[7], RC_LOW_PASS_FLTR_CUTOFF_4HZ, SAMPLING_PERIOD); // Initialize the RCFilter fc = 4 Hz ; Ts = 0.01 s
 
   ComplementaryFilter_Init(&CF, COMP_FLTR_ALPHA);
 
   ComplementaryFilter2D_Init(&CF2, COMP_FLTR_2D_ALPHA);
 
-  if (barometer.calibratedAbsoluteDifference(ALTITUDE)) {
-    Serial.println("BMP390: Absolute difference base value set successfully");
-  }
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), barometerInterrupt, CHANGE); // Execute the ISR on interrupt level change
   Serial.println("BMI160: Calibrating");
   CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
@@ -233,12 +235,12 @@ void loop() {
   }
   verticalVelocity = ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T);
   verticalVelocity = RCFilter_Update(&lpFRC[7], verticalVelocity); // Update the RCFilter
-  Serial.print(accelGyroData[3] * RAD2DEG);Serial.print(", \t");
-  Serial.print(accelGyroData[4] * RAD2DEG);Serial.print(", \t");
-  Serial.print(accelGyroData[5] * RAD2DEG);Serial.print(", \t");
+  Serial.print(accelGyroData[3]);Serial.print(", \t");
+  Serial.print(accelGyroData[4]);Serial.print(", \t");
+  Serial.print(accelGyroData[5]);Serial.print(", \t");
   Serial.print(T);Serial.print(", \t");
   Serial.print(altitude);Serial.print(", \t");
-  Serial.print(verticalVelocity);Serial.println();
+  Serial.print(verticalVelocity * 10.0);Serial.println();
 
   while ((micros() - ST) / 1000000.0 <= 0.01)
   {
