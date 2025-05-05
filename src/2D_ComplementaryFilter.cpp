@@ -25,7 +25,7 @@ float ComplementaryFilter2D_Update(ComplementaryFilter2D* cf2, float* accel, flo
     // Set the sampling period
     cf2->T = dt;
 
-    // Derivate the altitude and save the current altitude
+    // Derivate the altitude and save the current altitude [m]
     cf2->velocities[0] = (floor(10 * alt) / 10 - floor(10 * cf2->alt) / 10) / cf2->T;
     cf2->alt = floor(10 * alt) / 10;
 
