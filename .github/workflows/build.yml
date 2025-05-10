@@ -28,10 +28,14 @@ jobs:
 
     - name: Set up ESP-IDF
       run: |
-        git clone --recursive https://github.com/espressif/esp-idf.git esp-idf
-        cd esp-idf
-        ./install.sh
-        . ./export.sh
+        sudo apt-get update
+        sudo apt-get install -y python3-pip git wget flex bison gperf python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+        git clone --recursive https://github.com/espressif/esp-idf.git $HOME/esp-idf
+        $HOME/esp-idf/install.sh
+        echo "source $HOME/esp-idf/export.sh" >> $GITHUB_ENV
+
+    - name: Source ESP-IDF environment
+      run: source $HOME/esp-idf/export.sh
 
     - name: Build the project
       run: |
