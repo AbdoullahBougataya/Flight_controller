@@ -39,7 +39,7 @@ float ComplementaryFilter2D_Update(ComplementaryFilter2D* cf2, float* accel, flo
     cf2->accel[0] = - sintheta * accel[3]
         + (sinphi * costheta) * accel[4]
         + (cosphi * costheta) * accel[5] - G_MPS2;
-    cf2->velocities[1] = int(cf2->velocities[1]) / 10 + ((cf2->accel[1] + cf2->accel[0]) / 2.0f) * cf2->T;
+    cf2->velocities[1] = int(cf2->velocities[1]) + ((cf2->accel[1] + cf2->accel[0]) / 2.0f) * cf2->T;
     cf2->accel[1] = cf2->accel[0];
 
     //Perform sensor fusion

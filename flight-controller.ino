@@ -240,7 +240,7 @@ void loop() {
   Serial.print(accelGyroData[5]);Serial.print(", \t");
   Serial.print(T);Serial.print(", \t");
   Serial.print(altitude);Serial.print(", \t");
-  Serial.print(verticalVelocity * 10.0);Serial.println();
+  Serial.print(verticalVelocity);Serial.println();
 
   while ((micros() - ST) / 1000000.0 <= 0.01)
   {
