@@ -35,6 +35,7 @@ jobs:
         echo "source $HOME/esp-idf/export.sh" >> $GITHUB_ENV
 
     - name: Source ESP-IDF environment
+      shell: bash
       run: source $HOME/esp-idf/export.sh
 
     - name: Build the project
