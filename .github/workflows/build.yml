@@ -36,7 +36,7 @@ jobs:
 
     - name: Source ESP-IDF environment
       shell: bash
-      run: source $HOME/esp-idf/export.sh
+      run: . $HOME/esp-idf/export.sh
 
     - name: Build the project
       run: |
