@@ -133,9 +133,9 @@
 #define BMI160_GYRO_Y_OFFSET INT8_C(-4)
 #define BMI160_GYRO_Z_OFFSET INT8_C(-7)
 // Accelerometer offset
-#define BMI160_ACC_X_OFFSET    -0.15
+#define BMI160_ACC_X_OFFSET    -0.145
 #define BMI160_ACC_Y_OFFSET     0.63
-#define BMI160_ACC_Z_OFFSET    -0.29
+#define BMI160_ACC_Z_OFFSET    -0.30
 
 // (°/s) to (rad/s)
 #define DPS2RPS                 0.01745329251994329576f

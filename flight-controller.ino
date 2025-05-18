@@ -64,7 +64,7 @@ RCFilter lpFRC[8]; // Declaring the RC filter object (IMU + Barometer + Vertical
 #define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
 #define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
 #define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
-#define COMP_FLTR_2D_ALPHA                0.50000000000000000000f  // 2D Complimentary filter coefficient
+#define COMP_FLTR_2D_ALPHA                1.00000000000000000000f  // 2D Complimentary filter coefficient
 #define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
 
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
@@ -244,6 +244,6 @@ void loop() {
 
   while ((micros() - ST) / 1000000.0 <= 0.01)
   {
-    delay(1);
+    delay(0.5);
   }
 }
