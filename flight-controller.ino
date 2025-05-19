@@ -304,6 +304,10 @@ void loop() {
 
   // if the data is succesfully extracted
   if (IMUrslt == 0) {
+
+    // Turn on the GREEN LED light
+    neopixelWrite(LED_PIN, 0, LED_BRIGHTNESS, 0);
+
     IMUrslt = 1;
 
     // Format and offset the accelerometer data

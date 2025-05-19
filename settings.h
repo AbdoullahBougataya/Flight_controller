@@ -26,7 +26,7 @@
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
 #define CHANNEL_NUMBER                    6                        // The number of channels in use
-#define LED_BRIGHTNESS                  200                        // The brightness of the onboard LED
+#define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 /*=================================================================================================*/
 
 /*************************************************************************************************
