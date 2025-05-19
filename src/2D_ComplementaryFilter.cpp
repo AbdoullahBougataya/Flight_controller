@@ -26,8 +26,8 @@ float ComplementaryFilter2D_Update(ComplementaryFilter2D* cf2, float* accel, flo
     cf2->T = dt;
 
     // Derivate the altitude and save the current altitude [m]
-    cf2->velocities[0] = (floor(10 * alt) / 10 - floor(10 * cf2->alt) / 10) / cf2->T;
-    cf2->alt = floor(10 * alt) / 10;
+    cf2->velocities[0] = (int(alt) - cf2->alt) / cf2->T;
+    cf2->alt = int(alt);
 
     // Pre-compute the sines and cosines
     float cosphi = cosf(euler[0]); // cosine of the roll
@@ -36,10 +36,10 @@ float ComplementaryFilter2D_Update(ComplementaryFilter2D* cf2, float* accel, flo
     float costheta = cosf(euler[1]); // cosine of the pitch
 
     //Perform the trigonometry and integrate the acceleration
-    cf2->accel[0] = sintheta * accel[3]
+    cf2->accel[0] = (sintheta * accel[3]
          + (sinphi * costheta) * accel[4]
-         + (cosphi * costheta) * accel[5] - G_MPS2;
-    cf2->velocities[1] = (int(cf2->velocities[1]) / 10) * 10 + ((cf2->accel[1] + cf2->accel[0]) / 2.0f) * cf2->T;
+         + (cosphi * costheta) * accel[5] - G_MPS2) * G_MPS2;
+    cf2->velocities[1] = int(cf2->velocities[1]) + ((cf2->accel[1] + cf2->accel[0]) / 2.0f) * cf2->T;
     cf2->accel[1] = cf2->accel[0];
 
     //Perform sensor fusion

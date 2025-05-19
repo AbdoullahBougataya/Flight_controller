@@ -15,7 +15,7 @@ typedef struct {
     float T;
 
     // Altitude from the barometer
-    float alt;
+    int alt;
 
     // vertical acceleration from the accelerometer
     float accel[2];

@@ -10,13 +10,17 @@ void CalibrateGyroscope(int SC, float *GyroOffset)
     float gyroRateCumulativeOffset[3] = { 0.0 }; // Define a temporary variable to sum the offsets
     // Reset the BMI160 to erased any preprogrammed instructions
     if (imu.softReset() != BMI160_OK) {
-      Serial.println("Reset error");
+      // Turn on the RED LED light
+      neopixelWrite(LED_PIN, 200, 0, 0);
+      Serial.println("BMI160: Reset error");
       while (1);
     }
 
     // Initialize the BMI160 on I²C
     if (imu.Init(addr) != BMI160_OK) {
-      Serial.println("Init error");
+      // Turn on the RED LED light
+      neopixelWrite(LED_PIN, 200, 0, 0);
+      Serial.println("BMI160: Init error");
       while (1);
     }
     for (int i = 0; i < SC; i++) {
@@ -38,7 +42,9 @@ void CalibrateGyroscope(int SC, float *GyroOffset)
         }
         else
         {
-          Serial.print("!!! Data reading error !!!");
+          // Turn on the RED LED light
+          neopixelWrite(LED_PIN, 200, 0, 0);
+          Serial.print("BMI160: Data reading error");
           Serial.println();
         }
       }
