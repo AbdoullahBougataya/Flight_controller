@@ -54,23 +54,38 @@
  * ***********************************************************************************************
  */
 //////////////////ROLL & PITCH RATES PID///////////////////
-#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN        1
-#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN            0
-#define ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN          0
+#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN     1.0f
+#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN         0.0f
+#define ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN       0.0f
 ///////////////////////////////////////////////////////////
 /*-------------------------------------------------------*/
 //////////////////////YAW RATE PID/////////////////////////
-#define YAW_RATE_PROPORTIONAL_GAIN                        1
-#define YAW_RATE_INTEGRAL_GAIN                            0
-#define YAW_RATE_DERIVATIVE_GAIN                          0
+#define YAW_RATE_PROPORTIONAL_GAIN                     1.0f
+#define YAW_RATE_INTEGRAL_GAIN                         0.0f
+#define YAW_RATE_DERIVATIVE_GAIN                       0.0f
 ///////////////////////////////////////////////////////////
 /*-------------------------------------------------------*/
 //////////////////VERTICAL VELOCITY PID////////////////////
-#define VERTICAL_VELOCITY_PROPORTIONAL_GAIN               1
-#define VERTICAL_VELOCITY_INTEGRAL_GAIN                   0
-#define VERTICAL_VELOCITY_DERIVATIVE_GAIN                 0
+#define VERTICAL_VELOCITY_PROPORTIONAL_GAIN            1.0f
+#define VERTICAL_VELOCITY_INTEGRAL_GAIN                0.0f
+#define VERTICAL_VELOCITY_DERIVATIVE_GAIN              0.0f
 ///////////////////////////////////////////////////////////
 /*=======================================================*/
-#define ANGULAR_GAIN                                      1
+#define ANGULAR_GAIN                                   1.0f
+/*=======================================================*/
+//////////////////ROLL & PITCH CLAMPING////////////////////
+#define ROLL_AND_PITCH_MIN_LIMIT                       0.0f
+#define ROLL_AND_PITCH_MAX_LIMIT                    1000.0f
+///////////////////////////////////////////////////////////
+/*-------------------------------------------------------*/
+//////////////////////YAW CLAMPING/////////////////////////
+#define YAW_MIN_LIMIT                                  0.0f
+#define YAW_MAX_LIMIT                               1000.0f
+///////////////////////////////////////////////////////////
+/*-------------------------------------------------------*/
+///////////////VERTICAL VELOCITY CLAMPING//////////////////
+#define VERTICAL_V_MIN_LIMIT                           0.0f
+#define VERTICAL_V_MAX_LIMIT                        1000.0f
+///////////////////////////////////////////////////////////
 /*=======================================================*/
  /*=================================================================================================*/

@@ -124,12 +124,12 @@ void setup() {
   */
     for(int i = 0; i < 2; i++)
     {
-      pid[i].Kp     = ;
-      pid[i].Ki     = ;
-      pid[i].Kd     = ;
+      pid[i].Kp     = ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN;
+      pid[i].Ki     = ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN;
+      pid[i].Kd     = ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN;
       pid[i].tau    = 1.5f;
-      pid[i].limMin = ;
-      pid[i].limMax = ;
+      pid[i].limMin = ROLL_AND_PITCH_MIN_LIMIT;
+      pid[i].limMax = ROLL_AND_PITCH_MAX_LIMIT;
       PIDController_Init(&pid[i], SAMPLING_PERIOD);
     }
   /*
@@ -137,12 +137,12 @@ void setup() {
     ----------------- Yaw rates Controllers -----------------
     =========================================================
   */
-    pid[2].Kp     = ;
-    pid[2].Ki     = ;
-    pid[2].Kd     = ;
+    pid[2].Kp     = YAW_RATE_PROPORTIONAL_GAIN;
+    pid[2].Ki     = YAW_RATE_INTEGRAL_GAIN;
+    pid[2].Kd     = YAW_RATE_DERIVATIVE_GAIN;
     pid[2].tau    = 1.5f;
-    pid[2].limMin = ;
-    pid[2].limMax = ;
+    pid[2].limMin = YAW_MIN_LIMIT;
+    pid[2].limMax = YAW_MAX_LIMIT;
     PIDController_Init(&pid[2], SAMPLING_PERIOD);
   /* =================== Angle Controllers =================== */
   /*
@@ -152,7 +152,7 @@ void setup() {
   */
     for(int i = 3; i < 5; i++)
     {
-      pid[i].Kp     = ;
+      pid[i].Kp     = ANGULAR_GAIN;
       pid[i].Ki     =     0.0f;
       pid[i].Kd     =     0.0f;
       pid[i].tau    =     1.5f;
@@ -166,12 +166,12 @@ void setup() {
       ------------- Vertical velocity Controller --------------
       =========================================================
     */
-    pid[5].Kp     = ;
-    pid[5].Ki     = ;
-    pid[5].Kd     = ;
+    pid[5].Kp     = VERTICAL_VELOCITY_PROPORTIONAL_GAIN;
+    pid[5].Ki     = VERTICAL_VELOCITY_INTEGRAL_GAIN;
+    pid[5].Kd     = VERTICAL_VELOCITY_DERIVATIVE_GAIN;
     pid[5].tau    = 1.5f;
-    pid[5].limMin = ;
-    pid[5].limMax = ;
+    pid[5].limMin = VERTICAL_V_MIN_LIMIT;
+    pid[5].limMax = VERTICAL_V_MAX_LIMIT;
     PIDController_Init(&pid[5], SAMPLING_PERIOD);
 /*====================================================================================*/
 /**************************************************************************************/
@@ -339,7 +339,7 @@ void loop() {
   verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T));
 
   /*
-  ++++++++++++++++++++++++++++++++++++++ Control System ++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
   rollRateReference = PIDController_Update(&pid[3], remoteController[0], eulerAngles[0] * THOUSAND_OVER_PI + 500);
   pitchRateReference = PIDController_Update(&pid[4], remoteController[1], eulerAngles[1] * THOUSAND_OVER_PI + 500);
