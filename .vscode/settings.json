@@ -60,7 +60,8 @@
         "ostream": "cpp",
         "*.tcc": "cpp",
         "chrono": "cpp",
-        "istream": "cpp"
+        "istream": "cpp",
+        "numeric": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
