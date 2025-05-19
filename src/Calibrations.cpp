@@ -11,7 +11,7 @@ void CalibrateGyroscope(int SC, float *GyroOffset)
     // Reset the BMI160 to erased any preprogrammed instructions
     if (imu.softReset() != BMI160_OK) {
       // Turn on the RED LED light
-      neopixelWrite(LED_PIN, 200, 0, 0);
+      neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
       Serial.println("BMI160: Reset error");
       while (1);
     }
@@ -19,7 +19,7 @@ void CalibrateGyroscope(int SC, float *GyroOffset)
     // Initialize the BMI160 on I²C
     if (imu.Init(addr) != BMI160_OK) {
       // Turn on the RED LED light
-      neopixelWrite(LED_PIN, 200, 0, 0);
+      neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
       Serial.println("BMI160: Init error");
       while (1);
     }
@@ -43,7 +43,7 @@ void CalibrateGyroscope(int SC, float *GyroOffset)
         else
         {
           // Turn on the RED LED light
-          neopixelWrite(LED_PIN, 200, 0, 0);
+          neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
           Serial.print("BMI160: Data reading error");
           Serial.println();
         }

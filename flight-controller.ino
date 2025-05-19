@@ -37,9 +37,16 @@
  #include "./include/ComplementaryFilter.h"
  #include "./include/2D_ComplementaryFilter.h"
  #include "./include/Calibrations.h"
+ #include "./include/PID.h"
+ #include "./include/PPMDecoder.h"
+ #include "settings.h"
  #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
+
+PPMDecoder ppm(PPM_PIN, CHANNEL_NUMBER); // Declaring the PPM object that receives data from the RC
+
+PIDController pid[6]; // Declaring the PID objects ({Roll, Pitch, Yaw} rate controllers + {Roll, Pitch} angle controllers + Vertical velocity controller)
 
 BMI160 imu; // Declaring the imu object
 
@@ -49,25 +56,7 @@ ComplementaryFilter CF; // Declaring the Complementary filter object
 
 ComplementaryFilter2D CF2; // Declaring the 2D Complementary filter object
 
-RCFilter lpFRC[8]; // Declaring the RC filter object (IMU + Barometer + Vertical velocity)
-
-#define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
-#define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
-#define PI                                3.14159265358979323846f  // Pi
-#define SAMPLING_PERIOD                   0.01000000000000000000f  // Sampling period of the sensor in seconds
-#define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
-#define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
-#define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the Barometer
-#define LED_PIN                          38                        // The pin that commands the LED
-#define RC_LOW_PASS_FLTR_CUTOFF_4HZ       4.00000000000000000000f  // The cutoff frequency for the RC low pass filter
-#define RC_LOW_PASS_FLTR_CUTOFF_5HZ       5.00000000000000000000f  // The cutoff frequency for the RC low pass filter
-#define RC_LOW_PASS_FLTR_CUTOFF_7HZ       7.00000000000000000000f  // The cutoff frequency for the RC low pass filter
-#define RC_LOW_PASS_FLTR_CUTOFF_10HZ     10.00000000000000000000f  // The cutoff frequency for the RC low pass filter
-#define GYRO_CALIBRATION_SAMPLES_200    200                        // It takes 200 samples to calibrate the gyroscope
-#define GYRO_CALIBRATION_SAMPLES_400    400                        // It takes 400 samples to calibrate the gyroscope
-#define COMP_FLTR_ALPHA                   0.10000000000000000000f  // Complimentary filter coefficient
-#define COMP_FLTR_2D_ALPHA                0.75000000000000000000f  // 2D Complimentary filter coefficient
-#define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
+RCFilter lpFRC[8]; // Declaring the RC filter objects (IMU + Barometer + Vertical velocity)
 
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
@@ -82,6 +71,9 @@ float T;              // Measured Period [s]
 
 float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 
+// Define RC Command array
+int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC
+
 // Define sensor data arrays
 int16_t accelGyroData_int[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
@@ -90,6 +82,14 @@ float altitude = 0.0; // Altitude from the barometer
 // Declare sensor fusion variables
 float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
 float verticalVelocity = 0.0; // The vertical velocity of the Quadcopter
+
+// Control signals
+float rollControlSignal = 0.0f;
+float pitchControlSignal = 0.0f;
+float yawControlSignal = 0.0f;
+float verticalVelocityControlSignal = 0.0f;
+float rollRateReference = 0.0f;
+float pitchRateReference = 0.0f;
 
 /* External interrupt flag */
 void barometerInterrupt()
@@ -103,14 +103,84 @@ void setup() {
   // Initialize serial communication at 115200 bytes per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
 
-  // Turn on the GREEN LED light
-  neopixelWrite(LED_PIN, 0, 200, 0);
+  // Initialize PPM communication with the receiver
+  ppm.begin();
 
+  // Turn on the GREEN LED light
+  neopixelWrite(LED_PIN, 0, LED_BRIGHTNESS, 0);
+
+  /***********************************************************
+  ============================================================
+                  PID Controllers Section
+  ============================================================
+  ************************************************************
+  */
+
+  /* =================== Rate Controllers =================== */
+  /*
+    =========================================================
+    ------------ Roll & Pitch rates Controllers -------------
+    =========================================================
+  */
+    for(int i = 0; i < 2; i++)
+    {
+      pid[i].Kp     = ;
+      pid[i].Ki     = ;
+      pid[i].Kd     = ;
+      pid[i].tau    = 1.5f;
+      pid[i].limMin = ;
+      pid[i].limMax = ;
+      PIDController_Init(&pid[i], SAMPLING_PERIOD);
+    }
+  /*
+    =========================================================
+    ----------------- Yaw rates Controllers -----------------
+    =========================================================
+  */
+    pid[2].Kp     = ;
+    pid[2].Ki     = ;
+    pid[2].Kd     = ;
+    pid[2].tau    = 1.5f;
+    pid[2].limMin = ;
+    pid[2].limMax = ;
+    PIDController_Init(&pid[2], SAMPLING_PERIOD);
+  /* =================== Angle Controllers =================== */
+  /*
+    =========================================================
+    ------------ Roll & Pitch angle Controllers -------------
+    =========================================================
+  */
+    for(int i = 3; i < 5; i++)
+    {
+      pid[i].Kp     = ;
+      pid[i].Ki     =     0.0f;
+      pid[i].Kd     =     0.0f;
+      pid[i].tau    =     1.5f;
+      pid[i].limMin =     0.0f;
+      pid[i].limMax =  1000.0f;
+      PIDController_Init(&pid[i], SAMPLING_PERIOD);
+    }
+    /* =================== Vertical Controllers =================== */
+    /*
+      =========================================================
+      ------------- Vertical velocity Controller --------------
+      =========================================================
+    */
+    pid[5].Kp     = ;
+    pid[5].Ki     = ;
+    pid[5].Kd     = ;
+    pid[5].tau    = 1.5f;
+    pid[5].limMin = ;
+    pid[5].limMax = ;
+    PIDController_Init(&pid[5], SAMPLING_PERIOD);
+/*====================================================================================*/
+/**************************************************************************************/
+/*====================================================================================*/
   // Begin the communication with the barometer
   while ( ERR_OK != (Barslt = barometer.begin()) ) {
 
     // Turn on the RED LED light
-    neopixelWrite(LED_PIN, 200, 0, 0);
+    neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
 
     if (ERR_DATA_BUS == Barslt) {
       Serial.println("BMP390: Data bus error");
@@ -133,7 +203,7 @@ void setup() {
    */
   while (!barometer.setSamplingMode(barometer.eHighPrecision)) {
     // Turn on the RED LED light
-    neopixelWrite(LED_PIN, 200, 0, 0);
+    neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
     Serial.println("BMP390: Set sampling mode fail, retrying....");
     delay(3000);
   }
@@ -171,7 +241,7 @@ void setup() {
   // Reset the BMI160 to erased any preprogrammed instructions
   if (imu.softReset() != BMI160_OK) {
     // Turn on the RED LED light
-    neopixelWrite(LED_PIN, 200, 0, 0);
+    neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
     Serial.println("BMI160: Reset error");
     while (1);
   }
@@ -179,7 +249,7 @@ void setup() {
   // Initialize the BMI160 on I²C
   if (imu.Init(addr) != BMI160_OK) {
     // Turn on the RED LED light
-    neopixelWrite(LED_PIN, 200, 0, 0);
+    neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
     Serial.println("BMI160: Init error");
     while (1);
   }
@@ -208,6 +278,13 @@ void loop() {
   T = (micros() - ST) / 1000000.0;
   ST = micros();
 
+  // Receive the informations from the receiver
+  if (ppm.available()) {
+    for (int i = 0; i < CHANNEL_NUMBER; i++) {
+      remoteController[i] = fminf(fmaxf(ppm.getChannelValue(i) - 1000, 0), 1000); // Read channel values from the reciever
+    }
+  }
+
   // Read altitude from the Barometer
   if (barometerFlag) {
     barometerFlag = 0; // Clear the flag
@@ -215,6 +292,7 @@ void loop() {
     altitude = barometer.readAltitudeM();
     altitude = RCFilter_Update(&lpFRC[6], altitude); // Update the RCFilter
   }
+
 
   // Initialize sensor data arrays
   memset(accelGyroData_int, 0, sizeof(accelGyroData_int));
@@ -251,7 +329,7 @@ void loop() {
   else
   {
     // Turn on the RED LED light
-    neopixelWrite(LED_PIN, 200, 0, 0);
+    neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
     Serial.print("BMI160: Data reading error");
     Serial.println();
   }
@@ -259,6 +337,17 @@ void loop() {
       Takes the data from the IMU and the baromter and mix them using a ratio alpha and outputs the vertical velocity of the quadcopter.
   */
   verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T));
+
+  /*
+  ++++++++++++++++++++++++++++++++++++++ Control System ++++++++++++++++++++++++++++++++++++++
+  */
+  rollRateReference = PIDController_Update(&pid[3], remoteController[0], eulerAngles[0] * THOUSAND_OVER_PI + 500);
+  pitchRateReference = PIDController_Update(&pid[4], remoteController[1], eulerAngles[1] * THOUSAND_OVER_PI + 500);
+  rollControlSignal = PIDController_Update(&pid[0], rollRateReference, accelGyroData[0] * THOUSAND_OVER_PI + 500);
+  pitchControlSignal = PIDController_Update(&pid[1], pitchRateReference, accelGyroData[1] * THOUSAND_OVER_PI + 500);
+  verticalVelocityControlSignal = PIDController_Update(&pid[5], remoteController[2], verticalVelocity);
+  yawControlSignal = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
+ /*-------------------------------------------------------------------------------------------*/
 
   Serial.print(accelGyroData[3]);Serial.print(", \t");
   Serial.print(accelGyroData[4]);Serial.print(", \t");
