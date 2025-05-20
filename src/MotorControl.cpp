@@ -12,8 +12,9 @@ void Motor_Init(Motor* s, int pin, int min, int max, int frequency) {
 }
 
 void setMotorThrottle(Motor* s, int value) {
+    // Ensure that the motor throttle is between 0 and 1000
     value = fmin(fmax(value, 0), 1000);
-    
+
     // Set the throttle
     s->throttle = value + 1000;
 

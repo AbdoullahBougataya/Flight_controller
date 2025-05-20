@@ -9,8 +9,9 @@ typedef struct {
 } Motor;
 
 /**
+ * @fn Motor_Init
  * @brief Initializes a motor
- * 
+ *
  * @param s Pointer to the Motor structure
  * @param pin GPIO pin number connected to the ESC
  * @param min Minimum throttle value [us]
@@ -20,8 +21,9 @@ typedef struct {
  void Motor_Init(Motor* s, int pin, int min, int max, int frequency);
 
 /**
+ * @fn setMotorThrottle
  * @brief Sets the throttle value for the motor
- * 
+ *
  * @param s Pointer to the Motor structure
  * @param value Throttle value to set [0, 1000]
  */

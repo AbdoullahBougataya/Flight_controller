@@ -6,31 +6,6 @@
  * @date  2024-12-20
  * @url  https://github.com/AbdoullahBougataya/Flight_controller
  */
-/*
-  This code is partitioned into four sections:
-    * Constants & Global variables declarations. 📝
-    * Initialization & setup section. 📌
-    * Looping and realtime processing. 🔁
-    * Function declarations. ▶️
-           -------------------------------------------
-  Tasks:
-    To do 🎯:
-      1. Implement additional signal processing for PID control.
-      2. Implement the PID control algorithms.
-      3. Implement PWM signal generation algorithms.
-      4. Take instructions in real time from the RC controller.
-    In progress ⏳:
-      1. Perform sensor fusion
-    Done ✅:
-      1. Initialize the sensors.
-      2. Calibrate the gyroscope.
-      3. Filters the sensor data.
-           -------------------------------------------
-  The flight controller code was highly inspired from various source in the internet, most notably:
-    * Carbon aeronautics series on making a Quadcopter using Teensy (Arduino compatible).
-    * Phil's Lab series on DSP using STM32 (Included more advanced topics like the Filtering, EKF, Compilmentary...).
- */
-
 
  #include "./include/RCFilter.h"
  #include "./include/BMP390.h"
@@ -38,6 +13,7 @@
  #include "./include/2D_ComplementaryFilter.h"
  #include "./include/Calibrations.h"
  #include "./include/MotorControl.h"
+ #include "./include/MotorMixingAlgorithm.h"
  #include "./include/PID.h"
  #include "./include/PPMDecoder.h"
  #include "settings.h"
@@ -45,7 +21,7 @@
 
 // Section 1: Constants & Global variables declarations.
 
-Motor motor[4]; // Declaring the Motor object (clockwise starting from Left-Front)
+Motor motor[MTR_NUMBER]; // Declaring the Motor object (clockwise starting from Left-Front)
 
 PPMDecoder ppm(PPM_PIN, CHANNEL_NUMBER); // Declaring the PPM object that receives data from the RC
 
@@ -65,7 +41,7 @@ volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
 
-const int motorPins[4] = {LEFT_FRONT, RIGHT_FRONT, RIGHT_BACK, LEFT_BACK}; // Pins connected to the ESCs
+const int motorPins[MTR_NUMBER] = {LEFT_FRONT, RIGHT_FRONT, RIGHT_BACK, LEFT_BACK}; // Pins connected to the ESCs
 
 uint8_t IMUrslt; // Define the result of the data extraction from the imu
 
@@ -108,7 +84,7 @@ void setup() {
   Serial.begin(SERIAL_BANDWIDTH_115200);
 
   // Initialize the ESCs
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < MTR_NUMBER; i++) {
     Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50);
   }
   delay(5000);
@@ -363,11 +339,7 @@ void loop() {
   controlSignals[3]  = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
  /*-------------------------------------------------------------------------------------------*/
 
-  /*
-
-  void MMA(Motor *m, float controlSignals);
-
-  */
+  MMA(motor, remoteController, controlSignals, MTR_NUMBER);
 
   Serial.print(accelGyroData[3]);Serial.print(", \t");
   Serial.print(accelGyroData[4]);Serial.print(", \t");
