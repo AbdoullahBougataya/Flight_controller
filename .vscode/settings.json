@@ -61,7 +61,8 @@
         "*.tcc": "cpp",
         "chrono": "cpp",
         "istream": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "complex": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -91,11 +91,7 @@ float altitude = 0.0; // Altitude from the barometer
 float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
 float verticalVelocity = 0.0; // The vertical velocity of the Quadcopter
 
-// Control signals
-float rollControlSignal = 0.0f;
-float pitchControlSignal = 0.0f;
-float yawControlSignal = 0.0f;
-float verticalVelocityControlSignal = 0.0f;
+// Control references
 float rollRateReference = 0.0f;
 float pitchRateReference = 0.0f;
 
@@ -368,7 +364,7 @@ void loop() {
  /*-------------------------------------------------------------------------------------------*/
 
   /*
-  
+
   void MMA(Motor *m, float controlSignals);
 
   */

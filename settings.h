@@ -78,18 +78,18 @@
 #define ANGULAR_GAIN                                   1.0f
 /*=======================================================*/
 //////////////////ROLL & PITCH CLAMPING////////////////////
-#define ROLL_AND_PITCH_MIN_LIMIT                       0.0f
-#define ROLL_AND_PITCH_MAX_LIMIT                    1000.0f
+#define ROLL_AND_PITCH_MIN_LIMIT                    -500.0f
+#define ROLL_AND_PITCH_MAX_LIMIT                     500.0f
 ///////////////////////////////////////////////////////////
 /*-------------------------------------------------------*/
 //////////////////////YAW CLAMPING/////////////////////////
-#define YAW_MIN_LIMIT                                  0.0f
-#define YAW_MAX_LIMIT                               1000.0f
+#define YAW_MIN_LIMIT                               -500.0f
+#define YAW_MAX_LIMIT                                500.0f
 ///////////////////////////////////////////////////////////
 /*-------------------------------------------------------*/
 ///////////////VERTICAL VELOCITY CLAMPING//////////////////
-#define VERTICAL_V_MIN_LIMIT                           0.0f
-#define VERTICAL_V_MAX_LIMIT                        1000.0f
+#define VERTICAL_V_MIN_LIMIT                        -500.0f
+#define VERTICAL_V_MAX_LIMIT                         500.0f
 ///////////////////////////////////////////////////////////
 /*=======================================================*/
  /*=================================================================================================*/
