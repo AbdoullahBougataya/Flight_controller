@@ -37,12 +37,15 @@
  #include "./include/ComplementaryFilter.h"
  #include "./include/2D_ComplementaryFilter.h"
  #include "./include/Calibrations.h"
+ #include "./include/MotorControl.h"
  #include "./include/PID.h"
  #include "./include/PPMDecoder.h"
  #include "settings.h"
  #include <math.h>
 
 // Section 1: Constants & Global variables declarations.
+
+Motor motor[4]; // Declaring the Motor object (clockwise starting from Left-Front)
 
 PPMDecoder ppm(PPM_PIN, CHANNEL_NUMBER); // Declaring the PPM object that receives data from the RC
 
@@ -62,6 +65,8 @@ volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
 
+const int motorPins[4] = {LEFT_FRONT, RIGHT_FRONT, RIGHT_BACK, LEFT_BACK}; // Pins connected to the ESCs
+
 uint8_t IMUrslt; // Define the result of the data extraction from the imu
 
 uint8_t Barslt; // Define the result of the data extraction from the barometer
@@ -72,7 +77,10 @@ float T;              // Measured Period [s]
 float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 
 // Define RC Command array
-int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC
+int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC {Roll, Pitch, Thrust, Yaw}
+
+// Define Control Signals array
+float controlSignals[CHANNEL_NUMBER] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
 
 // Define sensor data arrays
 int16_t accelGyroData_int[6] = { 0 }; // Raw data from the sensor
@@ -102,6 +110,12 @@ void barometerInterrupt()
 void setup() {
   // Initialize serial communication at 115200 bytes per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
+
+  // Initialize the ESCs
+  for (int i = 0; i < 4; i++) {
+    Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50);
+  }
+  delay(5000);
 
   // Initialize PPM communication with the receiver
   ppm.begin();
@@ -345,13 +359,19 @@ void loop() {
   /*
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
-  rollRateReference = PIDController_Update(&pid[3], remoteController[0], eulerAngles[0] * THOUSAND_OVER_PI + 500);
-  pitchRateReference = PIDController_Update(&pid[4], remoteController[1], eulerAngles[1] * THOUSAND_OVER_PI + 500);
-  rollControlSignal = PIDController_Update(&pid[0], rollRateReference, accelGyroData[0] * THOUSAND_OVER_PI + 500);
-  pitchControlSignal = PIDController_Update(&pid[1], pitchRateReference, accelGyroData[1] * THOUSAND_OVER_PI + 500);
-  verticalVelocityControlSignal = PIDController_Update(&pid[5], remoteController[2], verticalVelocity);
-  yawControlSignal = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
+  rollRateReference  = PIDController_Update(&pid[3], remoteController[0],   eulerAngles[0] * THOUSAND_OVER_PI + 500);
+  pitchRateReference = PIDController_Update(&pid[4], remoteController[1],   eulerAngles[1] * THOUSAND_OVER_PI + 500);
+  controlSignals[0]  = PIDController_Update(&pid[0], rollRateReference,   accelGyroData[0] * THOUSAND_OVER_PI + 500);
+  controlSignals[1]  = PIDController_Update(&pid[1], pitchRateReference,  accelGyroData[1] * THOUSAND_OVER_PI + 500);
+  controlSignals[2]  = PIDController_Update(&pid[5], remoteController[2], verticalVelocity);
+  controlSignals[3]  = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
  /*-------------------------------------------------------------------------------------------*/
+
+  /*
+  
+  void MMA(Motor *m, float controlSignals);
+
+  */
 
   Serial.print(accelGyroData[3]);Serial.print(", \t");
   Serial.print(accelGyroData[4]);Serial.print(", \t");

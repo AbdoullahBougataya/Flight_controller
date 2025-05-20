@@ -16,6 +16,10 @@
 #define INTERRUPT_1_MCU_PIN              17                        // The pin that receives the interrupt 1 signal from the Barometer
 #define LED_PIN                          38                        // The pin that commands the LED
 #define PPM_PIN                          20                        // The reciever pin of the flight controller
+#define LEFT_FRONT                       14
+#define RIGHT_FRONT                       4
+#define RIGHT_BACK                        2
+#define LEFT_BACK                        19
 /*=================================================================================================*/
 
 /*************************************************************************************************
@@ -25,7 +29,7 @@
 #define SAMPLING_PERIOD                   0.01000000000000000000f  // Sampling period of the sensor in seconds
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
-#define CHANNEL_NUMBER                    6                        // The number of channels in use
+#define CHANNEL_NUMBER                    6                        // The number of RC channels
 #define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 /*=================================================================================================*/
 
