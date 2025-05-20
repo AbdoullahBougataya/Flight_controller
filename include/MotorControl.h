@@ -5,6 +5,7 @@
 
 typedef struct {
     Servo esc;
+    int throttle;
 } Motor;
 
 /**

@@ -9,14 +9,14 @@ void Motor_Init(Motor* s, int pin, int min, int max, int frequency) {
 
     // Reset ESC's throttle
     s->esc.write(0);
-
-    // Delay the initialization for ESC start up sequence
-    delay(5000);
 }
 
 void setMotorThrottle(Motor* s, int value) {
     value = fmin(fmax(value, 0), 1000);
+    
+    // Set the throttle
+    s->throttle = value + 1000;
 
     // Throttle the motor speed [0, 1000]
-    s->esc.write(value + 1000);
+    s->esc.write(s->throttle);
 }
