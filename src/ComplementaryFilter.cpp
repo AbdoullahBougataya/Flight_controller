@@ -17,7 +17,7 @@ void ComplementaryFilter_Update(ComplementaryFilter* cf, float* inp, float* eule
   cf->T = dt;
 
   // Using gravity to estimate the Euler angles
-  float phiHat_acc_rad = atanf(inp[4] / sqrt(pow(inp[5], 2) + sqrt(pow(inp[3], 2))));        // Roll estimate
+  float phiHat_acc_rad = atanf(inp[4] / sqrt(pow(inp[5], 2) + pow(inp[3], 2)));              // Roll estimate
   float thetaHat_acc_rad = asinf(fminf(fmaxf(inp[3] / G_MPS2, -1.0f), 1.0f));                // Pitch estimate
 
   // Using gyroscope to estimate the euler rates (Transforming body rates to euler rates)

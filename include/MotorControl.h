@@ -6,27 +6,27 @@
 typedef struct {
     Servo esc;
     int throttle;
+    int frequency;
 } Motor;
 
 /**
  * @fn Motor_Init
  * @brief Initializes a motor
  *
- * @param s Pointer to the Motor structure
+ * @param motor The motor object
  * @param pin GPIO pin number connected to the ESC
  * @param min Minimum throttle value [us]
  * @param max Maximum throttle value [us]
  * @param frequency PWM frequency of the ESC
  */
- void Motor_Init(Motor* s, int pin, int min, int max, int frequency);
+ void Motor_Init(Motor* motor, int pin, int min, int max, int frequency);
 
 /**
  * @fn setMotorThrottle
- * @brief Sets the throttle value for the motor
+ * @brief Throttles the motor
  *
- * @param s Pointer to the Motor structure
- * @param value Throttle value to set [0, 1000]
+ * @param motor The motor object
  */
- void setMotorThrottle(Motor* s, int value);
+ void setMotorThrottle(Motor* motor);
 
 #endif

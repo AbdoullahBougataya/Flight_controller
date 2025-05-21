@@ -83,12 +83,6 @@ void setup() {
   // Initialize serial communication at 115200 bytes per second:
   Serial.begin(SERIAL_BANDWIDTH_115200);
 
-  // Initialize the ESCs
-  for (int i = 0; i < MTR_NUMBER; i++) {
-    Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50);
-  }
-  delay(5000);
-
   // Initialize PPM communication with the receiver
   ppm.begin();
 
@@ -255,6 +249,12 @@ void setup() {
   // Calibrate the gyroscope
   Serial.println("BMI160: Calibrating");
   CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
+
+  // Initialize the ESCs
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
+  }
+  delay(5000);
 }
 
 // Section 3: Looping and realtime processing.
@@ -339,6 +339,7 @@ void loop() {
   controlSignals[3]  = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
  /*-------------------------------------------------------------------------------------------*/
 
+  // Command the individual motors using the Motor Mixing Algorithm
   MMA(motor, remoteController, controlSignals, MTR_NUMBER);
 
   Serial.print(accelGyroData[3]);Serial.print(", \t");

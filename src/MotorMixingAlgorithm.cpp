@@ -9,8 +9,8 @@ void MMA(Motor* motor, int* remoteController, float* controlSignals, int motor_c
     /*          |                                 |                           |                  |                     |                     |                       |                      |
                 V                                 V                           V                  V                     V                     V                       V                      V
       Throttle[left-forward] =                Throttle                        -                 Yaw                    +                   Pitch                     -                    Roll
-      Throttle[left-forward] =                Throttle                        +                 Yaw                    +                   Pitch                     +                    Roll
-      Throttle[left-forward] =                Throttle                        -                 Yaw                    -                   Pitch                     +                    Roll
-      Throttle[left-forward] =                Throttle                        +                 Yaw                    -                   Pitch                     -                    Roll
+      Throttle[right-forward] =               Throttle                        +                 Yaw                    +                   Pitch                     +                    Roll
+      Throttle[right-backward] =              Throttle                        -                 Yaw                    -                   Pitch                     +                    Roll
+      Throttle[left-backward] =               Throttle                        +                 Yaw                    -                   Pitch                     -                    Roll
     */
 }
