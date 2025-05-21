@@ -335,12 +335,17 @@ void loop() {
   pitchRateReference = PIDController_Update(&pid[4], remoteController[1],   eulerAngles[1] * THOUSAND_OVER_PI + 500);
   controlSignals[0]  = PIDController_Update(&pid[0], rollRateReference,   accelGyroData[0] * THOUSAND_OVER_PI + 500);
   controlSignals[1]  = PIDController_Update(&pid[1], pitchRateReference,  accelGyroData[1] * THOUSAND_OVER_PI + 500);
-  controlSignals[2]  = PIDController_Update(&pid[5], remoteController[2], verticalVelocity);
+  controlSignals[2]  = PIDController_Update(&pid[5], remoteController[2], verticalVelocity * 50               + 500);
   controlSignals[3]  = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
  /*-------------------------------------------------------------------------------------------*/
 
   // Command the individual motors using the Motor Mixing Algorithm
-  MMA(motor, remoteController, controlSignals, MTR_NUMBER);
+  MMA(motor, controlSignals, MTR_NUMBER, HOVERING_THROTTLE);
+
+  // Set the motor throttle
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    setMotorThrottle(&motor[i]);
+  }
 
   Serial.print(accelGyroData[3]);Serial.print(", \t");
   Serial.print(accelGyroData[4]);Serial.print(", \t");
@@ -350,8 +355,5 @@ void loop() {
   Serial.print(verticalVelocity);Serial.println();
 
   // Delay the loop until the period finishes
-  while ((micros() - ST) / 1000000.0 <= 0.01)
-  {
-    delay(0.5);
-  }
+  while ((micros() - ST) / 1000000.0 <= 0.01);
 }

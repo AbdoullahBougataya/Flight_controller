@@ -32,6 +32,7 @@
 #define CHANNEL_NUMBER                    6                        // The number of RC channels
 #define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 #define MTR_NUMBER                        4                        // The number of motors used in the quadcopter
+#define HOVERING_THROTTLE               500                        // The throttle that makes the drone hover
 /*=================================================================================================*/
 
 /*************************************************************************************************
