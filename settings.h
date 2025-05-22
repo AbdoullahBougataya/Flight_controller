@@ -5,7 +5,10 @@
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
 #define PI                                3.14159265358979323846f  // π
-#define THOUSAND_OVER_PI                318.30988618379067153776f  // 1000/π
+#define THOUSAND_OVER_PI                318.30988618379067153777f  // 1000/π
+#define THOUSAND_OVER_THIRTY             33.33333333333333333333f  // 1000/30
+#define THOUSAND_OVER_ELEVEN             90.90909090909090909091f  // 1000/11
+#define TRANSFORMATION_FACTOR           184.15494309189533576888f  // ((1000/π) + 50)/2
 #define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
 /*=================================================================================================*/
 

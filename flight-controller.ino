@@ -25,7 +25,7 @@ Motor motor[MTR_NUMBER]; // Declaring the Motor object (clockwise starting from 
 
 PPMDecoder ppm(PPM_PIN, CHANNEL_NUMBER); // Declaring the PPM object that receives data from the RC
 
-PIDController pid[6]; // Declaring the PID objects ({Roll, Pitch, Yaw} rate controllers + {Roll, Pitch} angle controllers + Vertical velocity controller)
+PIDController pid[4]; // Declaring the PID objects ({Roll, Pitch, Yaw} rate controllers + {Roll, Pitch} angle controllers + Vertical velocity controller)
 
 BMI160 imu; // Declaring the imu object
 
@@ -56,7 +56,7 @@ float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC {Roll, Pitch, Thrust, Yaw}
 
 // Define angular rate reference array
-float rateReference[2] = { 0.0 };
+float rateReference[4] = { 0.0 };
 
 // Define Control Signals array
 float controlSignals[CHANNEL_NUMBER] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
@@ -113,45 +113,29 @@ void setup() {
     }
   /*
     =========================================================
-    ----------------- Yaw rates Controllers -----------------
+    ------------------ Yaw rate Controllers -----------------
     =========================================================
   */
-    pid[2].Kp     = YAW_RATE_PROPORTIONAL_GAIN;
-    pid[2].Ki     = YAW_RATE_INTEGRAL_GAIN;
-    pid[2].Kd     = YAW_RATE_DERIVATIVE_GAIN;
-    pid[2].tau    = 1.5f;
-    pid[2].limMin = YAW_MIN_LIMIT;
-    pid[2].limMax = YAW_MAX_LIMIT;
-    PIDController_Init(&pid[2], SAMPLING_PERIOD);
-  /* =================== Angle Controllers =================== */
-  /*
-    =========================================================
-    ------------ Roll & Pitch angle Controllers -------------
-    =========================================================
-  */
-    for(int i = 3; i < 5; i++)
-    {
-      pid[i].Kp     = ANGULAR_GAIN;
-      pid[i].Ki     =     0.0f;
-      pid[i].Kd     =     0.0f;
-      pid[i].tau    =     1.5f;
-      pid[i].limMin =     0.0f;
-      pid[i].limMax =  1000.0f;
-      PIDController_Init(&pid[i], SAMPLING_PERIOD);
-    }
+    pid[3].Kp     = YAW_RATE_PROPORTIONAL_GAIN;
+    pid[3].Ki     = YAW_RATE_INTEGRAL_GAIN;
+    pid[3].Kd     = YAW_RATE_DERIVATIVE_GAIN;
+    pid[3].tau    = 1.5f;
+    pid[3].limMin = YAW_MIN_LIMIT;
+    pid[3].limMax = YAW_MAX_LIMIT;
+    PIDController_Init(&pid[3], SAMPLING_PERIOD);
     /* =================== Vertical Controllers =================== */
     /*
       =========================================================
       ------------- Vertical velocity Controller --------------
       =========================================================
     */
-    pid[5].Kp     = VERTICAL_VELOCITY_PROPORTIONAL_GAIN;
-    pid[5].Ki     = VERTICAL_VELOCITY_INTEGRAL_GAIN;
-    pid[5].Kd     = VERTICAL_VELOCITY_DERIVATIVE_GAIN;
-    pid[5].tau    = 1.5f;
-    pid[5].limMin = VERTICAL_V_MIN_LIMIT;
-    pid[5].limMax = VERTICAL_V_MAX_LIMIT;
-    PIDController_Init(&pid[5], SAMPLING_PERIOD);
+    pid[2].Kp     = VERTICAL_VELOCITY_PROPORTIONAL_GAIN;
+    pid[2].Ki     = VERTICAL_VELOCITY_INTEGRAL_GAIN;
+    pid[2].Kd     = VERTICAL_VELOCITY_DERIVATIVE_GAIN;
+    pid[2].tau    = 1.5f;
+    pid[2].limMin = VERTICAL_V_MIN_LIMIT;
+    pid[2].limMax = VERTICAL_V_MAX_LIMIT;
+    PIDController_Init(&pid[2], SAMPLING_PERIOD);
 /*====================================================================================*/
 /**************************************************************************************/
 /*====================================================================================*/
@@ -326,19 +310,21 @@ void loop() {
       Takes the data from the IMU and the baromter and mix them using a ratio alpha and outputs the vertical velocity of the quadcopter.
   */
   verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T));
+  accelGyroData[3] = accelGyroData[2];
+  accelGyroData[2] = verticalVelocity;
 
   /*
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
   // Angular control of the drone
-  for (int i = 0; i < 2; i++){
-    rateReference[i] = ANGULAR_GAIN * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - 500); // Multiplying the angular error with the angular gain to control the angle
-    rateReference[i] = fmin(fmax(rateReference[i], -500), 500); // Clamping the output
+  for (int i = 0; i < 4; i++){
+    rateReference[i] = (i < 2)?(ANGULAR_GAIN * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - 500)):remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
+    rateReference[i] = (i < 2)?fmin(fmax(rateReference[i], -500), 500):rateReference[i];                                               // Clamping the output
   }
-  controlSignals[0]  = PIDController_Update(&pid[0], rateReference[0],    accelGyroData[0] * THOUSAND_OVER_PI + 500);
-  controlSignals[1]  = PIDController_Update(&pid[1], rateReference[1],    accelGyroData[1] * THOUSAND_OVER_PI + 500);
-  controlSignals[2]  = PIDController_Update(&pid[5], remoteController[2], verticalVelocity * 50               + 500);
-  controlSignals[3]  = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
+  // Hey Abdurrahman don't freak out, I had too much time the day before the exam
+  for (int i = 0; i < 4; i++) {
+    controlSignals[i]  = PIDController_Update(&pid[i], rateReference[i], accelGyroData[i] * (1 - 2 * (floor((i + 2)/4)- floor((i + 1)/4)) * 62.1212121212121 - pow(-1, (i % 4)-2) * 70.454545454545 + pow(-1, floor(i/3)) * 41.66666666666667) + 500 * (i % 4)/2);
+  }
  /*-------------------------------------------------------------------------------------------*/
 
   // Command the individual motors using the Motor Mixing Algorithm
