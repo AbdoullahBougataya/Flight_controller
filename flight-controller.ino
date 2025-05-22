@@ -55,6 +55,9 @@ float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 // Define RC Command array
 int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC {Roll, Pitch, Thrust, Yaw}
 
+// Define angular rate reference array
+float rateReference[2] = { 0.0 };
+
 // Define Control Signals array
 float controlSignals[CHANNEL_NUMBER] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
 
@@ -66,10 +69,6 @@ float altitude = 0.0; // Altitude from the barometer
 // Declare sensor fusion variables
 float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
 float verticalVelocity = 0.0; // The vertical velocity of the Quadcopter
-
-// Control references
-float rollRateReference = 0.0f;
-float pitchRateReference = 0.0f;
 
 /* External interrupt flag */
 void barometerInterrupt()
@@ -331,10 +330,13 @@ void loop() {
   /*
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
-  rollRateReference  = PIDController_Update(&pid[3], remoteController[0],   eulerAngles[0] * THOUSAND_OVER_PI + 500);
-  pitchRateReference = PIDController_Update(&pid[4], remoteController[1],   eulerAngles[1] * THOUSAND_OVER_PI + 500);
-  controlSignals[0]  = PIDController_Update(&pid[0], rollRateReference,   accelGyroData[0] * THOUSAND_OVER_PI + 500);
-  controlSignals[1]  = PIDController_Update(&pid[1], pitchRateReference,  accelGyroData[1] * THOUSAND_OVER_PI + 500);
+  // Angular control of the drone
+  for (int i = 0; i < 2; i++){
+    rateReference[i] = ANGULAR_GAIN * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - 500); // Multiplying the angular error with the angular gain to control the angle
+    rateReference[i] = fmin(fmax(rateReference[i], -500), 500); // Clamping the output
+  }
+  controlSignals[0]  = PIDController_Update(&pid[0], rateReference[0],    accelGyroData[0] * THOUSAND_OVER_PI + 500);
+  controlSignals[1]  = PIDController_Update(&pid[1], rateReference[1],    accelGyroData[1] * THOUSAND_OVER_PI + 500);
   controlSignals[2]  = PIDController_Update(&pid[5], remoteController[2], verticalVelocity * 50               + 500);
   controlSignals[3]  = PIDController_Update(&pid[2], remoteController[3], accelGyroData[2] * THOUSAND_OVER_PI + 500);
  /*-------------------------------------------------------------------------------------------*/
