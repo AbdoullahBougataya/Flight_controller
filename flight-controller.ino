@@ -25,7 +25,7 @@ Motor motor[MTR_NUMBER]; // Declaring the Motor object (clockwise starting from 
 
 PPMDecoder ppm(PPM_PIN, CHANNEL_NUMBER); // Declaring the PPM object that receives data from the RC
 
-PIDController pid[4]; // Declaring the PID objects ({Roll, Pitch, Yaw} rate controllers + {Roll, Pitch} angle controllers + Vertical velocity controller)
+PIDController pid[DEGREES_OF_CONTROL]; // Declaring the PID objects ({Roll, Pitch, Yaw} rate controllers + {Roll, Pitch} angle controllers + Vertical velocity controller)
 
 BMI160 imu; // Declaring the imu object
 
@@ -56,7 +56,10 @@ float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC {Roll, Pitch, Thrust, Yaw}
 
 // Define angular rate reference array
-float rateReference[4] = { 0.0 };
+float rateReference[DEGREES_OF_CONTROL] = { 0.0 };
+
+// Define the feedback rate measurements array
+float rateMeasurement[DEGREES_OF_CONTROL] = { 0.0 };
 
 // Define Control Signals array
 float controlSignals[CHANNEL_NUMBER] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
@@ -310,20 +313,29 @@ void loop() {
       Takes the data from the IMU and the baromter and mix them using a ratio alpha and outputs the vertical velocity of the quadcopter.
   */
   verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T));
-  accelGyroData[3] = accelGyroData[2];
-  accelGyroData[2] = verticalVelocity;
+
+  // Mapping the measurements to the rateMeasurement array
+  /*
+    * Rearranging the measurements in the order [roll, pitch, vertical velocity, yaw]
+    * Mapping the measurements from open intervals to set intervals between -500 and 500 (except vertical velocity and yaw are from 0 to 1000)
+    */
+  for(int i = 0; i < DEGREES_OF_CONTROL - 2; i++)
+  {                             /* Go to definition for better explanation */
+    rateMeasurement[i] = accelGyroData[i] * THOUSAND_OVER_THIRTY;
+  }
+  rateMeasurement[2] = verticalVelocity * THOUSAND_OVER_TWENTY + HALF_INTERVAL;
+  rateMeasurement[3] = accelGyroData[2] * THOUSAND_OVER_ELEVEN + HALF_INTERVAL;
 
   /*
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
-  // Angular control of the drone
-  for (int i = 0; i < 4; i++){
-    rateReference[i] = (i < 2)?(ANGULAR_GAIN * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - 500)):remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
-    rateReference[i] = (i < 2)?fmin(fmax(rateReference[i], -500), 500):rateReference[i];                                               // Clamping the output
-  }
-  // Hey Abdurrahman don't freak out, I had too much time the day before the exam
-  for (int i = 0; i < 4; i++) {
-    controlSignals[i]  = PIDController_Update(&pid[i], rateReference[i], accelGyroData[i] * (1 - 2 * (floor((i + 2)/4)- floor((i + 1)/4)) * 62.1212121212121 - pow(-1, (i % 4)-2) * 70.454545454545 + pow(-1, floor(i/3)) * 41.66666666666667) + 500 * (i % 4)/2);
+ for (int i = 0; i < DEGREES_OF_CONTROL; i++) {
+    // Angular control of the drone
+    rateReference[i] = (i < 2)?(ANGULAR_GAIN * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)):remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
+    rateReference[i] = (i < 2)?fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL):rateReference[i];                                   // Clamping the output
+
+    // Updating the PID Controllers
+    controlSignals[i]  = PIDController_Update(&pid[i], rateReference[i], rateMeasurement[i]);
   }
  /*-------------------------------------------------------------------------------------------*/
 
@@ -335,6 +347,7 @@ void loop() {
     setMotorThrottle(&motor[i]);
   }
 
+  // Data logging
   Serial.print(accelGyroData[3]);Serial.print(", \t");
   Serial.print(accelGyroData[4]);Serial.print(", \t");
   Serial.print(accelGyroData[5]);Serial.print(", \t");

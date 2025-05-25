@@ -5,10 +5,11 @@
 #define RAD2DEG                          57.29577951308232087680f  // Radians to degrees (per second)
 #define G_MPS2                            9.81000000000000000000f  // Gravitational acceleration (g)
 #define PI                                3.14159265358979323846f  // π
-#define THOUSAND_OVER_PI                318.30988618379067153777f  // 1000/π
-#define THOUSAND_OVER_THIRTY             33.33333333333333333333f  // 1000/30
-#define THOUSAND_OVER_ELEVEN             90.90909090909090909091f  // 1000/11
-#define TRANSFORMATION_FACTOR           184.15494309189533576888f  // ((1000/π) + 50)/2
+#define THOUSAND_OVER_PI                318.30988618379067153777f  // 1000/π  | transformation factor from [-pi/2, pi/2] to [-500, 500] for roll and pitch angles in radians
+#define THOUSAND_OVER_THIRTY             33.33333333333333333333f  // 1000/30 | transformation factor from [-15, 15] to [-500, 500] for roll and pitch rates in rad/s
+#define THOUSAND_OVER_ELEVEN             90.90909090909090909091f  // 1000/11 | transformation factor from [-10.5, 10.5] to [-500, 500] for yaw rate in rad/s
+#define THOUSAND_OVER_TWENTY             50                        // 1000/20 | transformation factor from [-10.0, 10.0] to [-500, 500] for vertical rates in m/s
+#define HALF_INTERVAL                   500                        // Half of the control interval
 #define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
 /*=================================================================================================*/
 
@@ -35,6 +36,7 @@
 #define CHANNEL_NUMBER                    6                        // The number of RC channels
 #define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 #define MTR_NUMBER                        4                        // The number of motors used in the quadcopter
+#define DEGREES_OF_CONTROL                4                        // How many degrees of freedom are controlled
 #define HOVERING_THROTTLE               500                        // The throttle that makes the drone hover
 /*=================================================================================================*/
 
