@@ -344,13 +344,13 @@ void loop() {
 
   // Set the motor throttle
   for (int i = 0; i < MTR_NUMBER; i++) {
+    // Serial.print(motor[i].throttle);Serial.print(", \t");
     setMotorThrottle(&motor[i]);
   }
 
   // Data logging
-  Serial.print(accelGyroData[3]);Serial.print(", \t");
-  Serial.print(accelGyroData[4]);Serial.print(", \t");
-  Serial.print(accelGyroData[5]);Serial.print(", \t");
+  Serial.print(remoteController[0]);Serial.print(", \t");
+  Serial.print(remoteController[2]);Serial.print(", \t");
   Serial.print(T);Serial.print(", \t");
   Serial.print(altitude);Serial.print(", \t");
   Serial.print(verticalVelocity);Serial.println();

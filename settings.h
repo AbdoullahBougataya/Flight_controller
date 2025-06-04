@@ -37,7 +37,7 @@
 #define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 #define MTR_NUMBER                        4                        // The number of motors used in the quadcopter
 #define DEGREES_OF_CONTROL                4                        // How many degrees of freedom are controlled
-#define HOVERING_THROTTLE               500                        // The throttle that makes the drone hover
+#define HOVERING_THROTTLE               380                        // The throttle that makes the drone hover
 /*=================================================================================================*/
 
 /*************************************************************************************************
