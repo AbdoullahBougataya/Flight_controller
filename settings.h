@@ -9,6 +9,8 @@
 #define THOUSAND_OVER_THIRTY             33.33333333333333333333f  // 1000/30 | transformation factor from [-15, 15] to [-500, 500] for roll and pitch rates in rad/s
 #define THOUSAND_OVER_ELEVEN             90.90909090909090909091f  // 1000/11 | transformation factor from [-10.5, 10.5] to [-500, 500] for yaw rate in rad/s
 #define THOUSAND_OVER_TWENTY             50                        // 1000/20 | transformation factor from [-10.0, 10.0] to [-500, 500] for vertical rates in m/s
+#define FTHOUSAND                      1000.00000000000000000000f  // 1000.00
+#define FZERO                             0.00000000000000000000f  // 0.00 zero! wow
 #define HALF_INTERVAL                   500                        // Half of the control interval
 #define ALTITUDE                         70.00000000000000000000f  // Current altitude of the Quadcopter
 /*=================================================================================================*/
