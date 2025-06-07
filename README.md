@@ -1,12 +1,9 @@
 <div align='center'><img src='https://github.com/AbdoullahBougataya/Flight_controller/blob/main/img/Quadimg.jpg' alt="Quadcopter" width="400" height="400" style="display: block; margin: 0 auto"/></div>
 
-# Flight Controller
-
-[![ESP IDF Build](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml/badge.svg)](https://github.com/AbdoullahBougataya/Flight_controller/actions/workflows/main.yml)
-
 > [!TIP]
 > This codebase is only compatible with dual core ESP32s
 
+# Flight Controller
 ## Overview
 
 This repository is the software part of a DIY flight controller. It's for people who want to build their own flight controller. This project is based on what we've learned (and what we're still learning) as Control & Automation engineering students. **The software has features for flight stabilization, sensor integration, PID control, and signal processing**. Compatible with ESP32 based quadcopter drones.
