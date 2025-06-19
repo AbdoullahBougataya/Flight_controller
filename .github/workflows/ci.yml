@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: esp32-firmware-arduino-cli
-          path: build/esp32.esp32.esp32s3/Flight_controller.ino.bin # Adjust path based on your board and sketch name
+          path: ./build/esp32.esp32.esp32s3/Flight_controller.ino.bin # Adjust path based on your board and sketch name
           retention-days: 7
 
   # Optional: Release Job for OTA updates or binary artifacts
