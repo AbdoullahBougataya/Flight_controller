@@ -1,0 +1,92 @@
+name: ESP32 Arduino-CLI CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  build_and_validate:
+    runs-on: ubuntu-latest # Or your preferred runner OS
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        # You can download and install it directly or use a pre-built action if available.
+        # This approach downloads and installs it.
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          sudo mv bin/arduino-cli /usr/local/bin/arduino-cli
+          arduino-cli config init
+
+      - name: Add ESP32 Board Manager URL
+        run: arduino-cli config set board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+      - name: Update Core Indexes
+        run: arduino-cli core update-index
+
+      - name: Install ESP32 Board Core
+        run: arduino-cli core install esp32:esp32
+
+      - name: Install Libraries (if any)
+        # This step is crucial. You need to explicitly list your dependencies.
+        # Or, parse them from your sketch if you have many.
+        # For simple cases, list them here:
+        run: |
+          arduino-cli lib install "WiFi"
+          arduino-cli lib install "AsyncTCP"
+
+      - name: Arduino-CLI Compile Sketch
+        # Replace 'my_sketch' with the actual directory name of your .ino sketch
+        # Replace 'esp32:esp32:esp32doit-devkit-v1' with your specific ESP32 board FQBN
+        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 flight-controller
+
+      - name: Upload Compiled Binary as Artifact (Optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-firmware-arduino-cli
+          path: my_sketch/build/esp32.esp32.esp32s3/flight-controller.ino.bin # Adjust path based on your board and sketch name
+          retention-days: 7
+
+  # Optional: Release Job for OTA updates or binary artifacts
+  release_firmware:
+    needs: build_and_validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Compiled Firmware
+        uses: actions/download-artifact@v4
+        with:
+          name: esp32-firmware-arduino-cli
+
+      - name: Create GitHub Release (Optional)
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          body: |
+            Automated release from CI/CD using arduino-cli.
+            Firmware for ESP32.
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset (Optional)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: flight-controller.ino.bin # This should be the name of the downloaded artifact
+          asset_name: firmware-${{ github.run_number }}.bin
+          asset_content_type: application/octet-stream
