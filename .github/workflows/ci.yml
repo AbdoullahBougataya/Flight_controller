@@ -44,13 +44,13 @@ jobs:
       - name: Arduino-CLI Compile Sketch
         # Replace 'my_sketch' with the actual directory name of your .ino sketch
         # Replace 'esp32:esp32:esp32doit-devkit-v1' with your specific ESP32 board FQBN
-        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 ..
+        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 .
 
       - name: Upload Compiled Binary as Artifact (Optional)
         uses: actions/upload-artifact@v4
         with:
           name: esp32-firmware-arduino-cli
-          path: my_sketch/build/esp32.esp32.esp32s3/flight-controller.ino.bin # Adjust path based on your board and sketch name
+          path: build/esp32.esp32.esp32s3/Flight_controller.ino.bin # Adjust path based on your board and sketch name
           retention-days: 7
 
   # Optional: Release Job for OTA updates or binary artifacts
@@ -87,6 +87,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: flight-controller.ino.bin # This should be the name of the downloaded artifact
+          asset_path: Flight_controller.ino.bin # This should be the name of the downloaded artifact
           asset_name: firmware-${{ github.run_number }}.bin
           asset_content_type: application/octet-stream
