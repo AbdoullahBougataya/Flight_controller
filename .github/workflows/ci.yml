@@ -44,7 +44,7 @@ jobs:
       - name: Arduino-CLI Compile Sketch
         # Replace 'my_sketch' with the actual directory name of your .ino sketch
         # Replace 'esp32:esp32:esp32doit-devkit-v1' with your specific ESP32 board FQBN
-        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 .
+        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 . --build-path ./build/esp32.esp32.esp32s3/
 
       - name: Upload Compiled Binary as Artifact (Optional)
         uses: actions/upload-artifact@v4
