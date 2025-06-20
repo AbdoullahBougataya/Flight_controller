@@ -38,6 +38,8 @@ ComplementaryFilter2D CF2; // Declaring the 2D Complementary filter object
 
 RCFilter lpFRC[8]; // Declaring the RC filter objects (IMU + Barometer + Vertical velocity)
 
+EMAFilter 
+
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
