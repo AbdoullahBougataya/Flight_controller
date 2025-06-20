@@ -257,7 +257,7 @@ void loop() {
   // Receive the informations from the receiver
   if (ppm.available()) {
     for (int i = 0; i < CHANNEL_NUMBER; i++) {
-      remoteController[i] = (i < 4) fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : ppm.getChannelValue(i); // Read channel values from the reciever
+      remoteController[i] = (i < 4)? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&ppm.getChannelValue(i); // Read channel values from the reciever
     }
   }
 
