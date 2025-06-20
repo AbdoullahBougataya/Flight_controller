@@ -53,7 +53,7 @@ float T;              // Measured Period [s]
 float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 
 // Define RC Command array
-int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC {Roll, Pitch, Thrust, Yaw}
+unsigned int remoteController[CHANNEL_NUMBER] = { 0 }; // Data from the RC {Roll, Pitch, Thrust, Yaw}
 
 // Define angular rate reference array
 float rateReference[DEGREES_OF_CONTROL] = { 0.0 };
