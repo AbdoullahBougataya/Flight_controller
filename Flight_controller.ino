@@ -257,7 +257,7 @@ void loop() {
   // Receive the informations from the receiver
   if (ppm.available()) {
     for (int i = 0; i < CHANNEL_NUMBER; i++) {
-      remoteController[i] = (i < 4)? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
+      remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
     }
   }
 
@@ -353,11 +353,10 @@ void loop() {
       motor[i].throttle = 0;
     };
     setMotorThrottle(&motor[i]);
-    // Serial.print(motor[i].throttle);Serial.print(", \t");
   }
 
   // Data logging
-  Serial.print(remoteController[0]);Serial.print(", \t");
+  Serial.print(motor[0].throttle);Serial.print(", \t");
   Serial.print(remoteController[2]);Serial.print(", \t");
   Serial.print(T);Serial.print(", \t");
   Serial.print(altitude);Serial.print(", \t");
