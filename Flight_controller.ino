@@ -8,7 +8,7 @@
  */
 
  #include "./include/RCFilter.h"
- #include "./include/EMA.h"
+ #include "./include/AVR.h"
  #include "./include/BMP390.h"
  #include "./include/ComplementaryFilter.h"
  #include "./include/2D_ComplementaryFilter.h"
@@ -38,7 +38,7 @@ ComplementaryFilter2D CF2; // Declaring the 2D Complementary filter object
 
 RCFilter lpFRC[8]; // Declaring the RC filter objects (IMU + Barometer + Vertical velocity)
 
-EMAFilter 
+AVRFilter AVR[2]; // The averaging filter for the armed disarmed switch
 
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
@@ -257,7 +257,7 @@ void loop() {
   // Receive the informations from the receiver
   if (ppm.available()) {
     for (int i = 0; i < CHANNEL_NUMBER; i++) {
-      remoteController[i] = fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND); // Read channel values from the reciever
+      remoteController[i] = (i < 4) fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : ppm.getChannelValue(i); // Read channel values from the reciever
     }
   }
 
