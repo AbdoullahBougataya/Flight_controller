@@ -349,7 +349,7 @@ void loop() {
   // Set the motor throttle
   for (int i = 0; i < MTR_NUMBER; i++) {
     // If the quadcopter is disarmed, turn off the motors
-    if(remoteController[4] < 1600){
+    if(remoteController[4] >= 1500){
       motor[i].throttle = 0;
     };
     setMotorThrottle(&motor[i]);
