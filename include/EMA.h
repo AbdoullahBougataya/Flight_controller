@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void EMAFilter_Update(EMAFilter *filt, );
+void EMAFilter_Update(EMAFilter *filt, unsigned int );
 
 #endif
