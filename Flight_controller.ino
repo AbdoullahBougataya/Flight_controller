@@ -260,7 +260,6 @@ void loop() {
       remoteController[i] = (i < 4)? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
     }
   }
-  while (remoteController[4] < )
 
   // Read altitude from the Barometer
   if (barometerFlag) {
@@ -349,8 +348,12 @@ void loop() {
 
   // Set the motor throttle
   for (int i = 0; i < MTR_NUMBER; i++) {
-    // Serial.print(motor[i].throttle);Serial.print(", \t");
+    // If the quadcopter is disarmed don't actuate the 
+    if(remoteController[4] < 1600){
+      motor[i].throttle = 0;
+    };
     setMotorThrottle(&motor[i]);
+    // Serial.print(motor[i].throttle);Serial.print(", \t");
   }
 
   // Data logging
