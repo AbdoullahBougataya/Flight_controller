@@ -229,6 +229,7 @@ void setup() {
 
   // Initialize the 2D complementary filter
   ComplementaryFilter2D_Init(&CF2, COMP_FLTR_2D_ALPHA);
+
   // Setup the interrupt for the barometer
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_1_MCU_PIN), barometerInterrupt, CHANGE); // Execute the ISR on interrupt level change
 
