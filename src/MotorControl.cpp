@@ -16,9 +16,6 @@ void setMotorThrottle(Motor* motor) {
     // Ensure that the motor throttle is between 0 and 1000
     motor->throttle = fmin(fmax(motor->throttle, 0), 1000);
 
-    // Set the throttle
-    motor->throttle = motor->throttle + 1000;
-
     // Throttle the motor speed [0, 1000]
-    motor->esc.write(motor->throttle);
+    motor->esc.write(motor->throttle + 1000);
 }
