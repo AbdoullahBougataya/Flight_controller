@@ -260,6 +260,7 @@ void loop() {
       remoteController[i] = (i < 4)? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
     }
   }
+  while (remoteController[4] < )
 
   // Read altitude from the Barometer
   if (barometerFlag) {
