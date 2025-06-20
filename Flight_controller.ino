@@ -8,6 +8,7 @@
  */
 
  #include "./include/RCFilter.h"
+ #include "./include/EMA.h"
  #include "./include/BMP390.h"
  #include "./include/ComplementaryFilter.h"
  #include "./include/2D_ComplementaryFilter.h"
