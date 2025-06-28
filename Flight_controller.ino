@@ -41,8 +41,8 @@ BMP390_BAROMETER barometer(&Wire, barometer.eSDOVDD); // Declaring the Baromter 
 AsyncWebServer server(80); // Initiate the server
 
 // WiFi informations here:
-const char* ssid = "DESKTOP-KGO6TN27985";
-const char* password = "w7N925:2";
+const char* ssid = "WIFI NAME HERE";
+const char* password = "WIFI PASSWORD HERE";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
 
