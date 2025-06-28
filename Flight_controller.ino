@@ -108,11 +108,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <title>Dashboard</title>
 </head>
 <body>
-    <form class="box" id="my-form">
-        <h2>PID Gains</h2>
-        %INPUTFIELDS%
-        <input type="submit" value="Submit" onClick="updatePID()">
-    </form>
+    %BODY%
     <script>
     function updatePID() {
         var xhr = new XMLHttpRequest();
@@ -494,8 +490,9 @@ void notFound(AsyncWebServerRequest *request) {
 }
 
 String processor(const String& var) {
-    if(var == "INPUTFIELDS") {
+    if(var == "BODY") {
         String input_fields = "";
+        input_fields += "<form class=\"box\" id=\"my-form\"><h2>PID Gains</h2>";
         input_fields += "<div class=\"section\"><h3>Roll & Pitch rates PID gains</h3>";
         input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[0]) + "\"></div>";
         input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[0]) + "\"></div>";
@@ -510,6 +507,7 @@ String processor(const String& var) {
         input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[1]) + "\"></div></div>";
         input_fields += "<div class=\"section\"><h3>Angular gain</h3>";
         input_fields += "<div class=\"part\"><input name=\"AngularGain\" type=\"text\" placeholder=\"Angular gain\" maxlength=\"5\" value=\"" + String(AngularGain) + "\"></div></div>";
+        input_fields += "<input type=\"submit\" value=\"Submit\" onClick=\"updatePID()\"></form>";
         return input_fields;
     }
     return String();
