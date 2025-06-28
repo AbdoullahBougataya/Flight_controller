@@ -90,7 +90,7 @@ static const uint32_t PROGMEM correspondingSamplingPeriod[] = {
 class BMP390
 {
 public:
-#define ERR_OK             0   // No error
+#define BMP390_ERR_OK              0    // No error
 #define ERR_DATA_BUS      (-1)   // data bus error
 #define ERR_IC_VERSION    (-2)   // the chip version not match
 

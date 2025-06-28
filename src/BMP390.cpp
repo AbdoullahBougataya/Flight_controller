@@ -31,7 +31,7 @@ int BMP390::begin(void)
   // cacheSensorEvent();
   // cacheINTStatus();
   DBG("begin ok!");
-  return ERR_OK;
+  return BMP390_ERR_OK;
 }
 
 /*****************Integrated configuration of each register ******************************/
