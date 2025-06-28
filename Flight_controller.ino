@@ -1,5 +1,5 @@
 /*!
- * @file  flight-controller.ino
+ * @file  Flight_controller.ino
  * @brief  Runs the flight control code for our ESP32 based quadcopter
  * @author  [Abdellah Bougataya](sience.story@gmail.com)
  * @version  V1.0
@@ -7,6 +7,7 @@
  * @url  https://github.com/AbdoullahBougataya/Flight_controller
  */
 
+/*********************** Local resources ***********************/
  #include "./include/RCFilter.h"
  #include "./include/AVR.h"
  #include "./include/BMP390.h"
@@ -18,7 +19,12 @@
  #include "./include/PID.h"
  #include "./include/PPMDecoder.h"
  #include "settings.h"
+
+/*********************** External resources ***********************/
  #include <math.h>
+ #include <WiFi.h>
+ #include <AsyncTCP.h>
+ #include <ESPAsyncWebServer.h>
 
 // Section 1: Constants & Global variables declarations.
 
@@ -30,7 +36,13 @@ PIDController pid[DEGREES_OF_CONTROL]; // Declaring the PID objects ({Roll, Pitc
 
 BMI160 imu; // Declaring the imu object
 
-BMP390_BAROMETER barometer(&Wire, barometer.eSDOVDD);
+BMP390_BAROMETER barometer(&Wire, barometer.eSDOVDD); // Declaring the Baromter object
+
+AsyncWebServer server(80); // Initiate the server
+
+// WiFi informations here:
+const char* ssid = "DESKTOP-KGO6TN27985";
+const char* password = "w7N925:2";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
 
@@ -67,6 +79,12 @@ float rateMeasurement[DEGREES_OF_CONTROL] = { 0.0 };
 // Define Control Signals array
 float controlSignals[CHANNEL_NUMBER] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
 
+// Define Control Gains
+float Kp[3] = { ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN, YAW_RATE_PROPORTIONAL_GAIN, VERTICAL_VELOCITY_PROPORTIONAL_GAIN };
+float Ki[3] = { ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN, YAW_RATE_INTEGRAL_GAIN, VERTICAL_VELOCITY_INTEGRAL_GAIN };
+float Kd[3] = { ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN, YAW_RATE_DERIVATIVE_GAIN, VERTICAL_VELOCITY_DERIVATIVE_GAIN };
+float AngularGain = ANGULAR_GAIN;
+
 // Define sensor data arrays
 int16_t accelGyroData_int[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
@@ -82,6 +100,40 @@ void barometerInterrupt()
   if(!barometerFlag) barometerFlag = 1;
 }
 
+/* HTML Web page of the Dashboard */
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <form class="box" id="my-form">
+        <h2>PID Gains</h2>
+        %INPUTFIELDS%
+        <input type="submit" value="Submit" onClick="updatePID()">
+    </form>
+    <script>
+    function updatePID() {
+        var xhr = new XMLHttpRequest();
+        let arg = "?";
+        for (let i = 0; i < 3; i++) {
+            arg += "Kp" + i.toString() + "=" + document.getElementsByName("Kp")[i].value + "&" + "Ki" + i.toString() + "=" + document.getElementsByName("Ki")[i].value + "&" + "Kd" + i.toString() + "=" + document.getElementsByName("Kd")[i].value + "&";
+        }
+        arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
+        xhr.open("GET", "/update" + arg, true);
+        xhr.send();
+        window.location.replace("/");
+    }
+    </script>
+</body>
+</html>
+)rawliteral";
+
+void notFound(AsyncWebServerRequest *request); // not found server response
+
+String processor(const String& var); // input fields processor
+
 // Section 2: Initialization & setup section.
 
 void setup() {
@@ -90,6 +142,12 @@ void setup() {
 
   // Initialize PPM communication with the receiver
   ppm.begin();
+
+  // Set the WiFi mode
+  WiFi.mode(WIFI_STA);
+
+  //Begin the WiFi connection
+  WiFi.begin(ssid, password);
 
   // Turn on the GREEN LED light
   neopixelWrite(LED_PIN, 0, LED_BRIGHTNESS, 0);
@@ -109,9 +167,9 @@ void setup() {
   */
     for(int i = 0; i < 2; i++)
     {
-      pid[i].Kp     = ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN;
-      pid[i].Ki     = ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN;
-      pid[i].Kd     = ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN;
+      pid[i].Kp     = Kp[0];
+      pid[i].Ki     = Ki[0];
+      pid[i].Kd     = Kd[0];
       pid[i].tau    = 1.5f;
       pid[i].limMin = ROLL_AND_PITCH_MIN_LIMIT;
       pid[i].limMax = ROLL_AND_PITCH_MAX_LIMIT;
@@ -122,9 +180,9 @@ void setup() {
     ------------------ Yaw rate Controllers -----------------
     =========================================================
   */
-    pid[3].Kp     = YAW_RATE_PROPORTIONAL_GAIN;
-    pid[3].Ki     = YAW_RATE_INTEGRAL_GAIN;
-    pid[3].Kd     = YAW_RATE_DERIVATIVE_GAIN;
+    pid[3].Kp     = Kp[1];
+    pid[3].Ki     = Ki[1];
+    pid[3].Kd     = Kd[1];
     pid[3].tau    = 1.5f;
     pid[3].limMin = YAW_MIN_LIMIT;
     pid[3].limMax = YAW_MAX_LIMIT;
@@ -135,9 +193,9 @@ void setup() {
       ------------- Vertical velocity Controller --------------
       =========================================================
     */
-    pid[2].Kp     = VERTICAL_VELOCITY_PROPORTIONAL_GAIN;
-    pid[2].Ki     = VERTICAL_VELOCITY_INTEGRAL_GAIN;
-    pid[2].Kd     = VERTICAL_VELOCITY_DERIVATIVE_GAIN;
+    pid[2].Kp     = Kp[2];
+    pid[2].Ki     = Ki[2];
+    pid[2].Kd     = Kd[2];
     pid[2].tau    = 1.5f;
     pid[2].limMin = VERTICAL_V_MIN_LIMIT;
     pid[2].limMax = VERTICAL_V_MAX_LIMIT;
@@ -145,8 +203,59 @@ void setup() {
 /*====================================================================================*/
 /**************************************************************************************/
 /*====================================================================================*/
+  // Check if the Wifi connection is established
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("WiFi Failed!");
+    // Turn on the RED LED light
+    neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
+    return;
+  }
+  Serial.println();
+  Serial.print("Server: IP Address: ");
+  Serial.println(WiFi.localIP()); // Log the server IP
+
+  // Send the web page with input fields to client
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/html", index_html, processor);
+  });
+
+  // Send a GET request to <ESP_IP>/update?arg=<inputArguement>
+  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
+    for (int i = 0; i < 3; i++) {
+        // GET Kp values on <ESP_IP>/update?Kp=<inputArguement>
+        if (request->getParam("Kp" + String(i))->value() != "") {
+            Kp[i] = atof(&request->getParam("Kp" + String(i))->value().c_str()[0]);
+        } else {
+            Kp[i] = 0.0f;
+        }
+        // GET Ki values on <ESP_IP>/update?Ki=<inputArguement>
+        if (request->getParam("Ki" + String(i))->value() != "") {
+            Ki[i] = atof(&request->getParam("Ki" + String(i))->value().c_str()[0]);
+        } else {
+            Ki[i] = 0.0f;
+        }
+        // GET Kd values on <ESP_IP>/update?Kd=<inputArguement>
+        if (request->getParam("Kd" + String(i))->value() != "") {
+            Kd[i] = atof(&request->getParam("Kd" + String(i))->value().c_str()[0]);
+        } else {
+            Kd[i] = 0.0f;
+        }
+    }
+    // GET Angular gain value on <ESP_IP>/update?AngularGain=<inputArguement>
+    if (request->getParam("AngularGain")->value() != "") {
+        AngularGain = atof(&request->getParam("AngularGain")->value().c_str()[0]);
+    } else {
+        AngularGain = 0.0f;
+    }
+    request->send(200, "text/plain", "OK");
+    request->redirect("/");
+  });
+
+  server.onNotFound(notFound); // Check if the request is not found
+  server.begin(); // Begin the server
+
   // Begin the communication with the barometer
-  while ( ERR_OK != (Barslt = barometer.begin()) ) {
+  while ( BMP390_ERR_OK != (Barslt = barometer.begin()) ) {
 
     // Turn on the RED LED light
     neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
@@ -333,9 +442,23 @@ void loop() {
   /*
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
- for (int i = 0; i < DEGREES_OF_CONTROL; i++) {
+  // Update the PID gains
+  for(int i = 0; i < 2; i++)
+  {
+    pid[i].Kp = Kp[0];
+    pid[i].Ki = Ki[0];
+    pid[i].Kd = Kd[0];
+  }
+  pid[3].Kp = Kp[1];
+  pid[3].Ki = Ki[1];
+  pid[3].Kd = Kd[1];
+  pid[2].Kp = Kp[2];
+  pid[2].Ki = Ki[2];
+  pid[2].Kd = Kd[2];
+
+  for (int i = 0; i < DEGREES_OF_CONTROL; i++) {
     // Angular control of the drone
-    rateReference[i] = (i < 2)?(ANGULAR_GAIN * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)):remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
+    rateReference[i] = (i < 2)?(AngularGain * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)):remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
     rateReference[i] = (i < 2)?fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL):rateReference[i];                                   // Clamping the output
 
     // Updating the PID Controllers
@@ -364,4 +487,30 @@ void loop() {
 
   // Delay the loop until the period finishes
   while ((micros() - ST) / 1000000.0 <= 0.01);
+}
+
+void notFound(AsyncWebServerRequest *request) {
+  request->send(404, "text/plain", "Not found");
+}
+
+String processor(const String& var) {
+    if(var == "INPUTFIELDS") {
+        String input_fields = "";
+        input_fields += "<div class=\"section\"><h3>Roll & Pitch rates PID gains</h3>";
+        input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[0]) + "\"></div>";
+        input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[0]) + "\"></div>";
+        input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[0]) + "\"></div></div>";
+        input_fields += "<div class=\"section\"><h3>Yaw rate PID gains</h3>";
+        input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[2]) + "\"></div>";
+        input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[2]) + "\"></div>";
+        input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[2]) + "\"></div></div>";
+        input_fields += "<div class=\"section\"><h3>Vertical velocity PID gains</h3>";
+        input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[1]) + "\"></div>";
+        input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[1]) + "\"></div>";
+        input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[1]) + "\"></div></div>";
+        input_fields += "<div class=\"section\"><h3>Angular gain</h3>";
+        input_fields += "<div class=\"part\"><input name=\"AngularGain\" type=\"text\" placeholder=\"Angular gain\" maxlength=\"5\" value=\"" + String(AngularGain) + "\"></div></div>";
+        return input_fields;
+    }
+    return String();
 }
