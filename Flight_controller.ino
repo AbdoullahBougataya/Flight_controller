@@ -25,10 +25,13 @@
  #include <WiFi.h>
  #include <AsyncTCP.h>
  #include <ESPAsyncWebServer.h>
+ #include <Arduino_JSON.h>
 
 // Section 1: Constants & Global variables declarations.
 
 Motor motor[MTR_NUMBER]; // Declaring the Motor object (clockwise starting from Left-Front)
+
+String motors[MTR_NUMBER] = {"left_front", "right_front", "right_back", "left_back"};
 
 PPMDecoder ppm(PPM_PIN, CHANNEL_NUMBER); // Declaring the PPM object that receives data from the RC
 
@@ -40,9 +43,11 @@ BMP390_BAROMETER barometer(&Wire, barometer.eSDOVDD); // Declaring the Baromter 
 
 AsyncWebServer server(80); // Initiate the server
 
+AsyncEventSource events("/events"); // Initiate the events source
+
 // WiFi informations here:
-const char* ssid = "WIFI NAME HERE";
-const char* password = "WIFI PASSWORD HERE";
+const char* ssid = "DESKTOP-KGO6TN27985";
+const char* password = "11111111";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
 
@@ -58,12 +63,136 @@ const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
 
 const int motorPins[MTR_NUMBER] = {LEFT_FRONT, RIGHT_FRONT, RIGHT_BACK, LEFT_BACK}; // Pins connected to the ESCs
 
+/* HTML Web page of the Dashboard */
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+    <title>Dashboard</title>
+</head>
+<body>
+    %BODY%
+    <span id="id"></span>
+    <div id='motor_throttles_left_front'></div>
+    <div id='motor_throttles_right_front'></div>
+    <div id='motor_throttles_right_back'></div>
+    <div id='motor_throttles_left_back'></div>
+    <h2>Pitch Angle</h2>
+    <h1 id='pitch_angle'></h1>
+    <h2>Roll Angle</h2>
+    <h1 id='roll_angle'></h1>
+    <script>
+    function updatePID() {
+        var xhr = new XMLHttpRequest();
+        let arg = "?";
+        for (let i = 0; i < 3; i++) {
+            arg += "Kp" + i.toString() + "=" + document.getElementsByName("Kp")[i].value + "&" + "Ki" + i.toString() + "=" + document.getElementsByName("Ki")[i].value + "&" + "Kd" + i.toString() + "=" + document.getElementsByName("Kd")[i].value + "&";
+        }
+        arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
+        xhr.open("GET", "/update" + arg, true);
+        xhr.send();
+        window.location.replace("/");
+    }
+        if (!!window.EventSource) {
+
+                var source = new EventSource('/events');
+
+                source.addEventListener('open', function(e) {
+                    console.log("Events Connected");
+                }, false);
+                source.addEventListener('error', function(e) {
+                    if (e.target.readyState != EventSource.OPEN) {
+                    console.log("Events Disconnected");
+                    }
+                }, false);
+
+                source.addEventListener('message', function(e) {
+                    console.log("message", e.data);
+                }, false);
+
+                source.addEventListener('data', function(e) {
+                    var obj = JSON.parse(e.data);
+                    document.getElementById("id").innerHTML = obj.id;
+                    document.getElementById("roll_angle").innerHTML = (obj.angles.x * 57.3).toFixed(2).toString() + " °";
+                    document.getElementById("pitch_angle").innerHTML = (obj.angles.y * 57.3).toFixed(2).toString() + " °";
+                    var motor_throttles_left_front = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.left_front.toFixed(),
+                                    title: { text: "Motor Front Left" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    var layout = { width: 450, height: 337, margin: { t: 0, b: 0 } };
+                    Plotly.newPlot('motor_throttles_left_front', motor_throttles_left_front, layout);
+                    var motor_throttles_right_front = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.right_front.toFixed(),
+                                    title: { text: "Motor Front Right" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    Plotly.newPlot('motor_throttles_right_front', motor_throttles_right_front, layout);
+                    var motor_throttles_right_back = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.right_front.toFixed(),
+                                    title: { text: "Motor Back Right" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    Plotly.newPlot('motor_throttles_right_back', motor_throttles_right_back, layout);
+                    var motor_throttles_left_back = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.left_front.toFixed(),
+                                    title: { text: "Motor Back Left" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    Plotly.newPlot('motor_throttles_left_back', motor_throttles_left_back, layout);
+
+                }, false);
+            }
+    </script>
+</body>
+</html>
+)rawliteral";
+
+static const unsigned long event_period = 200; // The period it takes for the Dashboard to be updated in milliseconds
+static unsigned long lastEventTime = 0; // The last event time time
+
 uint8_t IMUrslt; // Define the result of the data extraction from the imu
 
 uint8_t Barslt; // Define the result of the data extraction from the barometer
 
-unsigned long ST = 0; // Start Time [us]
-float T;              // Measured Period [s]
+JSONVar JSONdata; // Data to be logged to the user interface in JSON format
+
+unsigned long ST = 0;  // Start Time [us]
+float T;               // Measured Period [s]
+unsigned long cnt = 0; // Events counter
 
 float gyroRateOffset[3] = { 0.0 }; // Offset of the Gyroscope
 
@@ -89,6 +218,7 @@ float AngularGain = ANGULAR_GAIN;
 int16_t accelGyroData_int[6] = { 0 }; // Raw data from the sensor
 float accelGyroData[6] = { 0.0 }; // Data that is going to be processed
 float altitude = 0.0; // Altitude from the barometer
+String dimensions[3] = {"x", "y", "z"}; // The X Y Z dimensions
 
 // Declare sensor fusion variables
 float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
@@ -99,32 +229,6 @@ void barometerInterrupt()
 {
   if(!barometerFlag) barometerFlag = 1;
 }
-
-/* HTML Web page of the Dashboard */
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html><html lang="en">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-<body>
-    %BODY%
-    <script>
-    function updatePID() {
-        var xhr = new XMLHttpRequest();
-        let arg = "?";
-        for (let i = 0; i < 3; i++) {
-            arg += "Kp" + i.toString() + "=" + document.getElementsByName("Kp")[i].value + "&" + "Ki" + i.toString() + "=" + document.getElementsByName("Ki")[i].value + "&" + "Kd" + i.toString() + "=" + document.getElementsByName("Kd")[i].value + "&";
-        }
-        arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
-        xhr.open("GET", "/update" + arg, true);
-        xhr.send();
-        window.location.replace("/");
-    }
-    </script>
-</body>
-</html>
-)rawliteral";
 
 void notFound(AsyncWebServerRequest *request); // not found server response
 
@@ -139,7 +243,7 @@ void setup() {
   // Initialize PPM communication with the receiver
   ppm.begin();
 
-  // Set the WiFi mode
+  // Set the device as a Station and Soft Access Point simultaneously
   WiFi.mode(WIFI_STA);
 
   //Begin the WiFi connection
@@ -200,11 +304,11 @@ void setup() {
 /**************************************************************************************/
 /*====================================================================================*/
   // Check if the Wifi connection is established
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    delay(1000);
     Serial.println("WiFi Failed!");
     // Turn on the RED LED light
     neopixelWrite(LED_PIN, LED_BRIGHTNESS, 0, 0);
-    return;
   }
   Serial.println();
   Serial.print("Server: IP Address: ");
@@ -247,6 +351,13 @@ void setup() {
     request->redirect("/");
   });
 
+  events.onConnect([](AsyncEventSourceClient *client){
+    // send event with message "hello!", id current millis
+    // and set reconnect delay to 1 second
+    client->send("hello!", NULL, millis(), 10000);
+  });
+
+  server.addHandler(&events); // Add an event handler
   server.onNotFound(notFound); // Check if the request is not found
   server.begin(); // Begin the server
 
@@ -350,6 +461,7 @@ void setup() {
     Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
   }
   delay(5000);
+  lastEventTime = millis();
 }
 
 // Section 3: Looping and realtime processing.
@@ -359,10 +471,15 @@ void loop() {
   T = (micros() - ST) / 1000000.0;
   ST = micros();
 
+  // Receive the current sample ID
+  JSONdata["id"] = String(cnt);
+
   // Receive the informations from the receiver
   if (ppm.available()) {
     for (int i = 0; i < CHANNEL_NUMBER; i++) {
       remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
+      // Receive the RC command in the dashboard
+      JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
     }
   }
 
@@ -374,6 +491,8 @@ void loop() {
     altitude = RCFilter_Update(&lpFRC[6], altitude); // Update the RCFilter
   }
 
+  // Receive the current altitude in the dashboard
+  JSONdata["altitude"] = altitude;
 
   // Initialize sensor data arrays
   memset(accelGyroData_int, 0, sizeof(accelGyroData_int));
@@ -384,7 +503,7 @@ void loop() {
   IMUrslt = imu.getAccelGyroData(accelGyroData_int);
 
   // if the data is succesfully extracted
-  if (IMUrslt == 0) {
+  if (!IMUrslt) {
 
     // Turn on the GREEN LED light
     neopixelWrite(LED_PIN, 0, LED_BRIGHTNESS, 0);
@@ -402,14 +521,28 @@ void loop() {
     // Initialize the RC low pass filters
     for (int i = 0; i < 6; i++) {
       accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+      // Receive the current acceleromter and gyroscope data in the dashboard
+      if (i > 2)
+      {
+        JSONdata["accelerometer_raw"][dimensions[i - 3]] = accelGyroData[i];
+      }
+      else
+      {
+        JSONdata["gyroscope_raw"][dimensions[i]] = accelGyroData[i];
+      }
     }
-
     /*
       A complimentary filter is a premitive technique of sensor fusion
       to use both the accelerometer and the gyroscope to predict the
       euler angles (phi: roll, theta: pitch, psi: yaw)
     */
     ComplementaryFilter_Update(&CF, accelGyroData, eulerAngles, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+
+    // Receive the current angles in the dashboard
+    for (int i = 0; i < 3; i++)
+    {
+      JSONdata["angles"][dimensions[i]] = eulerAngles[i];
+    }
   }
   else
   {
@@ -422,6 +555,9 @@ void loop() {
       Takes the data from the IMU and the baromter and mix them using a ratio alpha and outputs the vertical velocity of the quadcopter.
   */
   verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T));
+
+  // Receive the current vertical velocity in the dashboard
+  JSONdata["vertical_velocity"] = verticalVelocity;
 
   // Mapping the measurements to the rateMeasurement array
   /*
@@ -474,15 +610,23 @@ void loop() {
     setMotorThrottle(&motor[i]);
   }
 
-  // Data logging
-  Serial.print(motor[0].throttle);Serial.print(", \t");
-  Serial.print(remoteController[2]);Serial.print(", \t");
-  Serial.print(T);Serial.print(", \t");
-  Serial.print(altitude);Serial.print(", \t");
-  Serial.print(verticalVelocity);Serial.println();
+  // Receive the current motor throttles in the dashboard
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    JSONdata["motor_throttles"][motors[i]] = motor[i].throttle;
+  }
+
+  // Update the Dashboard
+  if (millis() - lastEventTime > event_period) {
+    String JSONdatastring = JSON.stringify(JSONdata);
+    events.send(JSONdatastring.c_str(), "data", millis());
+    lastEventTime = millis();
+    // Increment the event counter
+    cnt++;
+  }
 
   // Delay the loop until the period finishes
   while ((micros() - ST) / 1000000.0 <= 0.01);
+
 }
 
 void notFound(AsyncWebServerRequest *request) {
