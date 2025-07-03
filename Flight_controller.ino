@@ -507,15 +507,9 @@ void loop() {
     // Increment the event counter
     cnt++;
   }
-  for(int i = 0; i < 3; i++) {
-    Serial.print(Kp[i]);Serial.print("\t");
-    Serial.print(Ki[i]);Serial.print("\t");
-    Serial.print(Kd[i]);Serial.print("\t");
-  }
-  Serial.println();
+
   // Delay the loop until the period finishes
   while ((micros() - ST) / 1000000.0 <= 0.01);
-
 }
 
 void notFound(AsyncWebServerRequest *request) {
