@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+    <title>Dashboard</title>
+</head>
+<body>
+    <form class="box" id="my-form"><h2>PID Gains</h2>
+    <div class="section">
+        <h3>Roll & Pitch rates PID gains</h3>
+        <div class="part"><input name="Kp" type="text" placeholder="Kp" maxlength="5"></div>
+        <div class="part"><input name="Ki" type="text" placeholder="Ki" maxlength="5"></div>
+        <div class="part"><input name="Kd" type="text" placeholder="Kd" maxlength="5"></div>
+    </div>
+    <div class="section">
+    <h3>Yaw rate PID gains</h3>
+    <div class="part"><input name="Kp" type="text" placeholder="Kp" maxlength="5"></div>
+    <div class="part"><input name="Ki" type="text" placeholder="Ki" maxlength="5"></div>
+    <div class="part"><input name="Kd" type="text" placeholder="Kd" maxlength="5"></div></div>
+    <div class="section"><h3>Vertical velocity PID gains</h3>
+    <div class="part"><input name="Kp" type="text" placeholder="Kp" maxlength="5"></div>
+    <div class="part"><input name="Ki" type="text" placeholder="Ki" maxlength="5"></div>
+    <div class="part"><input name="Kd" type="text" placeholder="Kd" maxlength="5"></div></div>
+    <div class="section"><h3>Angular gain</h3>
+    <div class="part"><input name="AngularGain" type="text" placeholder="Angular gain" maxlength="5"></div>
+    </div>
+    <input type="submit" value="Submit" onClick="updatePID()"></form>
+    <span id="id"></span>
+    <div id='motor_throttles_left_front'></div>
+    <div id='motor_throttles_right_front'></div>
+    <div id='motor_throttles_right_back'></div>
+    <div id='motor_throttles_left_back'></div>
+    <h2>Pitch Angle</h2>
+    <h1 id='pitch_angle'></h1>
+    <h2>Roll Angle</h2>
+    <h1 id='roll_angle'></h1>
+    <script>
+    function updatePID() {
+        let xhr = new XMLHttpRequest();
+        let arg = "?";
+        for (let i = 0; i < 3; i++) {
+            arg += "Kp" + i.toString() + "=" + document.getElementsByName("Kp")[i].value + "&" + "Ki" + i.toString() + "=" + document.getElementsByName("Ki")[i].value + "&" + "Kd" + i.toString() + "=" + document.getElementsByName("Kd")[i].value + "&";
+        }
+        arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
+        xhr.open("GET", "/update" + arg, true);
+        xhr.send();
+        // window.location.replace("/");
+    }
+    document.getElementById("my-form").addEventListener("submit", function(e){
+            e.preventDefault()
+    });
+        if (!!window.EventSource) {
+
+                var source = new EventSource('/events');
+
+                source.addEventListener('open', function(e) {
+                    console.log("Events Connected");
+                }, false);
+                source.addEventListener('error', function(e) {
+                    if (e.target.readyState != EventSource.OPEN) {
+                    console.log("Events Disconnected");
+                    }
+                }, false);
+
+                source.addEventListener('message', function(e) {
+                    console.log("message", e.data);
+                }, false);
+
+                source.addEventListener('data', function(e) {
+                    var obj = JSON.parse(e.data);
+                    document.getElementById("id").innerHTML = obj.id;
+                    document.getElementById("roll_angle").innerHTML = (obj.angles.x * 57.3).toFixed(2).toString() + " °";
+                    document.getElementById("pitch_angle").innerHTML = (obj.angles.y * 57.3).toFixed(2).toString() + " °";
+                    var motor_throttles_left_front = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.left_front.toFixed(),
+                                    title: { text: "Motor Front Left" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    var layout = { width: 450, height: 337, margin: { t: 0, b: 0 } };
+                    Plotly.newPlot('motor_throttles_left_front', motor_throttles_left_front, layout);
+                    var motor_throttles_right_front = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.right_front.toFixed(),
+                                    title: { text: "Motor Front Right" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    Plotly.newPlot('motor_throttles_right_front', motor_throttles_right_front, layout);
+                    var motor_throttles_right_back = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.right_front.toFixed(),
+                                    title: { text: "Motor Back Right" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    Plotly.newPlot('motor_throttles_right_back', motor_throttles_right_back, layout);
+                    var motor_throttles_left_back = [
+                                {
+                                    domain: { x: [0, 1], y: [0, 1] },
+                                    value: obj.motor_throttles.left_front.toFixed(),
+                                    title: { text: "Motor Back Left" },
+                                    type: "indicator",
+                                    mode: "gauge+number+delta",
+                                    delta: { reference: 380 },
+                                    gauge: {
+                                    axis: { range: [0, 1000], color: "lightgray", }
+                                    }
+                                }
+                            ];
+                    Plotly.newPlot('motor_throttles_left_back', motor_throttles_left_back, layout);
+
+                }, false);
+            }
+    </script>
+</body>
+</html>

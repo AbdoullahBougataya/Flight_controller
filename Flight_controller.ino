@@ -26,6 +26,7 @@
  #include <AsyncTCP.h>
  #include <ESPAsyncWebServer.h>
  #include <Arduino_JSON.h>
+ #include <LittleFS.h>
 
 // Section 1: Constants & Global variables declarations.
 
@@ -62,124 +63,6 @@ volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
 
 const int motorPins[MTR_NUMBER] = {LEFT_FRONT, RIGHT_FRONT, RIGHT_BACK, LEFT_BACK}; // Pins connected to the ESCs
-
-/* HTML Web page of the Dashboard */
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html><html lang="en">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
-    <title>Dashboard</title>
-</head>
-<body>
-    %BODY%
-    <span id="id"></span>
-    <div id='motor_throttles_left_front'></div>
-    <div id='motor_throttles_right_front'></div>
-    <div id='motor_throttles_right_back'></div>
-    <div id='motor_throttles_left_back'></div>
-    <h2>Pitch Angle</h2>
-    <h1 id='pitch_angle'></h1>
-    <h2>Roll Angle</h2>
-    <h1 id='roll_angle'></h1>
-    <script>
-    function updatePID() {
-        var xhr = new XMLHttpRequest();
-        let arg = "?";
-        for (let i = 0; i < 3; i++) {
-            arg += "Kp" + i.toString() + "=" + document.getElementsByName("Kp")[i].value + "&" + "Ki" + i.toString() + "=" + document.getElementsByName("Ki")[i].value + "&" + "Kd" + i.toString() + "=" + document.getElementsByName("Kd")[i].value + "&";
-        }
-        arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
-        xhr.open("GET", "/update" + arg, true);
-        xhr.send();
-        window.location.replace("/");
-    }
-        if (!!window.EventSource) {
-
-                var source = new EventSource('/events');
-
-                source.addEventListener('open', function(e) {
-                    console.log("Events Connected");
-                }, false);
-                source.addEventListener('error', function(e) {
-                    if (e.target.readyState != EventSource.OPEN) {
-                    console.log("Events Disconnected");
-                    }
-                }, false);
-
-                source.addEventListener('message', function(e) {
-                    console.log("message", e.data);
-                }, false);
-
-                source.addEventListener('data', function(e) {
-                    var obj = JSON.parse(e.data);
-                    document.getElementById("id").innerHTML = obj.id;
-                    document.getElementById("roll_angle").innerHTML = (obj.angles.x * 57.3).toFixed(2).toString() + " °";
-                    document.getElementById("pitch_angle").innerHTML = (obj.angles.y * 57.3).toFixed(2).toString() + " °";
-                    var motor_throttles_left_front = [
-                                {
-                                    domain: { x: [0, 1], y: [0, 1] },
-                                    value: obj.motor_throttles.left_front.toFixed(),
-                                    title: { text: "Motor Front Left" },
-                                    type: "indicator",
-                                    mode: "gauge+number+delta",
-                                    delta: { reference: 380 },
-                                    gauge: {
-                                    axis: { range: [0, 1000], color: "lightgray", }
-                                    }
-                                }
-                            ];
-                    var layout = { width: 450, height: 337, margin: { t: 0, b: 0 } };
-                    Plotly.newPlot('motor_throttles_left_front', motor_throttles_left_front, layout);
-                    var motor_throttles_right_front = [
-                                {
-                                    domain: { x: [0, 1], y: [0, 1] },
-                                    value: obj.motor_throttles.right_front.toFixed(),
-                                    title: { text: "Motor Front Right" },
-                                    type: "indicator",
-                                    mode: "gauge+number+delta",
-                                    delta: { reference: 380 },
-                                    gauge: {
-                                    axis: { range: [0, 1000], color: "lightgray", }
-                                    }
-                                }
-                            ];
-                    Plotly.newPlot('motor_throttles_right_front', motor_throttles_right_front, layout);
-                    var motor_throttles_right_back = [
-                                {
-                                    domain: { x: [0, 1], y: [0, 1] },
-                                    value: obj.motor_throttles.right_front.toFixed(),
-                                    title: { text: "Motor Back Right" },
-                                    type: "indicator",
-                                    mode: "gauge+number+delta",
-                                    delta: { reference: 380 },
-                                    gauge: {
-                                    axis: { range: [0, 1000], color: "lightgray", }
-                                    }
-                                }
-                            ];
-                    Plotly.newPlot('motor_throttles_right_back', motor_throttles_right_back, layout);
-                    var motor_throttles_left_back = [
-                                {
-                                    domain: { x: [0, 1], y: [0, 1] },
-                                    value: obj.motor_throttles.left_front.toFixed(),
-                                    title: { text: "Motor Back Left" },
-                                    type: "indicator",
-                                    mode: "gauge+number+delta",
-                                    delta: { reference: 380 },
-                                    gauge: {
-                                    axis: { range: [0, 1000], color: "lightgray", }
-                                    }
-                                }
-                            ];
-                    Plotly.newPlot('motor_throttles_left_back', motor_throttles_left_back, layout);
-
-                }, false);
-            }
-    </script>
-</body>
-</html>
-)rawliteral";
 
 static const unsigned long event_period = 200; // The period it takes for the Dashboard to be updated in milliseconds
 static unsigned long lastEventTime = 0; // The last event time time
@@ -232,8 +115,6 @@ void barometerInterrupt()
 
 void notFound(AsyncWebServerRequest *request); // not found server response
 
-String processor(const String& var); // input fields processor
-
 // Section 2: Initialization & setup section.
 
 void setup() {
@@ -246,8 +127,11 @@ void setup() {
   // Set the device as a Station and Soft Access Point simultaneously
   WiFi.mode(WIFI_STA);
 
-  //Begin the WiFi connection
+  // Begin the WiFi connection
   WiFi.begin(ssid, password);
+
+  // Begin the Little File System
+  LittleFS.begin();
 
   // Turn on the GREEN LED light
   neopixelWrite(LED_PIN, 0, LED_BRIGHTNESS, 0);
@@ -316,7 +200,7 @@ void setup() {
 
   // Send the web page with input fields to client
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/html", index_html, processor);
+    request->send(LittleFS, "/index.html");
   });
 
   // Send a GET request to <ESP_IP>/update?arg=<inputArguement>
@@ -623,7 +507,12 @@ void loop() {
     // Increment the event counter
     cnt++;
   }
-
+  for(int i = 0; i < 3; i++) {
+    Serial.print(Kp[i]);Serial.print("\t");
+    Serial.print(Ki[i]);Serial.print("\t");
+    Serial.print(Kd[i]);Serial.print("\t");
+  }
+  Serial.println();
   // Delay the loop until the period finishes
   while ((micros() - ST) / 1000000.0 <= 0.01);
 
@@ -631,28 +520,4 @@ void loop() {
 
 void notFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
-}
-
-String processor(const String& var) {
-    if(var == "BODY") {
-        String input_fields = "";
-        input_fields += "<form class=\"box\" id=\"my-form\"><h2>PID Gains</h2>";
-        input_fields += "<div class=\"section\"><h3>Roll & Pitch rates PID gains</h3>";
-        input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[0]) + "\"></div>";
-        input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[0]) + "\"></div>";
-        input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[0]) + "\"></div></div>";
-        input_fields += "<div class=\"section\"><h3>Yaw rate PID gains</h3>";
-        input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[2]) + "\"></div>";
-        input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[2]) + "\"></div>";
-        input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[2]) + "\"></div></div>";
-        input_fields += "<div class=\"section\"><h3>Vertical velocity PID gains</h3>";
-        input_fields += "<div class=\"part\"><input name=\"Kp\" type=\"text\" placeholder=\"Kp\" maxlength=\"5\" value=\"" + String(Kp[1]) + "\"></div>";
-        input_fields += "<div class=\"part\"><input name=\"Ki\" type=\"text\" placeholder=\"Ki\" maxlength=\"5\" value=\"" + String(Ki[1]) + "\"></div>";
-        input_fields += "<div class=\"part\"><input name=\"Kd\" type=\"text\" placeholder=\"Kd\" maxlength=\"5\" value=\"" + String(Kd[1]) + "\"></div></div>";
-        input_fields += "<div class=\"section\"><h3>Angular gain</h3>";
-        input_fields += "<div class=\"part\"><input name=\"AngularGain\" type=\"text\" placeholder=\"Angular gain\" maxlength=\"5\" value=\"" + String(AngularGain) + "\"></div></div>";
-        input_fields += "<input type=\"submit\" value=\"Submit\" onClick=\"updatePID()\"></form>";
-        return input_fields;
-    }
-    return String();
 }
