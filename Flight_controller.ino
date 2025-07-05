@@ -421,7 +421,6 @@ void loop() {
       euler angles (phi: roll, theta: pitch, psi: yaw)
     */
     ComplementaryFilter_Update(&CF, accelGyroData, eulerAngles, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
-
     // Receive the current angles in the dashboard
     for (int i = 0; i < 3; i++)
     {
@@ -455,6 +454,7 @@ void loop() {
   rateMeasurement[2] = verticalVelocity * THOUSAND_OVER_TWENTY + HALF_INTERVAL;
   rateMeasurement[3] = accelGyroData[2] * THOUSAND_OVER_ELEVEN + HALF_INTERVAL;
 
+
   /*
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
@@ -480,7 +480,8 @@ void loop() {
     // Updating the PID Controllers
     controlSignals[i]  = PIDController_Update(&pid[i], rateReference[i], rateMeasurement[i]);
   }
- /*-------------------------------------------------------------------------------------------*/
+
+ /*---------------------------------------------------------------------------------------------*/
 
   // Command the individual motors using the Motor Mixing Algorithm
   MMA(motor, controlSignals, MTR_NUMBER, HOVERING_THROTTLE);
