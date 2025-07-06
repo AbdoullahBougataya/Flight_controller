@@ -32,11 +32,47 @@
     <div id='motor_throttles_right_front'></div>
     <div id='motor_throttles_right_back'></div>
     <div id='motor_throttles_left_back'></div>
-    <h2>Pitch Angle</h2>
-    <h1 id='pitch_angle'></h1>
-    <h2>Roll Angle</h2>
-    <h1 id='roll_angle'></h1>
+    <div id='chart-pitch'></div>
+    <div id='chart-roll'></div>
     <script>
+        var chartPitch = new Highcharts.Chart({
+                        chart:{ renderTo : 'chart-pitch', type: 'spline' },
+                        title: { text: 'Pitch angle' },
+                        series: [{
+                            showInLegend: true,
+                            data: []
+                        }],
+                        plotOptions: {
+                            line: { animation: false,
+                            dataLabels: { enabled: false }
+                            },
+                            series: { color: '#DD0000' }
+                        },
+                        xAxis: { text: 'Sample' },
+                        yAxis: {
+                            title: { text: 'Pitch angle (°)' }
+                        },
+                        credits: { enabled: false }
+                    });
+        var chartRoll = new Highcharts.Chart({
+                        chart:{ renderTo : 'chart-roll', type: 'spline' },
+                        title: { text: 'Roll angle' },
+                        series: [{
+                            showInLegend: true,
+                            data: []
+                        }],
+                        plotOptions: {
+                            line: {
+                            dataLabels: { enabled: false }
+                            },
+                            series: { color: '#DD0000', animation: false }
+                        },
+                        xAxis: { text: 'Sample' },
+                        yAxis: {
+                            title: { text: 'Roll angle (°)' }
+                        },
+                        credits: { enabled: false }
+                    });
     function updatePID() {
         let xhr = new XMLHttpRequest();
         let arg = "?";
@@ -46,7 +82,6 @@
         arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
         xhr.open("GET", "/update" + arg, true);
         xhr.send();
-        // window.location.replace("/");
     }
     document.getElementById("my-form").addEventListener("submit", function(e){
             e.preventDefault()
@@ -69,11 +104,20 @@
                 }, false);
 
                 source.addEventListener('data', function(e) {
-                    var obj = JSON.parse(e.data);
+                    let obj = JSON.parse(e.data);
                     document.getElementById("id").innerHTML = obj.id;
-                    document.getElementById("roll_angle").innerHTML = (obj.angles.x * 57.3).toFixed(2).toString() + " °";
-                    document.getElementById("pitch_angle").innerHTML = (obj.angles.y * 57.3).toFixed(2).toString() + " °";
-                    var motor_throttles_left_front = [
+                    let sample = parseInt(obj.id), pitchAngle = parseFloat((obj.angles.y * 57.3).toFixed(2)), rollAngle = parseFloat((obj.angles.x * 57.3).toFixed(2));
+                    if(chartPitch.series[0].data.length > 10) {
+                        chartPitch.series[0].addPoint([sample, pitchAngle], true, true, true);
+                    } else {
+                        chartPitch.series[0].addPoint([sample, pitchAngle], true, false, true);
+                    }
+                    if(chartRoll.series[0].data.length > 10) {
+                        chartRoll.series[0].addPoint([sample, rollAngle], true, true, true);
+                    } else {
+                        chartRoll.series[0].addPoint([sample, rollAngle], true, false, true);
+                    }
+                    let motor_throttles_left_front = [
                                 {
                                     domain: { x: [0, 1], y: [0, 1] },
                                     value: obj.motor_throttles.left_front.toFixed(),
@@ -86,9 +130,9 @@
                                     }
                                 }
                             ];
-                    var layout = { width: 450, height: 337, margin: { t: 0, b: 0 } };
+                    let layout = { width: 450, height: 337, margin: { t: 0, b: 0 } };
                     Plotly.newPlot('motor_throttles_left_front', motor_throttles_left_front, layout);
-                    var motor_throttles_right_front = [
+                    let motor_throttles_right_front = [
                                 {
                                     domain: { x: [0, 1], y: [0, 1] },
                                     value: obj.motor_throttles.right_front.toFixed(),
@@ -102,7 +146,7 @@
                                 }
                             ];
                     Plotly.newPlot('motor_throttles_right_front', motor_throttles_right_front, layout);
-                    var motor_throttles_right_back = [
+                    let motor_throttles_right_back = [
                                 {
                                     domain: { x: [0, 1], y: [0, 1] },
                                     value: obj.motor_throttles.right_front.toFixed(),
@@ -116,7 +160,7 @@
                                 }
                             ];
                     Plotly.newPlot('motor_throttles_right_back', motor_throttles_right_back, layout);
-                    var motor_throttles_left_back = [
+                    let motor_throttles_left_back = [
                                 {
                                     domain: { x: [0, 1], y: [0, 1] },
                                     value: obj.motor_throttles.left_front.toFixed(),
