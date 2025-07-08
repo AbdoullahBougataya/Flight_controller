@@ -40,7 +40,7 @@ jobs:
         run: |
           arduino-cli config set library.enable_unsafe_install true
           arduino-cli lib install "WiFi"
-          arduino-cli lib install "AsyncTCP"
+          arduino-cli lib install --git-url https://github.com/ESP32Async/AsyncTCP.git
           arduino-cli lib install --git-url https://github.com/ESP32Async/ESPAsyncWebServer.git
           arduino-cli lib install "Arduino_JSON"
 
