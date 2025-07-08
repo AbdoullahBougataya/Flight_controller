@@ -40,6 +40,7 @@
 #define MTR_NUMBER                        4                        // The number of motors used in the quadcopter
 #define DEGREES_OF_CONTROL                4                        // How many degrees of freedom are controlled
 #define HOVERING_THROTTLE               380                        // The throttle that makes the drone hover
+#define DEFAULT_RC_VALUE                500                        // The default RC value when the signal is lost
 /*=================================================================================================*/
 
 /*************************************************************************************************

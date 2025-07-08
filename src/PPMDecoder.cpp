@@ -7,6 +7,7 @@ volatile bool PPMDecoder::_signalReady = false;
 unsigned int PPMDecoder::_channelIndex = 0;
 unsigned long PPMDecoder::_lastTime = 0;
 unsigned long PPMDecoder::_duration = 0;
+unsigned long PPMDecoder::_lastFrameTime = 0;
 
 PPMDecoder::PPMDecoder(uint8_t ppmPin, uint8_t channelAmount)
 {
@@ -24,6 +25,8 @@ void PPMDecoder::begin()
     // Attach an interrupt to the pin
     pinMode(_ppmPin, INPUT);
     attachInterrupt(digitalPinToInterrupt(_ppmPin), isrHandler, RISING);
+
+    _lastFrameTime = micros();
 }
 
 bool PPMDecoder::available()
@@ -33,6 +36,12 @@ bool PPMDecoder::available()
         return true;
     }
     return false;
+}
+
+bool PPMDecoder::isSignalLost()
+{
+    unsigned long now = micros();
+    return (now - _lastFrameTime) > TIMEOUT_DURATION;
 }
 
 unsigned int PPMDecoder::getChannelValue(uint8_t channel)
@@ -60,9 +69,14 @@ void PPMDecoder::readReceiver()
 
     if (_duration > BLANK_TIME) {
         _channelIndex = 0;
+        _lastFrameTime = currentTime;
     }
     else if (_channelIndex < _channelAmount && _duration >= min && _duration <= max) {
         _rawValues[_channelIndex] = _duration;
         _channelIndex++;
+
+        if (_channelIndex == _channelAmount) {
+            _lastFrameTime = currentTime;
+        }
     }
 }
