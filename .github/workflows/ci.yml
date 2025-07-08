@@ -40,6 +40,7 @@ jobs:
         run: |
           arduino-cli lib install "WiFi"
           arduino-cli lib install "AsyncTCP"
+          arduino-cli lib install "ESPAsyncWebServer"
           arduino-cli lib install "Arduino_JSON"
 
       - name: Arduino-CLI Compile Sketch
