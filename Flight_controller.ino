@@ -359,12 +359,19 @@ void loop() {
   JSONdata["id"] = String(cnt);
 
   // Receive the informations from the receiver
-  if (ppm.available()) {
-    for (int i = 0; i < CHANNEL_NUMBER; i++) {
+  for (int i = 0; i < CHANNEL_NUMBER; i++) {
+    if (ppm.isSignalLost()) {
+
+      remoteController[i] = DEFAULT_RC_VALUE;
+
+    } else if (ppm.available()) {
+
       remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
-      // Receive the RC command in the dashboard
-      JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
+
     }
+
+    // Receive the RC command in the dashboard
+    JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
   }
 
   // Read altitude from the Barometer

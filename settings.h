@@ -36,6 +36,7 @@
 #define SERIAL_BANDWIDTH_115200      115200                        // The serial monitor's bandwidth
 #define STARTUP_DELAY                   100                        // 100 ms for the microcontroller to start
 #define CHANNEL_NUMBER                    6                        // The number of RC channels
+#define DEFAULT_RC_VALUE               1500                        // The default RC value when the signal is lost
 #define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 #define MTR_NUMBER                        4                        // The number of motors used in the quadcopter
 #define DEGREES_OF_CONTROL                4                        // How many degrees of freedom are controlled
