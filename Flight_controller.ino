@@ -47,7 +47,7 @@ AsyncWebServer server(80); // Initiate the server
 AsyncEventSource events("/events"); // Initiate the events source
 
 // WiFi informations here:
-const char* ssid = "DESKTOP-KGO6TN27985";
+const char* ssid = "DESKTOP-KERTHZ";
 const char* password = "11111111";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
@@ -118,8 +118,9 @@ void notFound(AsyncWebServerRequest *request); // not found server response
 // Section 2: Initialization & setup section.
 
 void setup() {
-  // Initialize serial communication at 115200 bytes per second:
+  // Initialize serial communication at 115200 bytes per second and wait until Serial Monitor opens:
   Serial.begin(SERIAL_BANDWIDTH_115200);
+  while (!Serial);
 
   // Initialize PPM communication with the receiver
   ppm.begin();
