@@ -148,7 +148,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div>
                         <h3 class="text-m font-semibold text-gray-300 mb-1">Vertical Velocity PID</h3>
                         <div class="grid grid-cols-3 gap-2">
@@ -180,7 +180,7 @@
                     </div>
 
                 </div>
-            
+
 
                 <button id="update-gains-btn" type="submit" value="Submit" onClick="updatePID()"
                     class="mt-2 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-1 px-2 rounded-md shadow-lg text-sm">
@@ -266,7 +266,7 @@
         document.getElementById("my-form").addEventListener("submit", function(e){
                 e.preventDefault()
         });
-        
+
         // --- Motor Gauge Update Logic ---
         function updateMotorGauges(data) {
             const maxThrust = 1000; // Max value for the gauges
@@ -302,11 +302,11 @@
 
             // Calculate marker position (0% to 100% within the container)
             // Roll (left/right) maps directly: -MAX_ANGLE -> 0%, 0 -> 50%, +MAX_ANGLE -> 100%
-            const rollPosition = ((clampedRoll + MAX_ANGLE) / (2 * MAX_ANGLE)) * 100;
+            const rollPosition = ((-clampedRoll + MAX_ANGLE) / (2 * MAX_ANGLE)) * 100;
 
             // Pitch (up/down): -MAX_ANGLE -> 100% (bottom), 0 -> 50%, +MAX_ANGLE -> 0% (top)
             // Invert the pitch value for 'top' CSS property as 'top' increases downwards
-            const pitchPosition = (1 - ((clampedPitch + MAX_ANGLE) / (2 * MAX_ANGLE))) * 100;
+            const pitchPosition = (1 - ((-clampedPitch + MAX_ANGLE) / (2 * MAX_ANGLE))) * 100;
 
             attitudeMarker.style.left = `${rollPosition}%`;
             attitudeMarker.style.top = `${pitchPosition}%`;
@@ -357,7 +357,7 @@
                 let motor_2 = parseInt(obj.motor_throttles.right_front.toFixed());
                 let motor_3 = parseInt(obj.motor_throttles.right_back.toFixed());
                 let motor_4 = parseInt(obj.motor_throttles.left_back.toFixed());
-                    
+
                 const motorData = {
                     m1: motor_1,
                     m2: motor_2,

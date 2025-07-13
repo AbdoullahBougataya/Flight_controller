@@ -47,7 +47,7 @@ AsyncWebServer server(80); // Initiate the server
 AsyncEventSource events("/events"); // Initiate the events source
 
 // WiFi informations here:
-const char* ssid = "DESKTOP-KERTHZ";
+const char* ssid = "ESP32S3-WiFi";
 const char* password = "11111111";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
