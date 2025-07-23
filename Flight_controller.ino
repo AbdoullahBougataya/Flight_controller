@@ -47,8 +47,8 @@ AsyncWebServer server(80); // Initiate the server
 AsyncEventSource events("/events"); // Initiate the events source
 
 // WiFi informations here:
-const char* ssid = "ESP32S3-WiFi";
-const char* password = "11111111";
+const char* ssid = "DESKTOP-KERTHZ";
+const char* password = "sdfcasfva";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
 
@@ -360,19 +360,22 @@ void loop() {
   JSONdata["id"] = String(cnt);
 
   // Receive the informations from the receiver
-  for (int i = 0; i < CHANNEL_NUMBER; i++) {
-    if (ppm.isSignalLost()) {
+  if (ppm.isSignalLost()) {
 
-      remoteController[i] = DEFAULT_RC_VALUE;
-
-    } else if (ppm.available()) {
-
-      remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
-
+    for (int i = 0; i < CHANNEL_NUMBER; i++) {
+      remoteController[i] = (i < 4) ? DEFAULT_RC_VALUE : 1000; // Default Switch value is 1000
+      
+      JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i]; // Receive the RC command in the dashboard
     }
 
-    // Receive the RC command in the dashboard
-    JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
+  } else if (ppm.available()) {
+
+    for (int i = 0; i < CHANNEL_NUMBER; i++) {
+      remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
+      
+      JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
+    }
+
   }
 
   // Read altitude from the Barometer
@@ -467,7 +470,7 @@ void loop() {
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
   // Update the PID gains
-  for(int i = 0; i < 2; i++)
+  for (int i = 0; i < 2; i++)
   {
     pid[i].Kp = Kp[0];
     pid[i].Ki = Ki[0];
@@ -482,8 +485,8 @@ void loop() {
 
   for (int i = 0; i < DEGREES_OF_CONTROL; i++) {
     // Angular control of the drone
-    rateReference[i] = (i < 2)?(AngularGain * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)):remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
-    rateReference[i] = (i < 2)?fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL):rateReference[i];                                   // Clamping the output
+    rateReference[i] = (i < 2) ? (AngularGain * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)) : remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
+    rateReference[i] = (i < 2) ? fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL) : rateReference[i];                                  // Clamping the output
 
     // Updating the PID Controllers
     controlSignals[i]  = PIDController_Update(&pid[i], rateReference[i], rateMeasurement[i]);
