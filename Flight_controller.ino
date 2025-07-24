@@ -120,7 +120,6 @@ void notFound(AsyncWebServerRequest *request); // not found server response
 void setup() {
   // Initialize serial communication at 115200 bytes per second and wait until Serial Monitor opens:
   Serial.begin(SERIAL_BANDWIDTH_115200);
-  while (!Serial);
 
   // Initialize PPM communication with the receiver
   ppm.begin();
