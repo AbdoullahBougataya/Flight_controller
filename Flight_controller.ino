@@ -58,6 +58,8 @@ RCFilter lpFRC[8]; // Declaring the RC filter objects (IMU + Barometer + Vertica
 
 AVRFilter AVR[2]; // The averaging filter for the armed disarmed switch
 
+volatile uint8_t manual = 1;
+
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
 const int8_t addr = 0x68; // 0x68 for SA0 connected to the ground (IMU)
@@ -345,6 +347,10 @@ void setup() {
     Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
   }
   delay(5000);
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    // Turn off the motors
+    motor[i].throttle = 0;
+  }
   lastEventTime = millis();
 }
 
@@ -363,18 +369,19 @@ void loop() {
 
     for (int i = 0; i < CHANNEL_NUMBER; i++) {
       remoteController[i] = (i < 4) ? DEFAULT_RC_VALUE : 1000; // Default Switch value is 1000
-      
+
       JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i]; // Receive the RC command in the dashboard
     }
 
   } else if (ppm.available()) {
+    // Check if the command is manual
+    if (manual) {
+      for (int i = 0; i < CHANNEL_NUMBER; i++) {
+        remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
 
-    for (int i = 0; i < CHANNEL_NUMBER; i++) {
-      remoteController[i] = (i < 4) ? fminf(fmaxf(ppm.getChannelValue(i) - FTHOUSAND, FZERO), FTHOUSAND) : AVRFilter_Update(&AVR[i - 4], ppm.getChannelValue(i)); // Read channel values from the reciever
-      
-      JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
+        JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i];
+      }
     }
-
   }
 
   // Read altitude from the Barometer
@@ -508,6 +515,11 @@ void loop() {
   // Receive the current motor throttles in the dashboard
   for (int i = 0; i < MTR_NUMBER; i++) {
     JSONdata["motor_throttles"][motors[i]] = motor[i].throttle;
+  }
+
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    // Turn off the motors
+    motor[i].throttle = 0;
   }
 
   // Update the Dashboard
