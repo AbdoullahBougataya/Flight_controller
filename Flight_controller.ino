@@ -58,7 +58,7 @@ RCFilter lpFRC[8]; // Declaring the RC filter objects (IMU + Barometer + Vertica
 
 AVRFilter AVR[2]; // The averaging filter for the armed disarmed switch
 
-volatile uint8_t manual = 1;
+volatile uint8_t manual = 1; // Determine if the quadcopter is Manual or automatic
 
 volatile uint8_t barometerFlag = 0; // Barometer interrupt flag
 
@@ -122,6 +122,16 @@ void notFound(AsyncWebServerRequest *request); // not found server response
 void setup() {
   // Initialize serial communication at 115200 bytes per second and wait until Serial Monitor opens:
   Serial.begin(SERIAL_BANDWIDTH_115200);
+
+  // Initialize the ESCs
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
+  }
+  delay(5000);
+  for (int i = 0; i < MTR_NUMBER; i++) {
+    // Turn off the motors
+    motor[i].throttle = 0;
+  }
 
   // Initialize PPM communication with the receiver
   ppm.begin();
@@ -342,15 +352,6 @@ void setup() {
   Serial.println("BMI160: Calibrating");
   CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
 
-  // Initialize the ESCs
-  for (int i = 0; i < MTR_NUMBER; i++) {
-    Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
-  }
-  delay(5000);
-  for (int i = 0; i < MTR_NUMBER; i++) {
-    // Turn off the motors
-    motor[i].throttle = 0;
-  }
   lastEventTime = millis();
 }
 
@@ -372,7 +373,6 @@ void loop() {
 
       JSONdata["remote_controller"]["channel_" + String(i)] = remoteController[i]; // Receive the RC command in the dashboard
     }
-
   } else if (ppm.available()) {
     // Check if the command is manual
     if (manual) {
@@ -506,7 +506,7 @@ void loop() {
   // Set the motor throttle
   for (int i = 0; i < MTR_NUMBER; i++) {
     // If the quadcopter is disarmed, turn off the motors
-    if(remoteController[4] >= 1500){
+    if(remoteController[4] >= 1500 || ppm.isSignalLost()){
       motor[i].throttle = 0;
     };
     setMotorThrottle(&motor[i]);
@@ -515,11 +515,6 @@ void loop() {
   // Receive the current motor throttles in the dashboard
   for (int i = 0; i < MTR_NUMBER; i++) {
     JSONdata["motor_throttles"][motors[i]] = motor[i].throttle;
-  }
-
-  for (int i = 0; i < MTR_NUMBER; i++) {
-    // Turn off the motors
-    motor[i].throttle = 0;
   }
 
   // Update the Dashboard

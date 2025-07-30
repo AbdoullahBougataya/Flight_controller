@@ -9,7 +9,7 @@ void Motor_Init(Motor* motor, int pin, int min, int max, int frequency) {
     motor->esc.attach(pin, min, max);
 
     // Reset ESC's throttle
-    motor->esc.write(0);
+    motor->esc.write(1000);
 }
 
 void setMotorThrottle(Motor* motor) {
