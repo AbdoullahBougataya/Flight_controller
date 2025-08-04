@@ -25,11 +25,11 @@ float PIDController_Update(PIDController *pid, float setpoint, float measurement
     pid->integrator = pid->integrator + 0.5f * pid->Ki * pid->T * (error + pid->prevError);
 
     // Clamp integrator
-    if (pid->integrator > limMaxInt) {
-        pid->integrator = limMaxInt;
+    if (pid->integrator > pid->limMaxInt) {
+        pid->integrator = pid->limMaxInt;
     }
-    else if (pid->integrator < limMinInt) {
-        pid->integrator = limMinInt;
+    else if (pid->integrator < pid->limMinInt) {
+        pid->integrator = pid->limMinInt;
     }
 
     // Derivative
