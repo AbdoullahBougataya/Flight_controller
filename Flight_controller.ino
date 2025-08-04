@@ -169,6 +169,8 @@ void setup() {
       pid[i].tau    = 1.5f;
       pid[i].limMin = ROLL_AND_PITCH_MIN_LIMIT;
       pid[i].limMax = ROLL_AND_PITCH_MAX_LIMIT;
+      pid[2].limMinInt = ROLL_AND_PITCH_MIN_INT_LIMIT;
+      pid[2].limMaxInt = ROLL_AND_PITCH_MAX_INT_LIMIT;
       PIDController_Init(&pid[i], SAMPLING_PERIOD);
     }
   /*
@@ -182,6 +184,8 @@ void setup() {
     pid[3].tau    = 1.5f;
     pid[3].limMin = YAW_MIN_LIMIT;
     pid[3].limMax = YAW_MAX_LIMIT;
+    pid[2].limMinInt = YAW_MIN_INT_LIMIT;
+    pid[2].limMaxInt = YAW_MAX_INT_LIMIT;
     PIDController_Init(&pid[3], SAMPLING_PERIOD);
     /* =================== Vertical Controllers =================== */
     /*
@@ -195,6 +199,8 @@ void setup() {
     pid[2].tau    = 1.5f;
     pid[2].limMin = VERTICAL_V_MIN_LIMIT;
     pid[2].limMax = VERTICAL_V_MAX_LIMIT;
+    pid[2].limMinInt = VERTICAL_V_MIN_INT_LIMIT;
+    pid[2].limMaxInt = VERTICAL_V_MAX_INT_LIMIT;
     PIDController_Init(&pid[2], SAMPLING_PERIOD);
 /*====================================================================================*/
 /**************************************************************************************/
@@ -438,11 +444,16 @@ void loop() {
       euler angles (phi: roll, theta: pitch, psi: yaw)
     */
     ComplementaryFilter_Update(&CF, accelGyroData, eulerAngles, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+
+    // Adding the hardware offset of the IMU which is in this case 3.4°
+    eulerAngles[1] = eulerAngles[1] - (3.4/RAD2DEG);
+
     // Receive the current angles in the dashboard
     for (int i = 0; i < 3; i++)
     {
       JSONdata["angles"][dimensions[i]] = eulerAngles[i];
     }
+
   }
   else
   {
