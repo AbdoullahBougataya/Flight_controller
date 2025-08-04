@@ -47,8 +47,8 @@ AsyncWebServer server(80); // Initiate the server
 AsyncEventSource events("/events"); // Initiate the events source
 
 // WiFi informations here:
-const char* ssid = "ESP32S3-WiFi";
-const char* password = "11111111";
+const char* ssid = "DESKTOP-KERTHZ";
+const char* password = "sdfcasfva";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
 
@@ -128,10 +128,6 @@ void setup() {
     Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
   }
   delay(5000);
-  for (int i = 0; i < MTR_NUMBER; i++) {
-    // Turn off the motors
-    motor[i].throttle = 0;
-  }
 
   // Initialize PPM communication with the receiver
   ppm.begin();
