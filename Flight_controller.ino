@@ -107,6 +107,7 @@ String dimensions[3] = {"x", "y", "z"}; // The X Y Z dimensions
 
 // Declare sensor fusion variables
 float eulerAngles[3] = { 0.0 }; // Euler angles φ, θ and ψ
+float eulerRates[6] = { 0.0 }; // Euler angles φ dot, θ dot and ψ dot
 float verticalVelocity = 0.0; // The vertical velocity of the Quadcopter
 
 /* External interrupt flag */
@@ -424,6 +425,7 @@ void loop() {
     // Initialize the RC low pass filters
     for (int i = 0; i < 6; i++) {
       accelGyroData[i] = RCFilter_Update(&lpFRC[i], accelGyroData[i]); // Update the RCFilter
+      eulerRates[i] = accelGyroData[i];
       // Receive the current acceleromter and gyroscope data in the dashboard
       if (i > 2)
       {
@@ -439,7 +441,7 @@ void loop() {
       to use both the accelerometer and the gyroscope to predict the
       euler angles (phi: roll, theta: pitch, psi: yaw)
     */
-    ComplementaryFilter_Update(&CF, accelGyroData, eulerAngles, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
+    ComplementaryFilter_Update(&CF, eulerRates, eulerAngles, T); // This function transform the gyro rates and the Accelerometer angles into equivalent euler angles
 
     // Adding the hardware offset of the IMU which is in this case 3.4°
     eulerAngles[1] = eulerAngles[1] - (3.4/RAD2DEG);
@@ -461,7 +463,7 @@ void loop() {
   /*
       Takes the data from the IMU and the baromter and mix them using a ratio alpha and outputs the vertical velocity of the quadcopter.
   */
-  verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, accelGyroData, eulerAngles, altitude, T));
+  verticalVelocity = RCFilter_Update(&lpFRC[7], ComplementaryFilter2D_Update(&CF2, eulerRates, eulerAngles, altitude, T));
 
   // Receive the current vertical velocity in the dashboard
   JSONdata["vertical_velocity"] = verticalVelocity;
