@@ -68,24 +68,24 @@
  * ***********************************************************************************************
  */
 //////////////////ROLL & PITCH RATES PID////////////////////
-#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN     0.60f
-#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN         0.80f
-#define ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN       0.13f
+#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN     0.65f
+#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN         0.15f
+#define ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN       0.02f
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////////YAW RATE PID//////////////////////////
-#define YAW_RATE_PROPORTIONAL_GAIN                     0.50f
-#define YAW_RATE_INTEGRAL_GAIN                         0.00f
-#define YAW_RATE_DERIVATIVE_GAIN                       0.00f
+#define YAW_RATE_PROPORTIONAL_GAIN                     5.80f
+#define YAW_RATE_INTEGRAL_GAIN                         7.00f
+#define YAW_RATE_DERIVATIVE_GAIN                       0.47f
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////VERTICAL VELOCITY PID/////////////////////
-#define VERTICAL_VELOCITY_PROPORTIONAL_GAIN            0.50f
-#define VERTICAL_VELOCITY_INTEGRAL_GAIN                0.00f
-#define VERTICAL_VELOCITY_DERIVATIVE_GAIN              0.00f
+#define VERTICAL_VELOCITY_PROPORTIONAL_GAIN            1.00f
+#define VERTICAL_VELOCITY_INTEGRAL_GAIN                0.15f
+#define VERTICAL_VELOCITY_DERIVATIVE_GAIN              0.08f
 ////////////////////////////////////////////////////////////
 /*========================================================*/
-#define ANGULAR_GAIN                                   0.50f
+#define ANGULAR_GAIN                                   0.36f
 /*========================================================*/
 //////////////////ROLL & PITCH CLAMPING/////////////////////
 #define ROLL_AND_PITCH_MIN_LIMIT                    -480.00f
