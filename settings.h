@@ -39,7 +39,7 @@
 #define LED_BRIGHTNESS                  100                        // The brightness of the onboard LED
 #define MTR_NUMBER                        4                        // The number of motors used in the quadcopter
 #define DEGREES_OF_CONTROL                4                        // How many degrees of freedom are controlled
-#define HOVERING_THROTTLE               200                        // The throttle that makes the drone hover
+#define HOVERING_THROTTLE               400                        // The throttle that makes the drone hover
 #define DEFAULT_RC_VALUE                500                        // The default RC value when the signal is lost
 /*=================================================================================================*/
 
@@ -74,7 +74,7 @@
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////////YAW RATE PID//////////////////////////
-#define YAW_RATE_PROPORTIONAL_GAIN                     5.80f
+#define YAW_RATE_PROPORTIONAL_GAIN                     2.80f
 #define YAW_RATE_INTEGRAL_GAIN                         7.00f
 #define YAW_RATE_DERIVATIVE_GAIN                       0.47f
 ////////////////////////////////////////////////////////////

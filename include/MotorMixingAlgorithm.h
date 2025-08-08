@@ -8,8 +8,8 @@
   * @param motor The motors objects
   * @param controlSignals The Control signal array output from the controllers
   * @param motor_count The number of motors used
-  * @param hovering_throttle the throttle required to make the drone hover
+  * @param throttle the throttle
   */
-void MMA(Motor* motor, float* controlSignals, int motor_count, int hovering_throttle);
+void MMA(Motor* motor, float* controlSignals, int motor_count, int throttle);
 
 #endif

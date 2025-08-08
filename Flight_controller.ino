@@ -129,7 +129,7 @@ void setup() {
     Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
   }
   delay(5000);
-
+  
   // Initialize PPM communication with the receiver
   ppm.begin();
 
@@ -354,7 +354,6 @@ void setup() {
   // Calibrate the gyroscope
   Serial.println("BMI160: Calibrating");
   CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
-
   lastEventTime = millis();
 }
 
@@ -510,7 +509,7 @@ void loop() {
  /*---------------------------------------------------------------------------------------------*/
 
   // Command the individual motors using the Motor Mixing Algorithm
-  MMA(motor, controlSignals, MTR_NUMBER, HOVERING_THROTTLE);
+  MMA(motor, controlSignals, MTR_NUMBER, rateReference[2]);
 
   // Set the motor throttle
   for (int i = 0; i < MTR_NUMBER; i++) {

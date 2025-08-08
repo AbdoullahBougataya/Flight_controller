@@ -1,9 +1,13 @@
 #include "../include/MotorControl.h"
 
 void Motor_Init(Motor* motor, int pin, int min, int max, int frequency) {
+    // Initialize motor throttle
+    motor->throttle = 0;
+    
     // Set the frequency of the ESC
     motor->frequency = frequency;
     motor->esc.setPeriodHertz(frequency);
+
 
     // Attach the motor to the ESC object
     motor->esc.attach(pin, min, max);
