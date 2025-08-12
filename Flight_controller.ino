@@ -47,7 +47,7 @@ AsyncWebServer server(80); // Initiate the server
 AsyncEventSource events("/events"); // Initiate the events source
 
 // WiFi informations here:
-const char* ssid = "ESP32S3-WiFi";
+const char* ssid = "Bshr";
 const char* password = "11111111";
 
 ComplementaryFilter CF; // Declaring the Complementary filter object
@@ -68,7 +68,7 @@ const int motorPins[MTR_NUMBER] = {LEFT_FRONT, RIGHT_FRONT, RIGHT_BACK, LEFT_BAC
 
 static const unsigned long event_period = 200; // The period it takes for the Dashboard to be updated in milliseconds
 static unsigned long lastEventTime = 0; // The last event time time
-
+static unsigned long loopStartTime = 0; // The time the loop starts
 uint8_t IMUrslt; // Define the result of the data extraction from the imu
 
 uint8_t Barslt; // Define the result of the data extraction from the barometer
@@ -129,7 +129,7 @@ void setup() {
     Motor_Init(&motor[i], motorPins[i], 1000, 2000, 50); // Initialize the ESC
   }
   delay(5000);
-  
+
   // Initialize PPM communication with the receiver
   ppm.begin();
 
@@ -354,6 +354,7 @@ void setup() {
   // Calibrate the gyroscope
   Serial.println("BMI160: Calibrating");
   CalibrateGyroscope(GYRO_CALIBRATION_SAMPLES_400, gyroRateOffset);
+  loopStartTime = millis();
   lastEventTime = millis();
 }
 
@@ -514,7 +515,7 @@ void loop() {
   // Set the motor throttle
   for (int i = 0; i < MTR_NUMBER; i++) {
     // If the quadcopter is disarmed, turn off the motors
-    if(remoteController[4] >= 1500 || ppm.isSignalLost()){
+    if(remoteController[4] >= 1500 || ppm.isSignalLost() || (millis() - loopStartTime) <= 4500){
       motor[i].throttle = 0;
     };
     setMotorThrottle(&motor[i]);

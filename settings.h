@@ -74,9 +74,9 @@
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////////YAW RATE PID//////////////////////////
-#define YAW_RATE_PROPORTIONAL_GAIN                     2.80f
-#define YAW_RATE_INTEGRAL_GAIN                         7.00f
-#define YAW_RATE_DERIVATIVE_GAIN                       0.47f
+#define YAW_RATE_PROPORTIONAL_GAIN                     0.00f
+#define YAW_RATE_INTEGRAL_GAIN                         0.00f
+#define YAW_RATE_DERIVATIVE_GAIN                       0.00f
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////VERTICAL VELOCITY PID/////////////////////
