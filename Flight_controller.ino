@@ -158,6 +158,7 @@ void setup() {
     ------------ Roll & Pitch rates Controllers -------------
     =========================================================
   */
+    // Make this independent
     for(int i = 0; i < 2; i++)
     {
       pid[i].Kp     = Kp[0];
@@ -485,6 +486,7 @@ void loop() {
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
   // Update the PID gains
+  // Make this independent
   for (int i = 0; i < 2; i++)
   {
     pid[i].Kp = Kp[0];
@@ -500,6 +502,7 @@ void loop() {
 
   for (int i = 0; i < DEGREES_OF_CONTROL; i++) {
     // Angular control of the drone
+    // Make this independent
     rateReference[i] = (i < 2) ? (AngularGain * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)) : remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
     rateReference[i] = (i < 2) ? fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL) : rateReference[i];                                  // Clamping the output
 

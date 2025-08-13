@@ -67,9 +67,10 @@
  * =========================================== Controller gains ===========================================
  * ***********************************************************************************************
  */
+// Make this independent
 //////////////////ROLL & PITCH RATES PID////////////////////
-#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN     0.65f
-#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN         0.15f
+#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN     0.50f
+#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN         0.18f
 #define ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN       0.02f
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
@@ -87,6 +88,7 @@
 /*========================================================*/
 #define ANGULAR_GAIN                                   0.36f
 /*========================================================*/
+// Make this independent
 //////////////////ROLL & PITCH CLAMPING/////////////////////
 #define ROLL_AND_PITCH_MIN_LIMIT                    -480.00f
 #define ROLL_AND_PITCH_MAX_LIMIT                     480.00f
