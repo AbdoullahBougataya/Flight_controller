@@ -91,13 +91,13 @@ float rateReference[DEGREES_OF_CONTROL] = { 0.0 };
 float rateMeasurement[DEGREES_OF_CONTROL] = { 0.0 };
 
 // Define Control Signals array
-float controlSignals[CHANNEL_NUMBER] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
+float controlSignals[DEGREES_OF_CONTROL] = { 0 }; // Control Signals array {Roll, Pitch, Thrust, Yaw}
 
 // Define Control Gains
-float Kp[3] = { ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN, YAW_RATE_PROPORTIONAL_GAIN, VERTICAL_VELOCITY_PROPORTIONAL_GAIN };
-float Ki[3] = { ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN, YAW_RATE_INTEGRAL_GAIN, VERTICAL_VELOCITY_INTEGRAL_GAIN };
-float Kd[3] = { ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN, YAW_RATE_DERIVATIVE_GAIN, VERTICAL_VELOCITY_DERIVATIVE_GAIN };
-float AngularGain = ANGULAR_GAIN;
+float Kp[4] = { ROLL_RATE_PROPORTIONAL_GAIN, PITCH_RATE_PROPORTIONAL_GAIN, YAW_RATE_PROPORTIONAL_GAIN, VERTICAL_VELOCITY_PROPORTIONAL_GAIN };
+float Ki[4] = { ROLL_RATE_INTEGRAL_GAIN, PITCH_RATE_INTEGRAL_GAIN, YAW_RATE_INTEGRAL_GAIN, VERTICAL_VELOCITY_INTEGRAL_GAIN };
+float Kd[4] = { ROLL_RATE_DERIVATIVE_GAIN, PITCH_RATE_DERIVATIVE_GAIN, YAW_RATE_DERIVATIVE_GAIN, VERTICAL_VELOCITY_DERIVATIVE_GAIN };
+float AngularGain[2] = { ROLL_ANGULAR_GAIN, PITCH_ANGULAR_GAIN };
 
 // Define sensor data arrays
 int16_t accelGyroData_int[6] = { 0 }; // Raw data from the sensor
@@ -155,35 +155,45 @@ void setup() {
   /* =================== Rate Controllers =================== */
   /*
     =========================================================
-    ------------ Roll & Pitch rates Controllers -------------
+    ---------------- Roll rates Controllers -----------------
     =========================================================
   */
-    // Make this independent
-    for(int i = 0; i < 2; i++)
-    {
-      pid[i].Kp     = Kp[0];
-      pid[i].Ki     = Ki[0];
-      pid[i].Kd     = Kd[0];
-      pid[i].tau    = 1.5f;
-      pid[i].limMin = ROLL_AND_PITCH_MIN_LIMIT;
-      pid[i].limMax = ROLL_AND_PITCH_MAX_LIMIT;
-      pid[2].limMinInt = ROLL_AND_PITCH_MIN_INT_LIMIT;
-      pid[2].limMaxInt = ROLL_AND_PITCH_MAX_INT_LIMIT;
-      PIDController_Init(&pid[i], SAMPLING_PERIOD);
-    }
+    pid[0].Kp     = Kp[0];
+    pid[0].Ki     = Ki[0];
+    pid[0].Kd     = Kd[0];
+    pid[0].tau    = 1.5f;
+    pid[0].limMin = ROLL_AND_PITCH_MIN_LIMIT;
+    pid[0].limMax = ROLL_AND_PITCH_MAX_LIMIT;
+    pid[0].limMinInt = ROLL_AND_PITCH_MIN_INT_LIMIT;
+    pid[0].limMaxInt = ROLL_AND_PITCH_MAX_INT_LIMIT;
+    PIDController_Init(&pid[0], SAMPLING_PERIOD);
+  /*
+    =========================================================
+    --------------- Pitch rates Controllers -----------------
+    =========================================================
+  */
+    pid[1].Kp     = Kp[1];
+    pid[1].Ki     = Ki[1];
+    pid[1].Kd     = Kd[1];
+    pid[1].tau    = 1.5f;
+    pid[1].limMin = ROLL_AND_PITCH_MIN_LIMIT;
+    pid[1].limMax = ROLL_AND_PITCH_MAX_LIMIT;
+    pid[1].limMinInt = ROLL_AND_PITCH_MIN_INT_LIMIT;
+    pid[1].limMaxInt = ROLL_AND_PITCH_MAX_INT_LIMIT;
+    PIDController_Init(&pid[1], SAMPLING_PERIOD);
   /*
     =========================================================
     ------------------ Yaw rate Controllers -----------------
     =========================================================
   */
-    pid[3].Kp     = Kp[1];
-    pid[3].Ki     = Ki[1];
-    pid[3].Kd     = Kd[1];
+    pid[3].Kp     = Kp[2];
+    pid[3].Ki     = Ki[2];
+    pid[3].Kd     = Kd[2];
     pid[3].tau    = 1.5f;
     pid[3].limMin = YAW_MIN_LIMIT;
     pid[3].limMax = YAW_MAX_LIMIT;
-    pid[2].limMinInt = YAW_MIN_INT_LIMIT;
-    pid[2].limMaxInt = YAW_MAX_INT_LIMIT;
+    pid[3].limMinInt = YAW_MIN_INT_LIMIT;
+    pid[3].limMaxInt = YAW_MAX_INT_LIMIT;
     PIDController_Init(&pid[3], SAMPLING_PERIOD);
     /* =================== Vertical Controllers =================== */
     /*
@@ -191,9 +201,9 @@ void setup() {
       ------------- Vertical velocity Controller --------------
       =========================================================
     */
-    pid[2].Kp     = Kp[2];
-    pid[2].Ki     = Ki[2];
-    pid[2].Kd     = Kd[2];
+    pid[2].Kp     = Kp[3];
+    pid[2].Ki     = Ki[3];
+    pid[2].Kd     = Kd[3];
     pid[2].tau    = 1.5f;
     pid[2].limMin = VERTICAL_V_MIN_LIMIT;
     pid[2].limMax = VERTICAL_V_MAX_LIMIT;
@@ -221,7 +231,7 @@ void setup() {
 
   // Send a GET request to <ESP_IP>/update?arg=<inputArguement>
   server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         // GET Kp values on <ESP_IP>/update?Kp=<inputArguement>
         if (request->getParam("Kp" + String(i))->value() != "") {
             Kp[i] = atof(&request->getParam("Kp" + String(i))->value().c_str()[0]);
@@ -242,10 +252,12 @@ void setup() {
         }
     }
     // GET Angular gain value on <ESP_IP>/update?AngularGain=<inputArguement>
-    if (request->getParam("AngularGain")->value() != "") {
-        AngularGain = atof(&request->getParam("AngularGain")->value().c_str()[0]);
-    } else {
-        AngularGain = 0.0f;
+    for (int i = 0; i < 2; i++) {
+      if (request->getParam("AngularGain" + String(i))->value() != "") {
+          AngularGain[i] = atof(&request->getParam("AngularGain" + String(i))->value().c_str()[0]);
+      } else {
+          AngularGain = 0.0f;
+      }
     }
     request->send(200, "text/plain", "OK");
     request->redirect("/");
@@ -486,25 +498,28 @@ void loop() {
   ++++++++++++++++++++++++++++++++++++++ Update the control system ++++++++++++++++++++++++++++++++++++++
   */
   // Update the PID gains
-  // Make this independent
-  for (int i = 0; i < 2; i++)
-  {
-    pid[i].Kp = Kp[0];
-    pid[i].Ki = Ki[0];
-    pid[i].Kd = Kd[0];
-  }
-  pid[3].Kp = Kp[1];
-  pid[3].Ki = Ki[1];
-  pid[3].Kd = Kd[1];
-  pid[2].Kp = Kp[2];
-  pid[2].Ki = Ki[2];
-  pid[2].Kd = Kd[2];
+
+  pid[0].Kp = Kp[0];
+  pid[0].Ki = Ki[0];
+  pid[0].Kd = Kd[0];
+
+  pid[1].Kp = Kp[1];
+  pid[1].Ki = Ki[1];
+  pid[1].Kd = Kd[1];
+
+  pid[3].Kp = Kp[2];
+  pid[3].Ki = Ki[2];
+  pid[3].Kd = Kd[2];
+
+  pid[2].Kp = Kp[3];
+  pid[2].Ki = Ki[3];
+  pid[2].Kd = Kd[3];
 
   for (int i = 0; i < DEGREES_OF_CONTROL; i++) {
+
     // Angular control of the drone
-    // Make this independent
-    rateReference[i] = (i < 2) ? (AngularGain * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)) : remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
-    rateReference[i] = (i < 2) ? fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL) : rateReference[i];                                  // Clamping the output
+    rateReference[i] = (i < 2) ? (AngularGain[i] * (remoteController[i] - eulerAngles[i] * THOUSAND_OVER_PI - HALF_INTERVAL)) : remoteController[i]; // Multiplying the angular error with the angular gain to control the angle
+    rateReference[i] = (i < 2) ? fmin(fmax(rateReference[i], -HALF_INTERVAL), HALF_INTERVAL) : rateReference[i];                                     // Clamping the output
 
     // Updating the PID Controllers
     controlSignals[i]  = PIDController_Update(&pid[i], rateReference[i], rateMeasurement[i]);
@@ -537,6 +552,22 @@ void loop() {
     // Increment the event counter
     cnt++;
   }
+
+  // One time code
+  JSONdata["roll_p"] = Kp[0];
+  JSONdata["pitch_p"] = Kp[1];
+  JSONdata["yaw_p"] = Kp[2];
+  JSONdata["vv_p"] = Kp[3];
+  JSONdata["roll_i"] = Ki[0];
+  JSONdata["pitch_i"] = Ki[1];
+  JSONdata["yaw_i"] = Ki[2];
+  JSONdata["vv_i"] = Ki[3];
+  JSONdata["roll_d"] = Kd[0];
+  JSONdata["pitch_d"] = Kd[1];
+  JSONdata["yaw_d"] = Kd[2];
+  JSONdata["vv_d"] = Kd[3];
+  JSONdata["Roll_Angular_Gain"] = AngularGain[0];
+  JSONdata["Pitch_Angular_Gain"] = AngularGain[1];
 
   // Delay the loop until the period finishes
   while ((micros() - ST) / 1000000.0 <= 0.01);

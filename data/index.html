@@ -93,9 +93,9 @@
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col">
 
-    <header class="bg-gray-800 p-2 shadow-lg flex-shrink-0">
+    <header class="bg-gray-800 p-4 shadow-lg flex-shrink-0">
         <div class="container mx-auto flex justify-between items-center">
-            <span class="text-xl font-bold text-teal-400">PropelX</span>
+            <span class="text-xl font-bold text-teal-400">AvionX</span>
             <span class="text-base text-gray-400">Real-time Control</span>
         </div>
     </header>
@@ -108,8 +108,8 @@
                 <div class="grid grid-cols-1 gap-y-2">
 
                     <div>
-                        <h3 class="text-m font-semibold text-gray-300 mb-1">Roll & Pitch PID</h3>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-4 gap-2 mb-2">
+                            <h3 class="text-m font-semibold text-gray-300 mb-1">Roll PID</h3>
                             <div>
                                 <label for="roll-p" class="block text-xs font-medium text-gray-400">P</label>
                                 <input type="text" name="Kp" id="roll-p"
@@ -127,10 +127,31 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div>
+                        <div class="grid grid-cols-4 gap-2 mb-2">
+                            <h3 class="text-m font-semibold text-gray-300 mb-1">Pitch PID</h3>
+                            <div>
+                                <label for="pitch-p" class="block text-xs font-medium text-gray-400">P</label>
+                                <input type="text" name="Kp" id="pitch-p"
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-gray-100 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm p-1">
+                            </div>
+                            <div>
+                                <label for="pitch-i" class="block text-xs font-medium text-gray-400">I</label>
+                                <input type="text" name="Ki" id="pitch-i"
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-gray-100 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm p-1">
+                            </div>
+                            <div>
+                                <label for="pitch-d" class="block text-xs font-medium text-gray-400">D</label>
+                                <input type="text" name="Kd" id="pitch-d"
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-gray-100 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm p-1">
+                            </div>
+                        </div>
+                    </div>
 
                     <div>
-                        <h3 class="text-m font-semibold text-gray-300 mb-1">Yaw PID</h3>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-4 gap-2 mb-2">
+                            <h3 class="text-m font-semibold text-gray-300 mb-1">Yaw PID</h3>
                             <div>
                                 <label for="yaw-p" class="block text-xs font-medium text-gray-400">P</label>
                                 <input type="text" name="Kp" id="yaw-p"
@@ -150,8 +171,8 @@
                     </div>
 
                     <div>
-                        <h3 class="text-m font-semibold text-gray-300 mb-1">Vertical Velocity PID</h3>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-4 gap-2 mb-2">
+                            <h3 class="text-m font-semibold text-gray-300 mb-1">VV PID</h3>
                             <div>
                                 <label for="vertical-p" class="block text-xs font-medium text-gray-400">P</label>
                                 <input type="text" name="Kp" id="vertical-p"
@@ -171,11 +192,22 @@
                     </div>
 
                     <div>
-                        <h3 class="text-m font-semibold text-gray-300 mb-1">Angular Gain</h3>
-                        <div>
-                            <label for="angular-gain" class="block text-xs font-medium text-gray-400">Gain</label>
-                            <input type="text" name="AngularGain" id="angular-gain"
-                                class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-gray-100 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm p-1">
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <h3 class="text-m font-semibold text-gray-300 mb-1">Roll Angular Gain</h3>
+                            <div>
+                                <input type="text" name="AngularGain" id="angular-gain"
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-gray-100 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm p-1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <h3 class="text-m font-semibold text-gray-300 mb-1">Pitch Angular Gain</h3>
+                            <div>
+                                <input type="text" name="AngularGain" id="angular-gain"
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-gray-100 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm p-1">
+                            </div>
                         </div>
                     </div>
 
@@ -254,12 +286,13 @@
         function updatePID() {
             let xhr = new XMLHttpRequest();
             let arg = "?";
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 4; i++) {
                 arg += "Kp" + i.toString() + "=" + document.getElementsByName("Kp")[i].value + "&";
                 arg += "Ki" + i.toString() + "=" + document.getElementsByName("Ki")[i].value + "&";
                 arg += "Kd" + i.toString() + "=" + document.getElementsByName("Kd")[i].value + "&";
             }
-            arg += "AngularGain=" + document.getElementsByName("AngularGain")[0].value;
+            arg += "AngularGain0=" + document.getElementsByName("AngularGain")[0].value;
+            arg += "AngularGain1=" + document.getElementsByName("AngularGain")[1].value;
             xhr.open("GET", "/update" + arg, true);
             xhr.send();
         }
@@ -369,12 +402,20 @@
                 updateAngleGauges(simPitch, simRoll);
 
                 console.log(
-                    obj.remote_controller.channel_0.toString() + " " +
-                    obj.remote_controller.channel_1.toString() + " " +
-                    obj.remote_controller.channel_2.toString() + " " +
-                    obj.remote_controller.channel_3.toString() + " " +
-                    obj.remote_controller.channel_4.toString() + " " +
-                    obj.remote_controller.channel_5.toString()
+                    obj.roll_p.toString() + "" +
+                    obj.roll_i.toString() + "" +
+                    obj.roll_d.toString() + "" +
+                    obj.pitch_p.toString() + "" +
+                    obj.pitch_i.toString() + "" +
+                    obj.pitch_d.toString() + "" +
+                    obj.yaw_p.toString() + "" +
+                    obj.yaw_i.toString() + "" +
+                    obj.yaw_d.toString() + "" +
+                    obj.vv_p.toString() + "" +
+                    obj.vv_i.toString() + "" +
+                    obj.vv_d.toString() + "" +
+                    obj.Roll_Angular_Gain.toString() + "" +
+                    obj.Pitch_Angular_Gain.toString()
                 );
                 
                 }, false);

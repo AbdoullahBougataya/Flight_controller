@@ -68,10 +68,16 @@
  * ***********************************************************************************************
  */
 // Make this independent
-//////////////////ROLL & PITCH RATES PID////////////////////
-#define ROLL_RATE_AND_PITCH_RATE_PROPORTIONAL_GAIN     0.50f
-#define ROLL_RATE_AND_PITCH_RATE_INTEGRAL_GAIN         0.18f
-#define ROLL_RATE_AND_PITCH_RATE_DERIVATIVE_GAIN       0.02f
+//////////////////////ROLL RATES PID////////////////////////
+#define ROLL_RATE_PROPORTIONAL_GAIN                    0.48f
+#define ROLL_RATE_INTEGRAL_GAIN                        0.17f
+#define ROLL_RATE_DERIVATIVE_GAIN                      0.02f
+////////////////////////////////////////////////////////////
+/*--------------------------------------------------------*/
+/////////////////////PITCH RATES PID////////////////////////
+#define PITCH_RATE_PROPORTIONAL_GAIN                   0.48f
+#define PITCH_RATE_INTEGRAL_GAIN                       0.17f
+#define PITCH_RATE_DERIVATIVE_GAIN                     0.02f
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////////YAW RATE PID//////////////////////////
@@ -81,12 +87,13 @@
 ////////////////////////////////////////////////////////////
 /*--------------------------------------------------------*/
 //////////////////VERTICAL VELOCITY PID/////////////////////
-#define VERTICAL_VELOCITY_PROPORTIONAL_GAIN            1.00f
-#define VERTICAL_VELOCITY_INTEGRAL_GAIN                0.15f
-#define VERTICAL_VELOCITY_DERIVATIVE_GAIN              0.08f
+#define VERTICAL_VELOCITY_PROPORTIONAL_GAIN            0.00f
+#define VERTICAL_VELOCITY_INTEGRAL_GAIN                0.00f
+#define VERTICAL_VELOCITY_DERIVATIVE_GAIN              0.00f
 ////////////////////////////////////////////////////////////
 /*========================================================*/
-#define ANGULAR_GAIN                                   0.36f
+#define ROLL_ANGULAR_GAIN                              0.37f
+#define PITCH_ANGULAR_GAIN                             0.37f
 /*========================================================*/
 // Make this independent
 //////////////////ROLL & PITCH CLAMPING/////////////////////

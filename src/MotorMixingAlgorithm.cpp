@@ -6,6 +6,7 @@ void MMA(Motor* motor, float* controlSignals, int motor_count, int throttle) {
     {                              //+ controlSignals[2]
         motor[i].throttle = throttle - pow(-1, i + 1) * controlSignals[3] - pow(-1, floor(i / 2)) * controlSignals[1] + pow(-1, floor((i+3)/2)) * controlSignals[0];
     }
+    
     /*          |                               |                           |                  |                     |                     |                       |                      |
                 V                               V                           V                  V                     V                     V                       V                      V
       Throttle[left-forward]   =            Throttle                        +                 Yaw                    -                   Pitch                     -                    Roll
